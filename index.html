@@ -1,0 +1,469 @@
+<html lang="zh-CN"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>王炸大魔王工序成本工具</title>
+
+<meta name="description" content="王炸大魔王工序成本工具 - 服装加工成本管理系统">
+<meta name="keywords" content="服装加工,工序成本,成本管理,计件工资,服装生产">
+<meta name="author" content="王炸大魔王">
+<meta property="og:title" content="王炸大魔王工序成本工具">
+<meta property="og:description" content="服装加工成本管理系统 - 工序管理、成本核算、数据导出">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#ff6600">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="王炸工具">
+
+
+<script src="xlsx.full.min.js"></script>
+<link rel="stylesheet" href="style.css"><link rel="stylesheet" href="style-extra.css"></head>
+<body>
+
+<!-- 顶部导航 -->
+<div class="topbar">
+  <h1>👔 王炸大魔王工序成本工具</h1>
+  <button class="tab-btn active" data-tab="dev">📐 新款开发</button>
+  <button class="tab-btn" data-tab="manage">⚙️ 工序管理</button>
+  <button class="tab-btn" data-tab="history">📁 历史款式</button>
+  <button class="tab-btn" data-tab="recycle">🗑️ 回收站 <span id="recycleCount" style="display:none;background:#e94560;color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;margin-left:4px">0</span></button>
+  <button class="tab-btn" data-tab="logs" id="logsTabBtn" style="">📊 操作日志</button>
+  <button class="btn-top" id="adminBtn" onclick="alert('克隆版本不包含管理后台功能')" style="background: rgba(233, 69, 96, 0.2); border: 1px solid rgba(233, 69, 96, 0.4); color: rgb(255, 138, 154);">👑 管理后台</button>
+  <div class="topbar-right">
+    <button class="btn-top" id="notifBell" onclick="showNotifyModal()" style="display: inline-flex; position: relative;">🔔 <span id="notifBadge" style="display:none;position:absolute;top:-6px;right:-6px;background:#e94560;color:#fff;border-radius:50%;width:18px;height:18px;font-size:11px;line-height:18px;text-align:center;font-weight:700">0</span></button>
+        <span id="userBadge" style="font-size: 12px; color: rgba(255, 255, 255, 0.5);">👤 管理员</span>
+    <button class="btn-top" id="logoutBtn" onclick="alert('这是本地克隆版本，无需登录')" style="">🚪 退出</button>
+    <button class="btn-top" id="changePwdBtn" onclick="openChangePwd()" style="background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.2);">🔑 修改密码</button>
+    <button class="btn-top" data-role-block="" onclick="exportData()">💾 导出数据</button>
+    <button class="btn-top" data-role-block="" onclick="importMode='replace';document.getElementById('importFile').click()">📂 导入备份</button>
+    <button class="btn-top" data-role-block="" onclick="importMode='merge';document.getElementById('importFile').click()">🔄 合并同事数据</button>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+  </div>
+</div>
+
+<div id="storageWarn">⚠️ 当前浏览器无法保存数据（多为用 Safari 打开本地文件所致），请用 <b>Chrome / Edge</b> 双击打开本文件，避免数据丢失</div>
+
+<div id="syncBar" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9998;background:linear-gradient(90deg,#10b981,#059669);color:#fff;padding:8px 16px;text-align:center;font-size:14px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,0.15);animation:slideDown 0.3s ease"><span id="syncBarText">✓ 已同步服务器最新数据</span></div>
+
+<div id="unloginOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:none;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;padding:40px">
+  <div style="font-size:64px;margin-bottom:20px">🔐</div>
+  <h2 style="font-size:24px;margin-bottom:12px">请先登录</h2>
+  <p style="color:rgba(255,255,255,0.6);font-size:15px;margin-bottom:28px">本工具需要登录后才能使用<br>数据保存在服务器，多人实时共享</p>
+  <a href="/" style="background:#e94560;color:#fff;padding:14px 36px;border-radius:12px;font-size:16px;font-weight:700;text-decoration:none;box-shadow:0 6px 20px rgba(233,69,96,0.4)">去登录 / 注册</a>
+</div>
+
+<!-- 待审批遮罩 -->
+<div id="pendingOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:9998;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;padding:40px">
+  <div style="font-size:64px;margin-bottom:20px">⏳</div>
+  <h2 style="font-size:24px;margin-bottom:12px">账号等待审批</h2>
+  <p style="color:rgba(255,255,255,0.6);font-size:15px;margin-bottom:24px">您的账号正在等待管理员审批<br>请联系管理员开通权限后再试</p>
+  <div style="background:rgba(233,69,96,0.15);border:1px solid rgba(233,69,96,0.3);border-radius:12px;padding:16px 28px;font-size:14px;color:#ff8a8a;margin-bottom:28px">提示：管理员(admin) 登录后可在此页面<br>「👑 管理后台 → 用户权限管理」中审批账号</div>
+  <a href="/" style="background:#444;color:rgba(255,255,255,0.7);padding:12px 28px;border-radius:12px;font-size:14px;text-decoration:none">👤 切换账号</a>
+</div>
+
+<div class="main">
+
+  <!-- ===== 新款开发 ===== -->
+  <div id="tab-dev" class="tab-content active">
+    <div class="card">
+      <div class="card-title"><span class="icon">👔</span> 款式信息</div>
+      <div class="style-header">
+        <div class="img-grid-row" id="imgGrid"><div class="img-upload-box" id="imgSlot0" ondragover="onImgDragOver(event,0)" ondragenter="onImgDragEnter(event,0)" ondragleave="onImgDragLeave(event,0)" ondrop="onImgDrop(event,0)" onclick="openImgSlot(0)">
+      <div class="placeholder"><span class="icon">📷</span><span>第1张<br><span style="font-size:11px;color:#bbb">点击或拖入或Ctrl+V粘贴</span></span></div>
+    </div></div>
+        <input type="file" id="imgInput" accept="image/*" style="display:none" onchange="imgChange(event)">
+        <div class="style-info">
+          <div class="row" style="display:contents">
+            <div class="field-cell field-pos">
+              <span class="fp-label">款号 / 款名</span>
+              <input type="text" id="styleName" placeholder="例如：S2501 女装连衣裙" autocomplete="off">
+            </div>
+            <div class="field-cell field-pos">
+              <span class="fp-label">备注</span>
+              <input type="text" id="styleNote" placeholder="选填，如颜色/面料" autocomplete="off">
+            </div>
+            <div class="field-cell field-pos">
+              <span class="fp-label">状态</span>
+              <select id="styleStatus">
+                <option value="pending">⏳ 待审批</option>
+                <option value="approved">✅ 已审批</option>
+              </select>
+            </div>
+            <div class="field-cell field-pos">
+              <span class="fp-label">创建日期</span>
+              <input type="text" id="styleDate" readonly="">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">📋</span> 粘贴导入表格</div>
+      <div style="margin-bottom:12px;color:#666;font-size:13px">
+        从 Excel 复制表格后粘贴到下方，格式：<b>工序名称 | 单价 | 种类</b>（3列）。工序不存在会自动添加到工序库。
+      </div>
+      <textarea id="pasteArea" placeholder="在此粘贴表格数据...
+示例：
+做上下领定唛压门边线	2.2	平车
+划位车口袋,装袋盖	1.6	平车
+做袖口一整套	1.6	平车
+衫脚卷边	0.4	平车
+埋肩上袖埋夹落唛	0.6	扎车" style="width:100%;height:120px;padding:12px;border:1px solid #ddd;border-radius:8px;font-size:13px;resize:vertical" onpaste="handlePasteTable(event)" autocomplete="off" name="_x4xottvsu_pasteArea"></textarea>
+      <div style="display:flex;gap:10px;margin-top:12px">
+        <button class="btn-add" onclick="parsePastedTable()">📥 解析并导入</button>
+        <button class="btn-top" onclick="document.getElementById('pasteArea').value=''">清空</button>
+        <span id="pasteResult" style="margin-left:auto;color:#666;font-size:13px;line-height:36px"></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span><span class="icon">🔧</span> 工序选择</span>
+        <button class="btn-add" data-role-block="" style="margin:0;padding:6px 14px;font-size:12px;background:linear-gradient(135deg,#e94560,#c13050);color:#fff;border:none;border-radius:8px;cursor:pointer" onclick="openQuickAddProcess()">➕ 新增工序</button>
+      </div>
+      <div class="search-bar" style="margin-bottom:14px">
+        <input type="text" id="procFilter" name="_x4xottvsu_procFilter" placeholder="🔍 输入工序名筛选（三分类同步）" oninput="processFilter=this.value.trim();renderProcessSelect()" autocomplete="off">
+        <button class="btn-add" style="margin:0;padding:10px 16px;white-space:nowrap" onclick="document.getElementById('procFilter').value='';processFilter='';renderProcessSelect()">清空筛选</button>
+      </div>
+      <div class="process-select-section">
+        <div class="process-col">
+          <div class="process-col-header pingche">🚲 平车</div>
+          <div class="process-col-items" id="col-pingche">
+          </div>
+        </div>
+        <div class="process-col">
+          <div class="process-col-header zache">⚡ 扎车</div>
+          <div class="process-col-items" id="col-zache">
+          </div>
+        </div>
+        <div class="process-col">
+          <div class="process-col-header kanche">🔪 坎车</div>
+          <div class="process-col-items" id="col-kanche">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title" style="display:flex;justify-content:space-between;align-items:center"><span><span class="icon">📋</span> 工序明细汇总</span><button class="btn-top" data-role-block="" onclick="clearAllSelected()" style="padding:6px 12px;font-size:12px">🗑️ 清空全部</button></div>
+      <table class="selected-table">
+        <thead>
+          <tr>
+            <th>工序名称</th>
+            <th>类型</th>
+            <th>数量</th>
+            <th>单价</th>
+            <th>小计</th>
+            <th style="width:50px">操作</th>
+          </tr>
+        </thead>
+        <tbody id="selectedBody"></tbody>
+      </table>
+      <div class="summary-bar">
+        <div class="summary-breakdown">
+          <div class="bd-item"><span class="bd-label">🚲 平车</span><span class="bd-val" id="subPingche">¥0.00</span></div>
+          <div class="bd-item"><span class="bd-label">⚡ 扎车</span><span class="bd-val" id="subZache">¥0.00</span></div>
+          <div class="bd-item"><span class="bd-label">🔪 坎车</span><span class="bd-val" id="subKanche">¥0.00</span></div>
+        </div>
+        <div style="text-align:right">
+          <div class="total-label" id="totalCount" style="font-size:12px">共 0 道工序</div>
+          <div class="total-money" id="totalMoney">¥0.00<small> 元</small></div>
+        </div>
+      </div>
+      <div class="action-btns">
+        <button class="btn-action save" data-role-block="" onclick="saveStyle()">💾 保存款式</button>
+        <button class="btn-action print" onclick="openPrint()">🖨️ 打印 / 预览</button>
+        <button class="btn-action clear" data-role-block="" onclick="clearStyle()">🗑️ 清空</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 工序管理 ===== -->
+  <div id="tab-manage" class="tab-content">
+    <div class="card">
+      <div class="card-title"><span class="icon">⚙️</span> 工序单价管理</div>
+      <div class="machine-tabs">
+        <button class="machine-tab pingche active" onclick="switchMachine('pingche')">🚲 平车</button>
+        <button class="machine-tab zache" onclick="switchMachine('zache')">⚡ 扎车</button>
+        <button class="machine-tab kanche" onclick="switchMachine('kanche')">🔪 坎车</button>
+      </div>
+      <input type="text" id="manageSearch" placeholder="🔍 搜索工序名称…" oninput="renderManageList()" autocomplete="off" style="width:100%;margin:12px 0;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box" name="_x4xottvsu_manageSearch">
+      <div class="process-list" id="manageList">
+        </div>
+      <button class="btn-add" onclick="addProcess()">➕ 添加新工序</button>
+      <button class="btn-add" data-role-block="" onclick="openBulkImport()" style="margin-left:10px;background:#4361ee">📥 批量导入工序</button>
+    </div>
+  </div>
+
+  <!-- ===== 回收站 ===== -->
+  <div id="tab-recycle" class="tab-content">
+    <div class="card">
+      <div class="card-title" style="display:flex;justify-content:space-between;align-items:center">
+        <span><span class="icon">🗑️</span> 回收站</span>
+        <button class="btn-top" data-role-block="" onclick="emptyRecycleBin()" style="padding:6px 14px;font-size:12px;background:#dc2626">🔥 清空回收站</button>
+      </div>
+      <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:12px;margin-bottom:16px;font-size:13px;color:#9a3412">
+        💡 <b>回收站说明</b>：删除的款式会在此保留 <b>30天</b>，期间可以恢复。超过 30 天的款式会自动清理。
+      </div>
+      <div id="recycleList" class="recycle-list"><div class="no-data">📭 回收站为空<br><span style="font-size:12px;color:#999">删除的款式会在此保留30天，之后自动清理</span></div></div>
+    </div>
+  </div>
+
+  <!-- ===== 历史款式 ===== -->
+  <div id="tab-history" class="tab-content">
+    <div class="card">
+      <div class="card-title"><span class="icon">📁</span> 历史款式</div>
+      <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="🔍 搜索款号/款名…" oninput="renderHistory()" autocomplete="off" name="_x4xottvsu_searchInput">
+        <button class="btn-add" data-role-block="" onclick="clearHistorySearch()" style="margin:0;padding:10px 16px;background:#6b7280">🔍 清除筛选</button>
+      </div>
+      <div class="history-list" id="historyList">
+        <div class="no-data">📭 暂无保存的款式<br><span style="font-size:13px">在新款开发中保存款式后会自动出现在这里</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 操作日志 ===== -->
+  <div id="tab-logs" class="tab-content">
+    <div class="card">
+      <div class="card-title"><span class="icon">📊</span> 操作日志 <span id="logTotal" style="font-size:13px;color:#888;font-weight:400"></span></div>
+      <div class="search-bar" style="gap:8px;flex-wrap:wrap;margin-bottom:14px">
+        <select id="logTimeFilter" onchange="loadLogs(true)" style="padding:9px 12px;border:1.5px solid #ddd;border-radius:8px;font-size:13px;font-family:inherit">
+          <option value="0">全部时间</option>
+          <option value="7">最近 7 天</option>
+          <option value="30">最近 30 天</option>
+          <option value="90">最近 90 天</option>
+        </select>
+        <select id="logUserFilter" onchange="loadLogs(true)" style="padding:9px 12px;border:1.5px solid #ddd;border-radius:8px;font-size:13px;font-family:inherit">
+          <option value="">👤 全部用户</option>
+        </select>
+        <select id="logActionFilter" onchange="loadLogs(true)" style="padding:9px 12px;border:1.5px solid #ddd;border-radius:8px;font-size:13px;font-family:inherit">
+          <option value="">⚙️ 全部操作</option>
+          <option value="login">🔓 登录</option>
+          <option value="logout">🔒 退出</option>
+          <option value="register">📝 注册</option>
+          <option value="save_style">💾 保存款式</option>
+          <option value="delete_style">🗑️ 删除款式</option>
+          <option value="restore_style">♻️ 恢复款式</option>
+          <option value="permanent_delete">🔥 彻底删除</option>
+          <option value="approve">✅ 通过审批</option>
+          <option value="reject">↩️ 退回审批</option>
+          <option value="empty_recycle">🗑️ 清空回收站</option>
+          <option value="clear_history">🗑️ 清空款式</option>
+          <option value="import">📂 导入备份</option>
+          <option value="merge">🔄 合并数据</option>
+          <option value="export">💾 导出数据</option>
+          <option value="clear_logs">🗑️ 清空日志</option>
+        </select>
+        <input type="text" id="logKeyword" placeholder="🔍 搜索详情…" oninput="loadLogs(true)" style="padding:9px 12px;border:1.5px solid #ddd;border-radius:8px;font-size:13px;font-family:inherit;flex:1;min-width:160px" autocomplete="off">
+        <button class="btn-add" onclick="loadLogs(true)" style="margin:0;padding:9px 14px">🔄 刷新</button>
+      </div>
+      <div id="logsList"></div>
+      <div id="loadMoreLogs" style="display:none;text-align:center;padding:16px">
+        <button class="btn-add" onclick="loadLogs(false)" style="background:#4361ee">📥 加载更多（<span id="loadMoreCount">0</span>条）</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+<!-- ═══════ 手机底部导航栏 ═══════ -->
+<nav class="mobile-nav" id="mobileNav">
+  <button class="mnav-btn active" data-tab="dev" onclick="mobileSwitchTab('dev')">
+    <span class="mnav-icon">📐</span><span class="mnav-label">新款开发</span>
+  </button>
+  <button class="mnav-btn" data-tab="manage" onclick="mobileSwitchTab('manage')">
+    <span class="mnav-icon">⚙️</span><span class="mnav-label">工序管理</span>
+  </button>
+  <button class="mnav-btn" data-tab="history" onclick="mobileSwitchTab('history')">
+    <span class="mnav-icon">📁</span><span class="mnav-label">历史款式</span>
+  </button>
+  <button class="mnav-btn" data-tab="recycle" onclick="mobileSwitchTab('recycle')">
+    <span class="mnav-icon">🗑️</span><span class="mnav-label">回收站</span>
+  </button>
+  <button class="mnav-btn" data-tab="logs" id="mnavLogs" style="" onclick="mobileSwitchTab('logs')">
+    <span class="mnav-icon">📊</span><span class="mnav-label">操作日志</span>
+  </button>
+  <button class="mnav-btn" id="mnavNotif" style="display: inline-flex;" onclick="showNotifyModal()">
+    <span class="mnav-icon">🔔</span><span class="mnav-label">通知</span>
+  </button>
+</nav>
+
+
+
+<!-- 打印预览弹窗 -->
+<div class="modal-overlay" id="printModal">
+  <div class="modal" style="max-width:700px">
+    <button class="modal-close" onclick="closePrint()">✕</button>
+    <h2>📄 款式成本单预览</h2>
+    <div class="print-view" id="printView"></div>
+    <div style="margin-top:20px;display:flex;gap:10px;justify-content:flex-end">
+      <button class="btn-action" style="background:#f0f0f0;color:#333" onclick="closePrint()">关闭</button>
+      <button class="btn-action print" onclick="doPrint()">🖨️ 打印</button>
+    </div>
+  </div>
+</div>
+
+<!-- 批量导入工序弹窗 -->
+<div class="modal-overlay" id="bulkModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeBulkImport()">✕</button>
+    <h2>📥 批量导入工序</h2>
+    <p style="font-size:13px;color:#666;margin-bottom:10px;line-height:1.8">
+      支持从 Excel 复制粘贴（制表符分隔）或直接输入。每行一条：<br>
+      • <b>工序名,单价</b> → 导入到当前分类（<span id="bulkTypeLabel" style="color:#e94560;font-weight:700"></span>）<br>
+      • <b>分类,工序名,单价</b> → 如：平车,上领,1.5（自动归类到对应分类）<br>
+      分类名称只认：平车 / 扎车 / 坎车
+    </p>
+    <textarea id="bulkText" style="width:100%;height:220px;border:1px solid #ddd;border-radius:8px;padding:12px;font-family:inherit;font-size:14px;outline:none;resize:vertical" placeholder="示例：
+上领,1.5
+上袖,2.0
+锁边,0.8
+平车,上腰,1.2
+扎车,绷缝,0.6" autocomplete="off"></textarea>
+    <div style="margin-top:16px;display:flex;gap:10px;justify-content:flex-end">
+      <button class="btn-action" style="background:#f0f0f0;color:#333" onclick="closeBulkImport()">取消</button>
+      <button class="btn-action save" data-role-block="" onclick="doBulkImport()">📥 导入</button>
+    </div>
+  </div>
+</div>
+
+<!-- 款式详情弹窗 -->
+<!-- 修改密码弹窗 -->
+<!-- 快速新增工序弹窗 -->
+<div class="modal-overlay" id="quickAddProcessModal">
+  <div class="modal" style="max-width:440px">
+    <h2 style="font-size:18px;margin-bottom:4px">➕ 快速新增工序</h2>
+    <p style="font-size:12px;color:#999;margin-bottom:16px">新增后自动出现在工序选择区，支持快捷勾选</p>
+    <div style="margin-bottom:16px">
+      <div style="font-size:13px;font-weight:600;margin-bottom:8px;color:#333">工序类型</div>
+      <div style="display:flex;gap:8px">
+        <label class="machine-btn selected" data-m="pingche" onclick="selectMachineType(this)">🚲 平车</label>
+        <label class="machine-btn" data-m="zache" onclick="selectMachineType(this)">⚡ 扎车</label>
+        <label class="machine-btn" data-m="kanche" onclick="selectMachineType(this)">🔪 坎车</label>
+      </div>
+    </div>
+    <div class="field-group">
+      <div class="field-label">工序名称</div>
+      <input class="field-input" type="text" id="quickProcName" placeholder="输入工序名称，如：上拉链、合侧缝" autocomplete="off">
+    </div>
+    <div class="field-group">
+      <div class="field-label">单价（元/件）</div>
+      <input class="field-input" type="number" id="quickProcPrice" placeholder="输入单价，如：0.5" min="0" step="0.01" autocomplete="off">
+    </div>
+    <div id="quickProcMsg" class="modal-msg" style="min-height:18px;margin-bottom:10px;font-size:13px"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px">
+      <button class="btn-action" style="background:#f0f0f0;color:#333" onclick="closeQuickAddProcess()">取消</button>
+      <button class="btn-action save" data-role-block="" onclick="doQuickAddProcess()">✅ 确认添加</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="changePwdModal">
+  <div class="modal">
+    <h2 style="font-size:18px;margin-bottom:4px">🔑 修改登录密码</h2>
+    <p id="changePwdMsg" class="modal-msg" style="min-height:18px;margin-bottom:14px;font-size:13px"></p>
+    <div class="field-group">
+      <div class="field-label">旧密码</div>
+      <input class="field-input" type="password" id="oldPwdInput" placeholder="输入当前密码" autocomplete="current-password">
+    </div>
+    <div class="field-group">
+      <div class="field-label">新密码 <span style="color:#999;font-size:12px">（至少4位）</span></div>
+      <input class="field-input" type="password" id="newPwdInput" placeholder="输入新密码（至少4位）" autocomplete="new-password">
+    </div>
+    <div class="field-group">
+      <div class="field-label">确认新密码</div>
+      <input class="field-input" type="password" id="newPwd2Input" placeholder="再输一次新密码" autocomplete="new-password">
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px">
+      <button class="btn-action" style="background:#f0f0f0;color:#333" onclick="closeChangePwd()">取消</button>
+      <button class="btn-action save" onclick="doChangePwd()">✅ 确认修改</button>
+    </div>
+  </div>
+</div>
+
+<!-- 图片全屏预览 -->
+<div class="modal-overlay" id="imgLightbox" style="display:none;background:rgba(0,0,0,0.95);z-index:100000;cursor:zoom-out" onclick="closeLightbox(event)">
+  <img id="lightboxImg" src="" style="max-width:95vw;max-height:95vh;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(1);transform-origin:center center;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.6);cursor:zoom-in;transition:transform 0.15s ease-out" onclick="event.stopPropagation();lbToggleZoom()">
+  <div style="position:fixed;top:20px;right:20px;color:#fff;font-size:28px;cursor:pointer;opacity:0.7;z-index:2" onclick="closeLightbox(event)">✕</div>
+  <div id="lightboxCounter" style="position:fixed;top:20px;left:20px;color:#fff;font-size:14px;opacity:0.7;user-select:none;z-index:2"></div>
+  <div style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%);display:flex;gap:16px;align-items:center;z-index:2">
+    <button onclick="event.stopPropagation();lbZoom(-0.25)" style="width:44px;height:44px;border-radius:50%;border:none;background:rgba(255,255,255,0.2);color:#fff;font-size:20px;cursor:pointer">➖</button>
+    <span id="lbScaleText" style="color:#fff;font-size:14px;min-width:48px;text-align:center;user-select:none">100%</span>
+    <button onclick="event.stopPropagation();lbZoom(0.25)" style="width:44px;height:44px;border-radius:50%;border:none;background:rgba(255,255,255,0.2);color:#fff;font-size:20px;cursor:pointer">➕</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="detailModal" onclick="if(event.target===this)closeDetail()">
+  <div class="modal" style="max-width:700px;padding-bottom:16px">
+    <button class="modal-close" onclick="closeDetail()">✕</button>
+    <h2>👔 款式详情</h2>
+    <div id="detailContent"></div>
+    <div style="margin-top:16px;padding-top:14px;border-top:1px solid #eee;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn-action save" data-role-block="" onclick="saveDetailChanges()">💾 保存修改</button>
+        <button class="btn-action" id="approveBtn" data-role-block="" onclick="toggleApprove()">✅ 通过审批</button>
+        <button class="btn-action save" data-role-block="" onclick="loadFromHistory()">📝 加载到此款式</button>
+        <button class="btn-action clear" data-role-block="" onclick="deleteCurrentHistory()">🗑️ 删除</button>
+        <button class="btn-action" style="background:#27ae60;color:#fff" data-role-block="" onclick="exportStyleXlsx()">📥 导出工序表</button>
+      </div>
+      <button class="btn-action" style="background:#f0f0f0;color:#333;padding:10px 24px;font-size:15px;border-radius:10px" onclick="closeDetail()">✕ 关闭</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ── 欢迎弹窗 ── -->
+<div id="welcomeModal" style="display:none;position:fixed;inset:0;z-index:99999;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);font-family:inherit">
+  <div style="background:#fff;border-radius:20px;padding:32px 28px;max-width:380px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.18);animation:wbSlideIn .3s ease">
+    <div style="font-size:48px;margin-bottom:8px" id="wbEmoji">👋</div>
+    <div style="font-size:22px;font-weight:700;color:#1a1a2e;margin-bottom:4px">欢迎回来，<span id="wbName"></span>！</div>
+    <div style="font-size:14px;color:#888;margin-bottom:20px" id="wbTime"></div>
+    <div id="wbRoleBadge" style="display:inline-block;font-size:12px;padding:3px 14px;border-radius:20px;margin-bottom:20px"></div>
+    <div style="background:#f8f9ff;border-radius:12px;padding:14px;margin-bottom:20px;text-align:left">
+      <div style="font-size:13px;color:#555;margin-bottom:6px;font-weight:600">📌 快捷操作</div>
+      <div style="font-size:13px;color:#666;line-height:1.8">
+        <span id="wbTip1"></span>
+      </div>
+    </div>
+    <button onclick="closeWelcome()" style="width:100%;height:48px;background:linear-gradient(135deg,#e94560,#c2324f);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer">开始使用 ✅</button>
+  </div>
+</div>
+<style>
+@keyframes wbSlideIn{from{opacity:0;transform:translateY(-20px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+</style>
+
+<script src="default-data.js"></script>
+<script src="app.js"></script>
+
+<!-- 通知弹窗 -->
+<div class="modal-overlay" id="notifModal">
+  <div class="modal" style="max-width:500px;max-height:80vh;display:flex;flex-direction:column">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-shrink:0">
+      <h3 style="margin:0">🔔 我的通知 <span id="notifUnread" style="color:#e94560;font-size:14px"></span></h3>
+      <button class="modal-close" onclick="closeNotifyModal()">✕</button>
+    </div>
+    <div id="notifList" style="overflow-y:auto;flex:1;min-height:0"></div>
+  </div>
+</div>
+
+<!-- ── 欢迎弹窗 ── -->
+<div id="welcomeModal" style="display:none;position:fixed;inset:0;z-index:99999;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);font-family:inherit">
+  <div style="background:#fff;border-radius:20px;padding:32px 28px;max-width:380px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.18);animation:wbSlideIn .3s ease">
+    <div style="font-size:48px;margin-bottom:8px" id="wbEmoji">👋</div>
+    <div style="font-size:22px;font-weight:700;color:#1a1a2e;margin-bottom:4px">欢迎回来，<span id="wbName"></span>！</div>
+    <div style="font-size:13px;color:#888;margin-bottom:20px" id="wbTime"></div>
+    <div id="wbRoleBadge" style="display:inline-block;font-size:12px;padding:3px 14px;border-radius:20px;margin-bottom:20px"></div>
+    <div style="background:#f8f9ff;border-radius:12px;padding:14px;margin-bottom:20px;text-align:left">
+      <div style="font-size:13px;color:#555;margin-bottom:6px;font-weight:600">📌 快捷操作</div>
+      <div style="font-size:13px;color:#666;line-height:1.8" id="wbTip1"></div>
+    </div>
+    <button onclick="closeWelcome()" style="width:100%;height:48px;background:linear-gradient(135deg,#e94560,#c2324f);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer">开始使用 ✅</button>
+  </div>
+</div>
+
+
+
+
+</body></html>
