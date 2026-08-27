@@ -1,6 +1,6 @@
 
 // ===== 应用版本号（每次更新递增）=====
-const APP_VERSION = '1.2.0';
+const APP_VERSION = '1.3.2';
 const VERSION_KEY = 'app_version';
 
 // ===== 版本检测与数据保护 =====
