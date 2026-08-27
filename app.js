@@ -1,6 +1,6 @@
 
 // ===== 应用版本号（每次更新递增）=====
-const APP_VERSION = '1.3.5';
+const APP_VERSION = '1.3.6';
 const VERSION_KEY = 'app_version';
 
 // ===== 版本检测与数据保护 =====
@@ -769,8 +769,10 @@ function showExportRecords(styleId) {
     html += '<div style="padding:10px 12px;border:1px solid #eee;border-radius:8px;margin-bottom:8px;background:#fafafa">';
     html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
     html += '<span style="font-size:13px;font-weight:600;color:#333">' + escHtml(log.styleName) + '</span>';
+    html += '<div style="display:flex;align-items:center;gap:8px">';
     html += '<span style="font-size:11px;background:#e8f4fd;color:#4361ee;padding:2px 8px;border-radius:10px">' + escHtml(log.format) + '</span>';
-    html += '</div>';
+    html += '<button onclick="deleteExportRecord(' + log.id + ', ' + styleId + ')" style="padding:2px 8px;background:#ef4444;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:11px">删除</button>';
+    html += '</div></div>';
     html += '<div style="font-size:12px;color:#888">';
     html += '👤 ' + escHtml(log.exportedBy) + ' · 📦 ' + log.itemCount + ' 项 · 🕐 ' + dateStr;
     html += '</div>';
@@ -790,6 +792,17 @@ function showExportRecords(styleId) {
       return l.format + ' - ' + l.exportedBy + ' - ' + d.toLocaleString();
     }).join('\n'));
   }
+}
+
+// 删除导出记录
+function deleteExportRecord(logId, styleId) {
+  if (!confirm('确定要删除这条导出记录吗？')) return;
+  var logs = getExportLogs();
+  logs = logs.filter(function(l) { return l.id !== logId; });
+  saveExportLog(logs);
+  toast('✅ 已删除导出记录');
+  // 刷新导出记录列表
+  showExportRecords(styleId);
 }
 
 // ===== 自动备份功能 =====
@@ -1389,6 +1402,12 @@ function toggleProcess(el, type, name, price) {
     selectedItems.splice(idx, 1);
   } else {
     selectedItems.push({ type, name, price, qty: 1 });
+    // 勾选工序后自动清除搜索关键词
+    if (processFilter) {
+      processFilter = '';
+      var filterInput = document.getElementById('procFilter');
+      if (filterInput) filterInput.value = '';
+    }
   }
   renderProcessSelect();
   renderSelectedTable();
@@ -2180,7 +2199,7 @@ function showDetail(id) {
         <th style="width:70px">单价</th>
         <th style="width:80px">小计</th>
         <th style="width:50px;text-align:center">
-          ${currentUser && currentUser.role === 'viewer' ? '' : '<button id="addDetailProcBtn" onclick="addDetailProcess()" style="padding:3px 10px;background:#16a34a;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px">➕</button>'}
+          ${currentUser && currentUser.role === 'viewer' ? '' : '<button id="addDetailProcBtn" onclick="addDetailProcess()" style="padding:3px 10px;background:#16a34a;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px;white-space:nowrap">➕ 新增工序</button>'}
         </th>
       </tr></thead>
       <tbody>
