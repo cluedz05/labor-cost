@@ -1,6 +1,6 @@
 
 // ===== 应用版本号（每次更新递增）=====
-const APP_VERSION = '1.3.7';
+const APP_VERSION = '1.3.8';
 const VERSION_KEY = 'app_version';
 
 // ===== 版本检测与数据保护 =====
@@ -2587,7 +2587,7 @@ function openLightbox(src, imgs, idx) {
   img.style.transform = 'translate(-50%,-50%) scale(1)';
   var cnt = document.getElementById('lightboxCounter');
   cnt.textContent = _lbImgs.length > 1 ? (_lbIdx+1)+' / '+_lbImgs.length : '';
-  document.getElementById('imgLightbox').style.display = 'flex !important';
+  document.getElementById('imgLightbox').style.display = 'flex';
   updateLbScaleText();
 }
 
@@ -2610,7 +2610,7 @@ function updateLbScaleText() {
 
 function closeLightbox(e) {
   if (e && e.target !== e.currentTarget && e.target.id !== 'lightboxImg') return;
-  document.getElementById('imgLightbox').style.display = 'none !important';
+  document.getElementById('imgLightbox').style.display = 'none';
   document.getElementById('lightboxImg').src = '';
   _lbScale = 1;
 }

@@ -439,7 +439,7 @@
 </div>
 
 <div class="modal-overlay" id="detailModal" onclick="if(event.target===this)closeDetail()">
-  <div class="modal" style="max-width:700px;padding-bottom:16px">
+  <div class="modal" style="max-width:700px;max-height:90vh;padding-bottom:16px;overflow-y:auto">
     <button class="modal-close" onclick="closeDetail()">✕</button>
     <h2>👔 款式详情</h2>
     <div id="detailContent"></div>
@@ -480,7 +480,7 @@
 </style>
 
 <script src="default-data.js"></script>
-<script src="app.js?v=1.3.7"></script>
+<script src="app.js?v=1.3.8"></script>
 
 <!-- 通知弹窗 -->
 <div class="modal-overlay" id="notifModal">
