@@ -560,6 +560,128 @@ function updateUserUI() {
   if (changePwdBtn) changePwdBtn.style.display = 'none'; // 纯前端模式不需要修改密码
 }
 
+// ===== 管理后台 =====
+function openAdminPanel() {
+  var users = getUsers();
+  var userList = Object.values(users);
+  var exportLogs = getExportLogs();
+  var backups = getBackups();
+  
+  // 计算存储使用情况
+  var storageUsed = 0;
+  try {
+    for (var key in localStorage) {
+      if (localStorage.hasOwnProperty(key)) {
+        storageUsed += (localStorage[key].length + key.length) * 2;
+      }
+    }
+  } catch(e) {}
+  var storageMB = (storageUsed / 1024 / 1024).toFixed(2);
+  
+  var html = '<div style="max-height:600px;overflow-y:auto">';
+  
+  // 数据统计
+  html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">';
+  html += '<div style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:16px;border-radius:12px;text-align:center">';
+  html += '<div style="font-size:28px;font-weight:700">' + (DB.styles || []).length + '</div>';
+  html += '<div style="font-size:12px;opacity:0.9">款式总数</div></div>';
+  html += '<div style="background:linear-gradient(135deg,#f093fb,#f5576c);color:#fff;padding:16px;border-radius:12px;text-align:center">';
+  var procCount = (DB.processes.pingche || []).length + (DB.processes.zache || []).length + (DB.processes.kanche || []).length;
+  html += '<div style="font-size:28px;font-weight:700">' + procCount + '</div>';
+  html += '<div style="font-size:12px;opacity:0.9">工序总数</div></div>';
+  html += '<div style="background:linear-gradient(135deg,#4facfe,#00f2fe);color:#fff;padding:16px;border-radius:12px;text-align:center">';
+  html += '<div style="font-size:28px;font-weight:700">' + exportLogs.length + '</div>';
+  html += '<div style="font-size:12px;opacity:0.9">导出记录</div></div>';
+  html += '<div style="background:linear-gradient(135deg,#43e97b,#38f9d7);color:#fff;padding:16px;border-radius:12px;text-align:center">';
+  html += '<div style="font-size:28px;font-weight:700">' + backups.length + '</div>';
+  html += '<div style="font-size:12px;opacity:0.9">备份数量</div></div>';
+  html += '</div>';
+  
+  // 系统信息
+  html += '<div style="background:#f8f9fa;padding:14px;border-radius:10px;margin-bottom:20px">';
+  html += '<div style="font-size:14px;font-weight:600;color:#333;margin-bottom:10px">📊 系统信息</div>';
+  html += '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;font-size:13px;color:#666">';
+  html += '<div>版本号：<strong>v' + APP_VERSION + '</strong></div>';
+  html += '<div>存储使用：<strong>' + storageMB + ' MB</strong></div>';
+  html += '<div>当前用户：<strong>' + (currentUser ? currentUser.username : '未登录') + '</strong></div>';
+  html += '<div>注册用户：<strong>' + userList.length + ' 个</strong></div>';
+  html += '</div></div>';
+  
+  // 用户管理
+  html += '<div style="margin-bottom:20px">';
+  html += '<div style="font-size:14px;font-weight:600;color:#333;margin-bottom:10px">👥 用户管理（' + userList.length + '个）</div>';
+  if (userList.length === 0) {
+    html += '<div style="text-align:center;padding:20px;color:#aaa;font-size:13px">暂无注册用户</div>';
+  } else {
+    html += '<div style="border:1px solid #eee;border-radius:8px;overflow:hidden">';
+    html += '<table style="width:100%;border-collapse:collapse;font-size:13px">';
+    html += '<thead><tr style="background:#f5f5f5"><th style="padding:8px;text-align:left;border-bottom:1px solid #eee">用户名</th><th style="padding:8px;text-align:left;border-bottom:1px solid #eee">角色</th><th style="padding:8px;text-align:left;border-bottom:1px solid #eee">注册时间</th><th style="padding:8px;text-align:center;border-bottom:1px solid #eee">操作</th></tr></thead>';
+    html += '<tbody>';
+    userList.forEach(function(user) {
+      var regDate = user.createdAt ? new Date(user.createdAt).toLocaleString() : '未知';
+      var roleText = user.isAdmin || user.role === 'admin' ? '👑 管理员' : '👤 普通用户';
+      html += '<tr style="border-bottom:1px solid #f5f5f5">';
+      html += '<td style="padding:8px;font-weight:600">' + escHtml(user.username) + '</td>';
+      html += '<td style="padding:8px">' + roleText + '</td>';
+      html += '<td style="padding:8px;color:#888;font-size:12px">' + regDate + '</td>';
+      html += '<td style="padding:8px;text-align:center">';
+      if (!user.isAdmin && user.role !== 'admin') {
+        html += '<button onclick="deleteUser(\'' + escAttr(user.username) + '\')" style="padding:4px 10px;background:#ef4444;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:11px">删除</button>';
+      } else {
+        html += '<span style="color:#aaa;font-size:11px">主账号</span>';
+      }
+      html += '</td></tr>';
+    });
+    html += '</tbody></table></div>';
+  }
+  html += '</div>';
+  
+  // 数据管理
+  html += '<div style="background:#fff5f5;padding:14px;border-radius:10px;border:1px solid #fecaca">';
+  html += '<div style="font-size:14px;font-weight:600;color:#991b1b;margin-bottom:10px">⚠️ 数据管理（危险操作）</div>';
+  html += '<div style="display:flex;gap:10px;flex-wrap:wrap">';
+  html += '<button onclick="resetToDefaultData()" style="padding:8px 16px;background:#f59e0b;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px">🔄 重置为默认数据</button>';
+  html += '<button onclick="clearAllData()" style="padding:8px 16px;background:#ef4444;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px">🗑️ 清空所有数据</button>';
+  html += '</div></div>';
+  
+  html += '</div>';
+  
+  // 显示弹窗
+  var modal = document.getElementById('detailModal');
+  var content = document.getElementById('detailContent');
+  if (modal && content) {
+    content.innerHTML = '<h2 style="margin-bottom:16px">👑 管理后台</h2>' + html;
+    modal.classList.add('show');
+  }
+}
+
+// 删除用户
+function deleteUser(username) {
+  if (!confirm('确定要删除用户「' + username + '」吗？')) return;
+  var users = getUsers();
+  delete users[username];
+  saveUsers(users);
+  toast('✅ 已删除用户「' + username + '」');
+  openAdminPanel(); // 刷新管理后台
+}
+
+// 重置为默认数据
+function resetToDefaultData() {
+  if (!confirm('确定要重置为默认数据吗？当前数据将被覆盖！')) return;
+  localStorage.removeItem('gf_cost_db');
+  toast('✅ 已重置，页面即将刷新...');
+  setTimeout(function() { location.reload(); }, 1000);
+}
+
+// 清空所有数据
+function clearAllData() {
+  if (!confirm('确定要清空所有数据吗？此操作不可恢复！')) return;
+  if (!confirm('再次确认：真的要清空所有款式、工序、用户数据吗？')) return;
+  localStorage.clear();
+  toast('✅ 已清空所有数据，页面即将刷新...');
+  setTimeout(function() { location.reload(); }, 1000);
+}
+
 // ===== 导出记录功能 =====
 const EXPORT_LOG_KEY = 'app_export_logs';
 
@@ -895,7 +1017,31 @@ async function loadDB() {
   const fromIdb = await idbLoad();
   if (fromIdb) { DB = fromIdb; migrateDB(); return; }
   
-  // 本地无数据时，从内置默认数据加载（通过script标签引入，无CORS问题）
+  // 本地无数据时，从默认数据文件加载
+  try {
+    console.log('本地无数据，尝试从默认数据文件加载...');
+    const r = await fetch('assets/data/default_data.json?v=' + Date.now());
+    if (r.ok) {
+      const defaultData = await r.json();
+      DB = defaultData;
+      migrateDB();
+      // 保存到localStorage，下次直接读取
+      try { 
+        const dbStr = JSON.stringify(DB);
+        localStorage.setItem('gf_cost_db', dbStr); 
+        console.log('默认数据已加载并保存到本地，款式数:', DB.styles.length, '数据大小:', dbStr.length, '字节');
+      } catch(e) {
+        console.warn('保存到localStorage失败（数据可能太大）:', e);
+      }
+      idbSave(DB);
+      console.log('✅ 已从默认数据文件加载数据（' + DB.styles.length + '款）');
+      return;
+    }
+  } catch(e) {
+    console.warn('加载默认数据文件失败:', e);
+  }
+  
+  // 最后尝试从内置默认数据加载（通过script标签引入，无CORS问题）
   try {
     if (window.DEFAULT_DATA) {
       DB = JSON.parse(JSON.stringify(window.DEFAULT_DATA));

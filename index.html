@@ -28,7 +28,7 @@
   <button class="tab-btn" data-tab="history">📁 历史款式</button>
   <button class="tab-btn" data-tab="recycle">🗑️ 回收站 <span id="recycleCount" style="display:none;background:#e94560;color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;margin-left:4px">0</span></button>
   <button class="tab-btn" data-tab="logs" id="logsTabBtn" style="">📊 操作日志</button>
-  <button class="btn-top" id="adminBtn" onclick="alert('克隆版本不包含管理后台功能')" style="background: rgba(233, 69, 96, 0.2); border: 1px solid rgba(233, 69, 96, 0.4); color: rgb(255, 138, 154);">👑 管理后台</button>
+  <button class="btn-top" id="adminBtn" onclick="openAdminPanel()" style="background: rgba(233, 69, 96, 0.2); border: 1px solid rgba(233, 69, 96, 0.4); color: rgb(255, 138, 154);">👑 管理后台</button>
   <div class="topbar-right">
     <button class="btn-top" id="notifBell" onclick="showNotifyModal()" style="display: inline-flex; position: relative;">🔔 <span id="notifBadge" style="display:none;position:absolute;top:-6px;right:-6px;background:#e94560;color:#fff;border-radius:50%;width:18px;height:18px;font-size:11px;line-height:18px;text-align:center;font-weight:700">0</span></button>
         <span id="userBadge" style="font-size: 12px; color: rgba(255, 255, 255, 0.5);">👤 未登录</span>
