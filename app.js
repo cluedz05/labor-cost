@@ -2,7 +2,7 @@
 
 // ===== 应用版本号（每次更新递增）=====
 
-const APP_VERSION = '1.8.0';
+const APP_VERSION = '1.8.1';
 
 const VERSION_KEY = 'app_version';
 
@@ -7808,9 +7808,27 @@ function initLibraryButtons() {
 
 // 页面加载完成后初始化按钮
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initLibraryButtons);
+  document.addEventListener('DOMContentLoaded', function() {
+    initLibraryButtons();
+    // 预加载AI模型（后台静默加载）
+    setTimeout(function() {
+      if (typeof loadMobileNetModel === 'function') {
+        loadMobileNetModel().then(function(model) {
+          if (model) console.log('AI模型预加载完成');
+        });
+      }
+    }, 2000);
+  });
 } else {
   initLibraryButtons();
+  // 预加载AI模型
+  setTimeout(function() {
+    if (typeof loadMobileNetModel === 'function') {
+      loadMobileNetModel().then(function(model) {
+        if (model) console.log('AI模型预加载完成');
+      });
+    }
+  }, 2000);
 }
 
 
@@ -7995,7 +8013,7 @@ function preprocessImage(imgElement) {
   });
 }
 
-// 提取图像特征向量
+// 提取图像特征向量（优化版：使用更小尺寸，更快速度）
 async function extractImageFeatures(imageSrc) {
   const model = await loadMobileNetModel();
   if (!model) return null;
@@ -8005,19 +8023,23 @@ async function extractImageFeatures(imageSrc) {
     img.crossOrigin = 'anonymous';
     img.onload = function() {
       try {
-        const tensor = preprocessImage(img);
-        // 使用MobileNet的倒数第二层输出作为特征向量
-        const features = model.predict(tensor, { verbose: false });
-        // 将特征向量展平并归一化
-        const flattened = features.reshape([-1]);
-        const normalized = flattened.div(flattened.norm());
-        const array = normalized.arraySync();
-        
-        // 清理tensor
-        tensor.dispose();
-        features.dispose();
-        flattened.dispose();
-        normalized.dispose();
+        // 使用tf.tidy自动清理内存
+        const array = tf.tidy(() => {
+          // 调整图片大小到128x128（更小尺寸，更快速度）
+          const tensor = tf.browser.fromPixels(img)
+            .resizeNearestNeighbor([128, 128])
+            .toFloat()
+            .div(tf.scalar(127.5))
+            .sub(tf.scalar(1))
+            .expandDims(0);
+          
+          // 使用模型预测
+          const features = model.predict(tensor, { verbose: false });
+          // 展平并归一化
+          const flattened = features.reshape([-1]);
+          const normalized = flattened.div(flattened.norm());
+          return normalized.arraySync();
+        });
         
         resolve(array);
       } catch (e) {
@@ -8042,9 +8064,8 @@ function cosineSimilarity(vec1, vec2) {
   return dotProduct; // 已经归一化，所以点积就是余弦相似度
 }
 
-// AI图像搜款
+// AI图像搜款（优化版：并行处理，更快速度）
 async function aiImageSearch(imageDataUrl, callback) {
-  // 显示加载状态
   const resultDiv = document.getElementById('aiSearchResult');
   if (resultDiv) {
     resultDiv.innerHTML = '<div style="text-align:center;padding:30px;color:#6b7280"><div style="font-size:32px;margin-bottom:10px">🤖</div>正在加载AI模型并分析图片...</div>';
@@ -8061,9 +8082,8 @@ async function aiImageSearch(imageDataUrl, callback) {
   }
   
   const library = getLibrary();
-  const results = [];
-  let processed = 0;
-  const total = library.filter(item => item.image).length;
+  const itemsWithImage = library.filter(item => item.image);
+  const total = itemsWithImage.length;
   
   if (total === 0) {
     if (resultDiv) {
@@ -8073,34 +8093,46 @@ async function aiImageSearch(imageDataUrl, callback) {
     return;
   }
   
-  // 遍历款式库，提取特征并计算相似度
-  for (let i = 0; i < library.length; i++) {
-    const item = library[i];
-    if (!item.image) continue;
+  const results = [];
+  let processed = 0;
+  
+  // 并行处理（每次处理3张图片，提高速度）
+  const batchSize = 3;
+  for (let batchStart = 0; batchStart < itemsWithImage.length; batchStart += batchSize) {
+    const batch = itemsWithImage.slice(batchStart, batchStart + batchSize);
     
-    // 检查是否有缓存的特征
-    let features = libraryFeatures[item.id];
-    if (!features) {
-      features = await extractImageFeatures(item.image);
-      if (features) {
-        libraryFeatures[item.id] = features;
+    // 并行提取当前批次的特征
+    const batchPromises = batch.map(async (item) => {
+      const idx = library.indexOf(item);
+      let features = libraryFeatures[item.id];
+      if (!features) {
+        features = await extractImageFeatures(item.image);
+        if (features) {
+          libraryFeatures[item.id] = features;
+        }
       }
-    }
+      return { idx, item, features };
+    });
     
-    processed++;
+    const batchResults = await Promise.all(batchPromises);
     
-    if (features) {
-      const similarity = cosineSimilarity(targetFeatures, features);
-      results.push({
-        idx: i,
-        item: item,
-        similarity: similarity
-      });
-    }
+    batchResults.forEach(({ idx, item, features }) => {
+      processed++;
+      if (features) {
+        const similarity = cosineSimilarity(targetFeatures, features);
+        results.push({ idx, item, similarity });
+      }
+    });
     
     // 更新进度
     if (resultDiv) {
-      resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:#6b7280"><div style="font-size:24px;margin-bottom:8px">🔍</div>正在分析图片... (' + processed + '/' + total + ')</div>';
+      const percent = Math.round((processed / total) * 100);
+      resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:#6b7280">' +
+        '<div style="font-size:24px;margin-bottom:8px">🔍</div>' +
+        '<div style="margin-bottom:8px">正在分析图片... (' + processed + '/' + total + ')</div>' +
+        '<div style="width:100%;height:8px;background:#e5e7eb;border-radius:4px;overflow:hidden">' +
+        '<div style="width:' + percent + '%;height:100%;background:linear-gradient(90deg,#10b981,#059669);transition:width 0.3s"></div>' +
+        '</div></div>';
     }
   }
   
