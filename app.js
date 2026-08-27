@@ -2,7 +2,7 @@
 
 // ===== 应用版本号（每次更新递增）=====
 
-const APP_VERSION = '1.6.0';
+const APP_VERSION = '1.7.0';
 
 const VERSION_KEY = 'app_version';
 
@@ -7339,15 +7339,34 @@ function renderLibrary() {
 
     html += '<div style="font-weight:600;font-size:15px;color:#1a1a2e;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + escHtml(item.name || '未命名') + '</div>';
 
+    // 工序详情（显示前3道）
+    var procPreview = '';
+    if (item.processes && item.processes.length > 0) {
+      var showProcs = item.processes.slice(0, 3);
+      procPreview = '<div style="margin-bottom:8px;padding:8px;background:#f9fafb;border-radius:6px;font-size:11px;color:#4b5563;line-height:1.6">';
+      showProcs.forEach(function(p) {
+        var typeName = {pingche:'平车', zache:'扎车', kanche:'坎车'}[p.type] || p.type;
+        procPreview += '<div style="display:flex;justify-content:space-between"><span>🔧 ' + escHtml(p.name || '未命名') + ' (' + typeName + ')</span><span style="color:#e94560;font-weight:600">¥' + ((p.price||0)*(p.qty||1)).toFixed(2) + '</span></div>';
+      });
+      if (item.processes.length > 3) {
+        procPreview += '<div style="text-align:center;color:#6b7280;margin-top:4px">...还有' + (item.processes.length - 3) + '道工序</div>';
+      }
+      procPreview += '</div>';
+    }
+
     html += '<div style="font-size:12px;color:#6b7280;margin-bottom:8px">分类：' + escHtml(item.category || '未分类') + ' | 工序：' + (item.processes || []).length + '道</div>';
 
     html += '<div style="font-size:18px;font-weight:700;color:#e94560;margin-bottom:8px">¥' + total.toFixed(2) + '</div>';
+
+    html += procPreview;
 
     html += '<div style="margin-bottom:10px;min-height:24px">' + tagsHtml + '</div>';
 
     html += '<div style="display:flex;gap:6px">';
 
     html += '<button onclick="loadLibraryStyle(' + idx + ')" style="flex:1;padding:6px;background:#4361ee;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px">📋 加载使用</button>';
+
+    html += '<button onclick="viewLibraryDetail(' + idx + ')" style="padding:6px 10px;background:#8b5cf6;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px" title="查看详情">👁️</button>';
 
     html += '<button onclick="editLibraryStyle(' + idx + ')" style="padding:6px 10px;background:#f59e0b;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px">✏️</button>';
 
@@ -7461,6 +7480,56 @@ function deleteLibraryStyle(idx) {
 
 }
 
+
+
+
+
+// 查看款式库详情
+function viewLibraryDetail(idx) {
+  var library = getLibrary();
+  var item = library[idx];
+  if (!item) return;
+
+  var typeNames = { pingche: '平车', zache: '扎车', kanche: '坎车' };
+  var total = 0;
+  (item.processes || []).forEach(function(p) { total += (p.price || 0) * (p.qty || 1); });
+
+  var procsHtml = '';
+  if (item.processes && item.processes.length > 0) {
+    procsHtml = '<table style="width:100%;border-collapse:collapse;font-size:13px;margin-top:12px">';
+    procsHtml += '<thead><tr style="background:#f3f4f6"><th style="padding:8px;text-align:left;border:1px solid #e5e7eb">工序名称</th><th style="padding:8px;text-align:center;border:1px solid #e5e7eb">类型</th><th style="padding:8px;text-align:right;border:1px solid #e5e7eb">单价</th><th style="padding:8px;text-align:center;border:1px solid #e5e7eb">数量</th><th style="padding:8px;text-align:right;border:1px solid #e5e7eb">小计</th></tr></thead><tbody>';
+    item.processes.forEach(function(p) {
+      var subtotal = (p.price || 0) * (p.qty || 1);
+      procsHtml += '<tr><td style="padding:8px;border:1px solid #e5e7eb">' + escHtml(p.name || '未命名') + '</td><td style="padding:8px;text-align:center;border:1px solid #e5e7eb">' + (typeNames[p.type] || p.type) + '</td><td style="padding:8px;text-align:right;border:1px solid #e5e7eb">¥' + (p.price || 0).toFixed(2) + '</td><td style="padding:8px;text-align:center;border:1px solid #e5e7eb">' + (p.qty || 1) + '</td><td style="padding:8px;text-align:right;border:1px solid #e5e7eb;color:#e94560;font-weight:600">¥' + subtotal.toFixed(2) + '</td></tr>';
+    });
+    procsHtml += '<tr style="background:#fef2f2;font-weight:700"><td colspan="4" style="padding:8px;text-align:right;border:1px solid #e5e7eb">合计：</td><td style="padding:8px;text-align:right;border:1px solid #e5e7eb;color:#e94560">¥' + total.toFixed(2) + '</td></tr>';
+    procsHtml += '</tbody></table>';
+  } else {
+    procsHtml = '<div style="text-align:center;padding:20px;color:#9ca3af">暂无工序数据</div>';
+  }
+
+  var tagsHtml = (item.tags || []).map(function(t) { return '<span style="display:inline-block;background:#e0e7ff;color:#4338ca;padding:3px 10px;border-radius:12px;font-size:12px;margin:2px">' + escHtml(t) + '</span>'; }).join('');
+
+  var modal = document.createElement('div');
+  modal.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px';
+  modal.innerHTML = '<div style="background:#fff;border-radius:16px;padding:24px;max-width:700px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3)">' +
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">' +
+      '<div><h3 style="margin:0 0 8px 0;font-size:20px;color:#1a1a2e">' + escHtml(item.name || '未命名') + '</h3>' +
+      '<div style="font-size:13px;color:#6b7280">分类：' + escHtml(item.category || '未分类') + ' | 工序：' + (item.processes || []).length + '道</div></div>' +
+      '<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#999;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%">✕</button>' +
+    '</div>' +
+    (item.image ? '<img src="' + item.image + '" style="width:100%;max-height:200px;object-fit:contain;border-radius:10px;background:#f5f5f5;margin-bottom:16px">' : '') +
+    (tagsHtml ? '<div style="margin-bottom:12px">' + tagsHtml + '</div>' : '') +
+    (item.note ? '<div style="background:#fef3c7;padding:10px 14px;border-radius:8px;font-size:13px;color:#92400e;margin-bottom:12px">📝 ' + escHtml(item.note) + '</div>' : '') +
+    '<div style="font-size:24px;font-weight:700;color:#e94560;margin-bottom:8px">💰 总成本：¥' + total.toFixed(2) + '</div>' +
+    procsHtml +
+    '<div style="display:flex;gap:10px;margin-top:20px">' +
+      '<button onclick="loadLibraryStyle(' + idx + ');this.closest(\'div[style*=fixed]\').remove()" style="flex:1;padding:12px;background:linear-gradient(135deg,#4361ee,#3730a3);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer">📋 加载使用</button>' +
+      '<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="padding:12px 24px;background:#f3f4f6;color:#374151;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer">关闭</button>' +
+    '</div>' +
+  '</div>';
+  document.body.appendChild(modal);
+}
 
 
 function loadLibraryStyle(idx) {
@@ -7655,6 +7724,121 @@ function importLibrary(event) {
 
 
 
+
+
+// 计算图片颜色直方图（用于图像相似度搜索）
+function extractColorHistogram(imageData, bins) {
+  bins = bins || 8;
+  var histogram = new Array(bins * bins * bins).fill(0);
+  var data = imageData.data;
+  var binSize = 256 / bins;
+  
+  for (var i = 0; i < data.length; i += 4) {
+    var r = Math.floor(data[i] / binSize);
+    var g = Math.floor(data[i + 1] / binSize);
+    var b = Math.floor(data[i + 2] / binSize);
+    var idx = r * bins * bins + g * bins + b;
+    histogram[idx]++;
+  }
+  
+  // 归一化
+  var total = histogram.reduce(function(a, b) { return a + b; }, 0);
+  if (total > 0) {
+    histogram = histogram.map(function(v) { return v / total; });
+  }
+  
+  return histogram;
+}
+
+// 计算两个直方图的相似度（余弦相似度）
+function histogramSimilarity(h1, h2) {
+  var dotProduct = 0;
+  var norm1 = 0;
+  var norm2 = 0;
+  
+  for (var i = 0; i < h1.length; i++) {
+    dotProduct += h1[i] * h2[i];
+    norm1 += h1[i] * h1[i];
+    norm2 += h2[i] * h2[i];
+  }
+  
+  norm1 = Math.sqrt(norm1);
+  norm2 = Math.sqrt(norm2);
+  
+  if (norm1 === 0 || norm2 === 0) return 0;
+  
+  return dotProduct / (norm1 * norm2);
+}
+
+// 从图片URL提取颜色直方图
+function getHistogramFromImage(src, callback) {
+  var img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.onload = function() {
+    var canvas = document.createElement('canvas');
+    var ctx = canvas.getContext('2d');
+    var size = 64;
+    canvas.width = size;
+    canvas.height = size;
+    ctx.drawImage(img, 0, 0, size, size);
+    var imageData = ctx.getImageData(0, 0, size, size);
+    var histogram = extractColorHistogram(imageData, 8);
+    callback(histogram);
+  };
+  img.onerror = function() {
+    callback(null);
+  };
+  img.src = src;
+}
+
+// 基于颜色的图像搜索
+function colorBasedImageSearch(imageDataUrl, callback) {
+  var img = new Image();
+  img.onload = function() {
+    var canvas = document.createElement('canvas');
+    var ctx = canvas.getContext('2d');
+    var size = 64;
+    canvas.width = size;
+    canvas.height = size;
+    ctx.drawImage(img, 0, 0, size, size);
+    var imageData = ctx.getImageData(0, 0, size, size);
+    var targetHist = extractColorHistogram(imageData, 8);
+    
+    var library = getLibrary();
+    var results = [];
+    var processed = 0;
+    
+    if (library.length === 0) {
+      callback([]);
+      return;
+    }
+    
+    library.forEach(function(item, idx) {
+      if (item.image) {
+        getHistogramFromImage(item.image, function(hist) {
+          processed++;
+          if (hist) {
+            var similarity = histogramSimilarity(targetHist, hist);
+            results.push({ idx: idx, item: item, similarity: similarity });
+          }
+          if (processed === library.length) {
+            results.sort(function(a, b) { return b.similarity - a.similarity; });
+            callback(results);
+          }
+        });
+      } else {
+        processed++;
+        if (processed === library.length) {
+          results.sort(function(a, b) { return b.similarity - a.similarity; });
+          callback(results);
+        }
+      }
+    });
+  };
+  img.src = imageDataUrl;
+}
+
+
 function searchByImage(event) {
   var file = event.target.files[0];
   if (!file) return;
@@ -7687,6 +7871,8 @@ function searchByImage(event) {
           '<button onclick="document.getElementById(\'imageSearchKeyword\').value=\'哈衣\'" style="padding:6px 14px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:20px;font-size:13px;cursor:pointer;color:#374151">哈衣</button>' +
         '</div>' +
       '</div>' +
+      '<div style="display:flex;gap:10px;margin-bottom:10px">' +
+        '<button onclick="var imgData=this.closest(\'div[style*=fixed]\').querySelector(\'img\').src;var modal=this.closest(\'div[style*=fixed]\');modal.querySelector(\'div[style*=background.*linear-gradient]\').innerHTML=\'<div style=\\'text-align:center;padding:20px\\'>🔍 正在进行AI颜色相似度搜索...</div>\';colorBasedImageSearch(imgData,function(results){if(results.length===0){modal.querySelector(\'div[style*=background.*linear-gradient]\').innerHTML=\'<div style=\\'text-align:center;padding:20px;color:#999\\'>未找到带图片的款式</div>\';return;}var html=\'<div style=\\'max-height:300px;overflow-y:auto\\'>\';results.slice(0,10).forEach(function(r,idx){var sim=(r.similarity*100).toFixed(1);html+=\'<div style=\\'display:flex;align-items:center;gap:10px;padding:8px;border-bottom:1px solid #eee;cursor:pointer\\' onclick=\\'viewLibraryDetail(\'+r.idx+\')\\'>\';html+=(r.item.image?\'<img src=\\"\'+r.item.image+\'\\" style=\\'width:50px;height:50px;object-fit:cover;border-radius:6px\\'>\':\'<div style=\\'width:50px;height:50px;background:#ddd;border-radius:6px;display:flex;align-items:center;justify-content:center\\'>👔</div>\');html+=\'<div style=\\'flex:1\\'><div style=\\'font-weight:600;font-size:13px\\'>\'+(r.item.name||\'未命名\')+\'</div><div style=\\'font-size:11px;color:#666\\'>相似度：\'+sim+\'%</div></div>\';html+=\'</div>\';});html+=\'</div>\';modal.querySelector(\'div[style*=background.*linear-gradient]\').innerHTML=html;});}" style="flex:1;padding:12px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer">🎨 AI颜色搜款</button>' +
       '<div style="display:flex;gap:10px">' +
         '<button onclick="var kw=document.getElementById(\'imageSearchKeyword\').value;if(kw){var si=document.getElementById(\'librarySearch\');if(si){si.value=kw;renderLibrary();}this.closest(\'div[style*=fixed]\').remove();toast(\'🔍 已搜索：\'+kw);}else{toast(\'⚠️ 请输入关键词\');}" style="flex:1;padding:12px;background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer">🔍 开始搜索</button>' +
         '<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="padding:12px 20px;background:#f3f4f6;color:#374151;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer">取消</button>' +
