@@ -2,7 +2,7 @@
 
 // ===== 应用版本号（每次更新递增）=====
 
-const APP_VERSION = '1.7.0';
+const APP_VERSION = '1.7.1';
 
 const VERSION_KEY = 'app_version';
 
@@ -7483,7 +7483,6 @@ function deleteLibraryStyle(idx) {
 
 
 
-
 // 查看款式库详情
 function viewLibraryDetail(idx) {
   var library = getLibrary();
@@ -7516,7 +7515,7 @@ function viewLibraryDetail(idx) {
     '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">' +
       '<div><h3 style="margin:0 0 8px 0;font-size:20px;color:#1a1a2e">' + escHtml(item.name || '未命名') + '</h3>' +
       '<div style="font-size:13px;color:#6b7280">分类：' + escHtml(item.category || '未分类') + ' | 工序：' + (item.processes || []).length + '道</div></div>' +
-      '<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#999;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%">✕</button>' +
+      '<button onclick="this.parentElement.parentElement.parentElement.remove()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#999;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%">✕</button>' +
     '</div>' +
     (item.image ? '<img src="' + item.image + '" style="width:100%;max-height:200px;object-fit:contain;border-radius:10px;background:#f5f5f5;margin-bottom:16px">' : '') +
     (tagsHtml ? '<div style="margin-bottom:12px">' + tagsHtml + '</div>' : '') +
@@ -7524,13 +7523,12 @@ function viewLibraryDetail(idx) {
     '<div style="font-size:24px;font-weight:700;color:#e94560;margin-bottom:8px">💰 总成本：¥' + total.toFixed(2) + '</div>' +
     procsHtml +
     '<div style="display:flex;gap:10px;margin-top:20px">' +
-      '<button onclick="loadLibraryStyle(' + idx + ');this.closest(\'div[style*=fixed]\').remove()" style="flex:1;padding:12px;background:linear-gradient(135deg,#4361ee,#3730a3);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer">📋 加载使用</button>' +
-      '<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="padding:12px 24px;background:#f3f4f6;color:#374151;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer">关闭</button>' +
+      '<button onclick="loadLibraryStyle(' + idx + ');this.parentElement.parentElement.parentElement.remove()" style="flex:1;padding:12px;background:linear-gradient(135deg,#4361ee,#3730a3);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer">📋 加载使用</button>' +
+      '<button onclick="this.parentElement.parentElement.parentElement.remove()" style="padding:12px 24px;background:#f3f4f6;color:#374151;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer">关闭</button>' +
     '</div>' +
   '</div>';
   document.body.appendChild(modal);
 }
-
 
 function loadLibraryStyle(idx) {
 
@@ -7724,190 +7722,6 @@ function importLibrary(event) {
 
 
 
-
-
-// 计算图片颜色直方图（用于图像相似度搜索）
-function extractColorHistogram(imageData, bins) {
-  bins = bins || 8;
-  var histogram = new Array(bins * bins * bins).fill(0);
-  var data = imageData.data;
-  var binSize = 256 / bins;
-  
-  for (var i = 0; i < data.length; i += 4) {
-    var r = Math.floor(data[i] / binSize);
-    var g = Math.floor(data[i + 1] / binSize);
-    var b = Math.floor(data[i + 2] / binSize);
-    var idx = r * bins * bins + g * bins + b;
-    histogram[idx]++;
-  }
-  
-  // 归一化
-  var total = histogram.reduce(function(a, b) { return a + b; }, 0);
-  if (total > 0) {
-    histogram = histogram.map(function(v) { return v / total; });
-  }
-  
-  return histogram;
-}
-
-// 计算两个直方图的相似度（余弦相似度）
-function histogramSimilarity(h1, h2) {
-  var dotProduct = 0;
-  var norm1 = 0;
-  var norm2 = 0;
-  
-  for (var i = 0; i < h1.length; i++) {
-    dotProduct += h1[i] * h2[i];
-    norm1 += h1[i] * h1[i];
-    norm2 += h2[i] * h2[i];
-  }
-  
-  norm1 = Math.sqrt(norm1);
-  norm2 = Math.sqrt(norm2);
-  
-  if (norm1 === 0 || norm2 === 0) return 0;
-  
-  return dotProduct / (norm1 * norm2);
-}
-
-// 从图片URL提取颜色直方图
-function getHistogramFromImage(src, callback) {
-  var img = new Image();
-  img.crossOrigin = 'anonymous';
-  img.onload = function() {
-    var canvas = document.createElement('canvas');
-    var ctx = canvas.getContext('2d');
-    var size = 64;
-    canvas.width = size;
-    canvas.height = size;
-    ctx.drawImage(img, 0, 0, size, size);
-    var imageData = ctx.getImageData(0, 0, size, size);
-    var histogram = extractColorHistogram(imageData, 8);
-    callback(histogram);
-  };
-  img.onerror = function() {
-    callback(null);
-  };
-  img.src = src;
-}
-
-// 基于颜色的图像搜索
-function colorBasedImageSearch(imageDataUrl, callback) {
-  var img = new Image();
-  img.onload = function() {
-    var canvas = document.createElement('canvas');
-    var ctx = canvas.getContext('2d');
-    var size = 64;
-    canvas.width = size;
-    canvas.height = size;
-    ctx.drawImage(img, 0, 0, size, size);
-    var imageData = ctx.getImageData(0, 0, size, size);
-    var targetHist = extractColorHistogram(imageData, 8);
-    
-    var library = getLibrary();
-    var results = [];
-    var processed = 0;
-    
-    if (library.length === 0) {
-      callback([]);
-      return;
-    }
-    
-    library.forEach(function(item, idx) {
-      if (item.image) {
-        getHistogramFromImage(item.image, function(hist) {
-          processed++;
-          if (hist) {
-            var similarity = histogramSimilarity(targetHist, hist);
-            results.push({ idx: idx, item: item, similarity: similarity });
-          }
-          if (processed === library.length) {
-            results.sort(function(a, b) { return b.similarity - a.similarity; });
-            callback(results);
-          }
-        });
-      } else {
-        processed++;
-        if (processed === library.length) {
-          results.sort(function(a, b) { return b.similarity - a.similarity; });
-          callback(results);
-        }
-      }
-    });
-  };
-  img.src = imageDataUrl;
-}
-
-
-
-
-// AI颜色搜款处理函数
-function doAIColorSearch(btn) {
-  var modal = btn.closest('div[style*=fixed]');
-  if (!modal) return;
-  
-  var img = modal.querySelector('img');
-  if (!img || !img.src) {
-    toast('⚠️ 没有找到图片');
-    return;
-  }
-  
-  var imgData = img.src;
-  
-  // 创建结果容器
-  var resultDiv = document.createElement('div');
-  resultDiv.style.cssText = 'margin-top:16px;padding:16px;background:#f9fafb;border-radius:10px;min-height:100px';
-  resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:#6b7280">🔍 正在进行AI颜色相似度搜索...</div>';
-  
-  // 移除之前的结果
-  var oldResult = modal.querySelector('#aiSearchResult');
-  if (oldResult) oldResult.remove();
-  resultDiv.id = 'aiSearchResult';
-  
-  // 插入到按钮区域前面
-  var btnArea = btn.parentElement;
-  btnArea.parentElement.insertBefore(resultDiv, btnArea);
-  
-  colorBasedImageSearch(imgData, function(results) {
-    if (results.length === 0) {
-      resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:#9ca3af">未找到带图片的款式</div>';
-      return;
-    }
-    
-    var html = '<div style="font-size:14px;font-weight:600;color:#1a1a2e;margin-bottom:10px">🎯 找到 ' + results.length + ' 个相似款式（按相似度排序）</div>';
-    html += '<div style="max-height:300px;overflow-y:auto">';
-    
-    results.slice(0, 10).forEach(function(r, idx) {
-      var sim = (r.similarity * 100).toFixed(1);
-      var simColor = sim >= 70 ? '#10b981' : sim >= 50 ? '#f59e0b' : '#ef4444';
-      
-      html += '<div style="display:flex;align-items:center;gap:10px;padding:10px;border-bottom:1px solid #e5e7eb;cursor:pointer;border-radius:8px" onmouseover="this.style.background=\'#f3f4f6\'" onmouseout="this.style.background=\'transparent\'" onclick="viewLibraryDetail(' + r.idx + ')">';
-      
-      if (r.item.image) {
-        html += '<img src="' + r.item.image + '" style="width:50px;height:50px;object-fit:cover;border-radius:6px">';
-      } else {
-        html += '<div style="width:50px;height:50px;background:#e5e7eb;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:24px">👔</div>';
-      }
-      
-      html += '<div style="flex:1">';
-      html += '<div style="font-weight:600;font-size:14px;color:#1a1a2e">' + escHtml(r.item.name || '未命名') + '</div>';
-      html += '<div style="font-size:12px;color:#6b7280">分类：' + escHtml(r.item.category || '未分类') + ' | 工序：' + (r.item.processes || []).length + '道</div>';
-      html += '</div>';
-      
-      html += '<div style="text-align:right">';
-      html += '<div style="font-size:18px;font-weight:700;color:' + simColor + '">' + sim + '%</div>';
-      html += '<div style="font-size:10px;color:#9ca3af">相似度</div>';
-      html += '</div>';
-      
-      html += '</div>';
-    });
-    
-    html += '</div>';
-    resultDiv.innerHTML = html;
-  });
-}
-
-
 function searchByImage(event) {
   var file = event.target.files[0];
   if (!file) return;
@@ -7940,8 +7754,6 @@ function searchByImage(event) {
           '<button onclick="document.getElementById(\'imageSearchKeyword\').value=\'哈衣\'" style="padding:6px 14px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:20px;font-size:13px;cursor:pointer;color:#374151">哈衣</button>' +
         '</div>' +
       '</div>' +
-      '<div style="display:flex;gap:10px;margin-bottom:10px">' +
-        '<button onclick="doAIColorSearch(this)" style="flex:1;padding:12px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer">🎨 AI颜色搜款</button>' +
       '<div style="display:flex;gap:10px">' +
         '<button onclick="var kw=document.getElementById(\'imageSearchKeyword\').value;if(kw){var si=document.getElementById(\'librarySearch\');if(si){si.value=kw;renderLibrary();}this.closest(\'div[style*=fixed]\').remove();toast(\'🔍 已搜索：\'+kw);}else{toast(\'⚠️ 请输入关键词\');}" style="flex:1;padding:12px;background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer">🔍 开始搜索</button>' +
         '<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="padding:12px 20px;background:#f3f4f6;color:#374151;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer">取消</button>' +
