@@ -1,6 +1,6 @@
 
 // ===== 应用版本号（每次更新递增）=====
-const APP_VERSION = '1.3.2';
+const APP_VERSION = '1.3.3';
 const VERSION_KEY = 'app_version';
 
 // ===== 版本检测与数据保护 =====
@@ -12,9 +12,30 @@ function checkVersionAndMigrate() {
     return { isFirstRun: true, isUpdate: false, oldVersion: null };
   }
   if (savedVersion !== APP_VERSION) {
-    // 检测到版本更新，做数据迁移（不覆盖已有数据）
+    // 检测到版本更新，做数据迁移
     console.log('🔄 检测到版本更新: ' + savedVersion + ' → ' + APP_VERSION);
-    // 数据迁移逻辑（目前数据结构兼容，只需更新版本号）
+    
+    // v1.3.0+ 数据迁移：如果旧数据款式少于10个，说明是测试数据，自动清除以加载默认84款
+    try {
+      var oldDataStr = localStorage.getItem('gf_cost_db');
+      if (oldDataStr) {
+        var oldData = JSON.parse(oldDataStr);
+        var oldStylesCount = (oldData.styles || []).length;
+        console.log('📊 旧数据款式数量: ' + oldStylesCount);
+        
+        if (oldStylesCount < 10) {
+          console.log('🗑️ 旧数据款式少于10个，自动清除以加载默认84款数据');
+          localStorage.removeItem('gf_cost_db');
+          // 同时清除IndexedDB
+          try {
+            indexedDB.deleteDatabase('gf_cost_db_idb');
+          } catch(e) {}
+        }
+      }
+    } catch(e) {
+      console.warn('版本迁移数据检查失败:', e);
+    }
+    
     localStorage.setItem(VERSION_KEY, APP_VERSION);
     return { isFirstRun: false, isUpdate: true, oldVersion: savedVersion };
   }
