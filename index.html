@@ -247,16 +247,16 @@
       <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
         <span><span class="icon">📚</span> 款式库 <span id="libraryCount" style="font-size:13px;color:#999;font-weight:normal">（0款）</span></span>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn-top" onclick="document.getElementById('libraryImportFile').click()" style="padding:6px 14px;font-size:12px;background:#4361ee">📥 导入Excel</button>
-          <button class="btn-top" onclick="exportLibrary()" style="padding:6px 14px;font-size:12px;background:#10b981">📤 导出Excel</button>
-          <button class="btn-top" onclick="addLibraryStyle()" style="padding:6px 14px;font-size:12px;background:#f59e0b">➕ 添加款式</button>
+          <button onclick="document.getElementById('libraryImportFile').click()" style="padding:8px 16px;font-size:13px;background:#4361ee!important;color:#fff!important;border:none;border-radius:8px;cursor:pointer;font-weight:600">📥 导入Excel</button>
+          <button onclick="exportLibrary()" style="padding:8px 16px;font-size:13px;background:#10b981!important;color:#fff!important;border:none;border-radius:8px;cursor:pointer;font-weight:600">📤 导出Excel</button>
+          <button onclick="addLibraryStyle()" style="padding:8px 16px;font-size:13px;background:#f59e0b!important;color:#fff!important;border:none;border-radius:8px;cursor:pointer;font-weight:600">➕ 添加款式</button>
         </div>
       </div>
       <input type="file" id="libraryImportFile" accept=".xlsx,.xls" style="display:none" onchange="importLibrary(event)">
       
       <div style="display:flex;gap:10px;margin:12px 0;flex-wrap:wrap">
         <input type="text" id="librarySearch" placeholder="🔍 搜索款式名称、工序、标签…" oninput="renderLibrary()" autocomplete="off" style="flex:1;min-width:200px;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box">
-        <button class="btn-top" onclick="document.getElementById('libraryImageSearch').click()" style="padding:10px 16px;font-size:13px;background:#8b5cf6">🖼️ 以图搜款</button>
+        <button onclick="document.getElementById('libraryImageSearch').click()" style="padding:10px 16px;font-size:13px;background:#8b5cf6!important;color:#fff!important;border:none;border-radius:8px;cursor:pointer;font-weight:600">🖼️ 以图搜款</button>
         <input type="file" id="libraryImageSearch" accept="image/*" style="display:none" onchange="searchByImage(event)">
         <select id="libraryCategory" onchange="renderLibrary()" style="padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px">
           <option value="">全部分类</option>
@@ -517,7 +517,7 @@
 </style>
 
 <script src="default-data.js"></script>
-<script src="app.js?v=1.5.0"></script>
+<script src="app.js?v=1.5.2"></script>
 
 <!-- 通知弹窗 -->
 <div class="modal-overlay" id="notifModal">
