@@ -442,9 +442,10 @@ function updateUserUI() {
   
   if (!currentUser) {
     if (badge) badge.textContent = '👤 未登录';
-    if (adminBtn) adminBtn.style.display = 'none';
-    if (logsTabBtn) logsTabBtn.style.display = 'none';
-    if (mnavLogs) mnavLogs.style.display = 'none';
+    // 所有用户都显示管理功能（已开启）
+    if (adminBtn) adminBtn.style.display = '';
+    if (logsTabBtn) logsTabBtn.style.display = '';
+    if (mnavLogs) mnavLogs.style.display = '';
     if (changePwdBtn) changePwdBtn.style.display = 'none';
     return;
   }
@@ -458,13 +459,215 @@ function updateUserUI() {
     }
   }
   
-  // 管理员功能显示/隐藏
-  var isAdmin = currentUser.isAdmin || currentUser.role === 'admin';
-  if (adminBtn) adminBtn.style.display = isAdmin ? '' : 'none';
-  if (logsTabBtn) logsTabBtn.style.display = isAdmin ? '' : 'none';
-  if (mnavLogs) mnavLogs.style.display = isAdmin ? '' : 'none';
+  // 所有用户都显示管理功能（已开启）
+  if (adminBtn) adminBtn.style.display = '';
+  if (logsTabBtn) logsTabBtn.style.display = '';
+  if (mnavLogs) mnavLogs.style.display = '';
   if (changePwdBtn) changePwdBtn.style.display = 'none'; // 纯前端模式不需要修改密码
 }
+
+// ===== 导出记录功能 =====
+const EXPORT_LOG_KEY = 'app_export_logs';
+
+function getExportLogs() {
+  try {
+    return JSON.parse(localStorage.getItem(EXPORT_LOG_KEY) || '[]');
+  } catch(e) {
+    return [];
+  }
+}
+
+function saveExportLog(logs) {
+  localStorage.setItem(EXPORT_LOG_KEY, JSON.stringify(logs));
+}
+
+function addExportRecord(styleName, styleId, format, itemCount) {
+  var logs = getExportLogs();
+  var record = {
+    id: Date.now(),
+    styleName: styleName,
+    styleId: styleId,
+    format: format,
+    itemCount: itemCount,
+    exportedBy: currentUser ? currentUser.username : '未知用户',
+    exportedAt: Date.now()
+  };
+  logs.unshift(record);
+  // 最多保留100条记录
+  if (logs.length > 100) logs = logs.slice(0, 100);
+  saveExportLog(logs);
+  return record;
+}
+
+function showExportRecords(styleId) {
+  var logs = getExportLogs();
+  var styleLogs = logs.filter(function(l) { return l.styleId === styleId; });
+  
+  if (styleLogs.length === 0) {
+    toast('📋 该款式暂无导出记录');
+    return;
+  }
+  
+  var html = '<div style="max-height:400px;overflow-y:auto">';
+  html += '<p style="font-size:13px;color:#666;margin-bottom:12px">共 ' + styleLogs.length + ' 条导出记录</p>';
+  styleLogs.forEach(function(log) {
+    var date = new Date(log.exportedAt);
+    var dateStr = date.getFullYear() + '-' + 
+      String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+      String(date.getDate()).padStart(2, '0') + ' ' +
+      String(date.getHours()).padStart(2, '0') + ':' +
+      String(date.getMinutes()).padStart(2, '0') + ':' +
+      String(date.getSeconds()).padStart(2, '0');
+    html += '<div style="padding:10px 12px;border:1px solid #eee;border-radius:8px;margin-bottom:8px;background:#fafafa">';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
+    html += '<span style="font-size:13px;font-weight:600;color:#333">' + escHtml(log.styleName) + '</span>';
+    html += '<span style="font-size:11px;background:#e8f4fd;color:#4361ee;padding:2px 8px;border-radius:10px">' + escHtml(log.format) + '</span>';
+    html += '</div>';
+    html += '<div style="font-size:12px;color:#888">';
+    html += '👤 ' + escHtml(log.exportedBy) + ' · 📦 ' + log.itemCount + ' 项 · 🕐 ' + dateStr;
+    html += '</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  
+  // 显示弹窗
+  var modal = document.getElementById('detailModal');
+  var content = document.getElementById('detailContent');
+  if (modal && content) {
+    content.innerHTML = '<h2 style="margin-bottom:16px">📋 导出记录</h2>' + html;
+    modal.classList.add('show');
+  } else {
+    alert('该款式导出记录：\n\n' + styleLogs.map(function(l) {
+      var d = new Date(l.exportedAt);
+      return l.format + ' - ' + l.exportedBy + ' - ' + d.toLocaleString();
+    }).join('\n'));
+  }
+}
+
+// ===== 自动备份功能 =====
+const BACKUP_KEY = 'app_auto_backups';
+const MAX_BACKUPS = 20; // 最多保留20个备份
+
+function getBackups() {
+  try {
+    return JSON.parse(localStorage.getItem(BACKUP_KEY) || '[]');
+  } catch(e) {
+    return [];
+  }
+}
+
+function saveBackups(backups) {
+  localStorage.setItem(BACKUP_KEY, JSON.stringify(backups));
+}
+
+function createAutoBackup(reason) {
+  try {
+    var backups = getBackups();
+    var backup = {
+      id: Date.now(),
+      timestamp: Date.now(),
+      reason: reason || '自动备份',
+      data: JSON.parse(JSON.stringify(DB)),
+      createdBy: currentUser ? currentUser.username : '系统'
+    };
+    backups.unshift(backup);
+    // 最多保留MAX_BACKUPS个备份
+    if (backups.length > MAX_BACKUPS) backups = backups.slice(0, MAX_BACKUPS);
+    saveBackups(backups);
+    console.log('💾 自动备份已创建: ' + reason + ' (共' + backups.length + '个备份)');
+    return backup;
+  } catch(e) {
+    console.warn('自动备份失败:', e);
+    return null;
+  }
+}
+
+function restoreBackup(backupId) {
+  var backups = getBackups();
+  var backup = backups.find(function(b) { return b.id === backupId; });
+  if (!backup) {
+    toast('❌ 备份不存在');
+    return false;
+  }
+  if (!confirm('确定要恢复到 ' + new Date(backup.timestamp).toLocaleString() + ' 的备份吗？\n当前数据将被覆盖！')) {
+    return false;
+  }
+  DB = JSON.parse(JSON.stringify(backup.data));
+  saveDB();
+  renderManageList();
+  renderProcessSelect();
+  renderHistory();
+  renderRecycleBin();
+  toast('✅ 已恢复到备份数据');
+  return true;
+}
+
+function showBackupManager() {
+  var backups = getBackups();
+  var html = '<div style="max-height:500px;overflow-y:auto">';
+  
+  if (backups.length === 0) {
+    html += '<div style="text-align:center;padding:40px;color:#aaa">';
+    html += '<div style="font-size:48px;margin-bottom:12px">💾</div>';
+    html += '<p>暂无备份记录</p>';
+    html += '<p style="font-size:12px;margin-top:8px">数据修改时会自动创建备份</p>';
+    html += '</div>';
+  } else {
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">';
+    html += '<span style="font-size:13px;color:#666">共 ' + backups.length + ' 个备份（最多保留' + MAX_BACKUPS + '个）</span>';
+    html += '<button onclick="createAutoBackup(\'手动备份\');showBackupManager();" style="padding:6px 14px;background:#10b981;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px">➕ 立即备份</button>';
+    html += '</div>';
+    
+    backups.forEach(function(backup) {
+      var date = new Date(backup.timestamp);
+      var dateStr = date.getFullYear() + '-' + 
+        String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+        String(date.getDate()).padStart(2, '0') + ' ' +
+        String(date.getHours()).padStart(2, '0') + ':' +
+        String(date.getMinutes()).padStart(2, '0');
+      var styleCount = (backup.data.styles || []).length;
+      var procCount = (backup.data.processes ? 
+        (backup.data.processes.pingche || []).length + 
+        (backup.data.processes.zache || []).length + 
+        (backup.data.processes.kanche || []).length : 0);
+      
+      html += '<div style="padding:12px;border:1px solid #eee;border-radius:10px;margin-bottom:8px;background:#fafafa;transition:all 0.2s" onmouseover="this.style.background=\'#f0f7ff\';this.style.borderColor=\'#4361ee\'" onmouseout="this.style.background=\'#fafafa\';this.style.borderColor=\'#eee\'">';
+      html += '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">';
+      html += '<div style="flex:1">';
+      html += '<div style="font-size:14px;font-weight:600;color:#333;margin-bottom:4px">💾 ' + escHtml(backup.reason) + '</div>';
+      html += '<div style="font-size:12px;color:#888;margin-bottom:4px">🕐 ' + dateStr + ' · 👤 ' + escHtml(backup.createdBy) + '</div>';
+      html += '<div style="font-size:11px;color:#aaa">📦 款式 ' + styleCount + ' 个 · 🔧 工序 ' + procCount + ' 项</div>';
+      html += '</div>';
+      html += '<button onclick="restoreBackup(' + backup.id + ')" style="padding:6px 14px;background:#4361ee;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px;white-space:nowrap">恢复</button>';
+      html += '</div>';
+      html += '</div>';
+    });
+  }
+  
+  html += '</div>';
+  
+  // 显示弹窗
+  var modal = document.getElementById('detailModal');
+  var content = document.getElementById('detailContent');
+  if (modal && content) {
+    content.innerHTML = '<h2 style="margin-bottom:16px">💾 数据备份管理</h2>' + html;
+    modal.classList.add('show');
+  } else {
+    alert('备份管理功能需要弹窗支持');
+  }
+}
+
+// 自动备份：在saveDB时触发
+var originalSaveDB = saveDB;
+saveDB = function() {
+  originalSaveDB();
+  // 节流：最多每30秒自动备份一次
+  var now = Date.now();
+  if (!window._lastAutoBackup || now - window._lastAutoBackup > 30000) {
+    window._lastAutoBackup = now;
+    createAutoBackup('数据修改自动备份');
+  }
+};
 
 function idbOpen() {
   return new Promise((resolve) => {
@@ -2094,6 +2297,9 @@ function exportStyleXlsx() {
   const filename = (style.name || '款式') + '_工序单价表_' + style.date + '.xlsx';
   XLSX.writeFile(wb, filename);
   toast('已导出：' + filename);
+  // 添加导出记录
+  addExportRecord(style.name, style.id, 'Excel', style.selections.length);
+  clientLog('export_style', '导出款式「' + style.name + '」Excel（' + style.selections.length + '项）');
 }
 
 function autoBackup() {
