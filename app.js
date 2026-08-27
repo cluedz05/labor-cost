@@ -728,6 +728,25 @@ function restoreBackup(backupId) {
   return true;
 }
 
+// 手动备份
+function doManualBackup() {
+  try {
+    var backup = createAutoBackup('手动备份');
+    if (backup) {
+      toast('✅ 手动备份已创建');
+      // 延迟刷新列表，确保数据已保存
+      setTimeout(function() {
+        showBackupManager();
+      }, 100);
+    } else {
+      toast('⚠️ 备份创建失败，请检查数据');
+    }
+  } catch(e) {
+    console.error('手动备份失败:', e);
+    toast('⚠️ 备份创建失败: ' + e.message);
+  }
+}
+
 function showBackupManager() {
   var backups = getBackups();
   var html = '<div style="max-height:500px;overflow-y:auto">';
@@ -742,7 +761,7 @@ function showBackupManager() {
   } else {
     html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">';
     html += '<span style="font-size:13px;color:#666">共 ' + backups.length + ' 个备份（最多' + MAX_BACKUPS + '个，超过' + BACKUP_EXPIRE_DAYS + '天自动删除）</span>';
-    html += '<button onclick="createAutoBackup(\'手动备份\');showBackupManager();" style="padding:6px 14px;background:#10b981;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px">➕ 立即备份</button>';
+    html += '<button onclick="doManualBackup()" style="padding:6px 14px;background:#10b981;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px">➕ 立即备份</button>';
     html += '</div>';
     
     backups.forEach(function(backup) {
@@ -783,18 +802,6 @@ function showBackupManager() {
     alert('备份管理功能需要弹窗支持');
   }
 }
-
-// 自动备份：在saveDB时触发
-var originalSaveDB = saveDB;
-saveDB = function() {
-  originalSaveDB();
-  // 节流：最多每30秒自动备份一次
-  var now = Date.now();
-  if (!window._lastAutoBackup || now - window._lastAutoBackup > 30000) {
-    window._lastAutoBackup = now;
-    createAutoBackup('数据修改自动备份');
-  }
-};
 
 function idbOpen() {
   return new Promise((resolve) => {
@@ -851,6 +858,19 @@ function saveDB() {
       .then(r => r.json())
       .then(d => { if (d && d.updatedAt) { DB._updatedAt = d.updatedAt; } })
       .catch(e => console.warn('保存到服务器失败（本地已保存）', e));
+  }
+  
+  // 自动备份：节流，最多每30秒自动备份一次
+  try {
+    var now = Date.now();
+    if (!window._lastAutoBackup || now - window._lastAutoBackup > 30000) {
+      window._lastAutoBackup = now;
+      if (typeof createAutoBackup === 'function') {
+        createAutoBackup('数据修改自动备份');
+      }
+    }
+  } catch(e) {
+    console.warn('自动备份失败:', e);
   }
 }
 
