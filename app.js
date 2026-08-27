@@ -7839,6 +7839,75 @@ function colorBasedImageSearch(imageDataUrl, callback) {
 }
 
 
+
+
+// AI颜色搜款处理函数
+function doAIColorSearch(btn) {
+  var modal = btn.closest('div[style*=fixed]');
+  if (!modal) return;
+  
+  var img = modal.querySelector('img');
+  if (!img || !img.src) {
+    toast('⚠️ 没有找到图片');
+    return;
+  }
+  
+  var imgData = img.src;
+  
+  // 创建结果容器
+  var resultDiv = document.createElement('div');
+  resultDiv.style.cssText = 'margin-top:16px;padding:16px;background:#f9fafb;border-radius:10px;min-height:100px';
+  resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:#6b7280">🔍 正在进行AI颜色相似度搜索...</div>';
+  
+  // 移除之前的结果
+  var oldResult = modal.querySelector('#aiSearchResult');
+  if (oldResult) oldResult.remove();
+  resultDiv.id = 'aiSearchResult';
+  
+  // 插入到按钮区域前面
+  var btnArea = btn.parentElement;
+  btnArea.parentElement.insertBefore(resultDiv, btnArea);
+  
+  colorBasedImageSearch(imgData, function(results) {
+    if (results.length === 0) {
+      resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:#9ca3af">未找到带图片的款式</div>';
+      return;
+    }
+    
+    var html = '<div style="font-size:14px;font-weight:600;color:#1a1a2e;margin-bottom:10px">🎯 找到 ' + results.length + ' 个相似款式（按相似度排序）</div>';
+    html += '<div style="max-height:300px;overflow-y:auto">';
+    
+    results.slice(0, 10).forEach(function(r, idx) {
+      var sim = (r.similarity * 100).toFixed(1);
+      var simColor = sim >= 70 ? '#10b981' : sim >= 50 ? '#f59e0b' : '#ef4444';
+      
+      html += '<div style="display:flex;align-items:center;gap:10px;padding:10px;border-bottom:1px solid #e5e7eb;cursor:pointer;border-radius:8px" onmouseover="this.style.background=\'#f3f4f6\'" onmouseout="this.style.background=\'transparent\'" onclick="viewLibraryDetail(' + r.idx + ')">';
+      
+      if (r.item.image) {
+        html += '<img src="' + r.item.image + '" style="width:50px;height:50px;object-fit:cover;border-radius:6px">';
+      } else {
+        html += '<div style="width:50px;height:50px;background:#e5e7eb;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:24px">👔</div>';
+      }
+      
+      html += '<div style="flex:1">';
+      html += '<div style="font-weight:600;font-size:14px;color:#1a1a2e">' + escHtml(r.item.name || '未命名') + '</div>';
+      html += '<div style="font-size:12px;color:#6b7280">分类：' + escHtml(r.item.category || '未分类') + ' | 工序：' + (r.item.processes || []).length + '道</div>';
+      html += '</div>';
+      
+      html += '<div style="text-align:right">';
+      html += '<div style="font-size:18px;font-weight:700;color:' + simColor + '">' + sim + '%</div>';
+      html += '<div style="font-size:10px;color:#9ca3af">相似度</div>';
+      html += '</div>';
+      
+      html += '</div>';
+    });
+    
+    html += '</div>';
+    resultDiv.innerHTML = html;
+  });
+}
+
+
 function searchByImage(event) {
   var file = event.target.files[0];
   if (!file) return;
@@ -7872,7 +7941,7 @@ function searchByImage(event) {
         '</div>' +
       '</div>' +
       '<div style="display:flex;gap:10px;margin-bottom:10px">' +
-        '<button onclick="var imgData=this.closest(\'div[style*=fixed]\').querySelector(\'img\').src;var modal=this.closest(\'div[style*=fixed]\');modal.querySelector(\'div[style*=background.*linear-gradient]\').innerHTML=\'<div style=\\'text-align:center;padding:20px\\'>🔍 正在进行AI颜色相似度搜索...</div>\';colorBasedImageSearch(imgData,function(results){if(results.length===0){modal.querySelector(\'div[style*=background.*linear-gradient]\').innerHTML=\'<div style=\\'text-align:center;padding:20px;color:#999\\'>未找到带图片的款式</div>\';return;}var html=\'<div style=\\'max-height:300px;overflow-y:auto\\'>\';results.slice(0,10).forEach(function(r,idx){var sim=(r.similarity*100).toFixed(1);html+=\'<div style=\\'display:flex;align-items:center;gap:10px;padding:8px;border-bottom:1px solid #eee;cursor:pointer\\' onclick=\\'viewLibraryDetail(\'+r.idx+\')\\'>\';html+=(r.item.image?\'<img src=\\"\'+r.item.image+\'\\" style=\\'width:50px;height:50px;object-fit:cover;border-radius:6px\\'>\':\'<div style=\\'width:50px;height:50px;background:#ddd;border-radius:6px;display:flex;align-items:center;justify-content:center\\'>👔</div>\');html+=\'<div style=\\'flex:1\\'><div style=\\'font-weight:600;font-size:13px\\'>\'+(r.item.name||\'未命名\')+\'</div><div style=\\'font-size:11px;color:#666\\'>相似度：\'+sim+\'%</div></div>\';html+=\'</div>\';});html+=\'</div>\';modal.querySelector(\'div[style*=background.*linear-gradient]\').innerHTML=html;});}" style="flex:1;padding:12px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer">🎨 AI颜色搜款</button>' +
+        '<button onclick="doAIColorSearch(this)" style="flex:1;padding:12px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer">🎨 AI颜色搜款</button>' +
       '<div style="display:flex;gap:10px">' +
         '<button onclick="var kw=document.getElementById(\'imageSearchKeyword\').value;if(kw){var si=document.getElementById(\'librarySearch\');if(si){si.value=kw;renderLibrary();}this.closest(\'div[style*=fixed]\').remove();toast(\'🔍 已搜索：\'+kw);}else{toast(\'⚠️ 请输入关键词\');}" style="flex:1;padding:12px;background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer">🔍 开始搜索</button>' +
         '<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="padding:12px 20px;background:#f3f4f6;color:#374151;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer">取消</button>' +
