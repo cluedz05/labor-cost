@@ -1,6 +1,6 @@
 
 // ===== 应用版本号（每次更新递增）=====
-const APP_VERSION = '1.3.8';
+const APP_VERSION = '1.3.9';
 const VERSION_KEY = 'app_version';
 
 // ===== 版本检测与数据保护 =====
@@ -639,20 +639,24 @@ function openAdminPanel() {
   } else {
     html += '<div style="border:1px solid #eee;border-radius:8px;overflow:hidden">';
     html += '<table style="width:100%;border-collapse:collapse;font-size:13px">';
-    html += '<thead><tr style="background:#f5f5f5"><th style="padding:8px;text-align:left;border-bottom:1px solid #eee">用户名</th><th style="padding:8px;text-align:left;border-bottom:1px solid #eee">角色</th><th style="padding:8px;text-align:left;border-bottom:1px solid #eee">注册时间</th><th style="padding:8px;text-align:center;border-bottom:1px solid #eee">操作</th></tr></thead>';
+    html += '<thead><tr style="background:#f5f5f5"><th style="padding:8px;text-align:center;border-bottom:1px solid #eee">头像</th><th style="padding:8px;text-align:left;border-bottom:1px solid #eee">用户名</th><th style="padding:8px;text-align:left;border-bottom:1px solid #eee">角色</th><th style="padding:8px;text-align:left;border-bottom:1px solid #eee">注册时间</th><th style="padding:8px;text-align:center;border-bottom:1px solid #eee">操作</th></tr></thead>';
     html += '<tbody>';
     userList.forEach(function(user) {
       var regDate = user.createdAt ? new Date(user.createdAt).toLocaleString() : '未知';
       var roleText = user.isAdmin || user.role === 'admin' ? '👑 管理员' : '👤 普通用户';
+      var avatar = user.avatar ? user.avatar : '';
+      var avatarHtml = avatar 
+        ? '<img src="' + avatar + '" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid #e0e0e0">' 
+        : '<div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600">' + user.username.charAt(0).toUpperCase() + '</div>';
       html += '<tr style="border-bottom:1px solid #f5f5f5">';
+      html += '<td style="padding:8px;text-align:center">' + avatarHtml + '</td>';
       html += '<td style="padding:8px;font-weight:600">' + escHtml(user.username) + '</td>';
       html += '<td style="padding:8px">' + roleText + '</td>';
       html += '<td style="padding:8px;color:#888;font-size:12px">' + regDate + '</td>';
-      html += '<td style="padding:8px;text-align:center">';
+      html += '<td style="padding:8px;text-align:center;white-space:nowrap">';
+      html += '<button onclick="editUser(\'' + escAttr(user.username) + '\')" style="padding:4px 10px;background:#4361ee;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:11px;margin-right:4px">编辑</button>';
       if (!user.isAdmin && user.role !== 'admin') {
         html += '<button onclick="deleteUser(\'' + escAttr(user.username) + '\')" style="padding:4px 10px;background:#ef4444;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:11px">删除</button>';
-      } else {
-        html += '<span style="color:#aaa;font-size:11px">主账号</span>';
       }
       html += '</td></tr>';
     });
@@ -686,6 +690,141 @@ function deleteUser(username) {
   delete users[username];
   saveUsers(users);
   toast('✅ 已删除用户「' + username + '」');
+  openAdminPanel(); // 刷新管理后台
+}
+
+// 编辑用户
+function editUser(username) {
+  var users = getUsers();
+  var user = users[username];
+  if (!user) {
+    toast('❌ 用户不存在');
+    return;
+  }
+  
+  var avatar = user.avatar || '';
+  var avatarPreview = avatar 
+    ? '<img id="editAvatarPreview" src="' + avatar + '" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid #e0e0e0;cursor:pointer" onclick="document.getElementById(\'editAvatarInput\').click()">'
+    : '<div id="editAvatarPreview" style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:600;cursor:pointer" onclick="document.getElementById(\'editAvatarInput\').click()">' + user.username.charAt(0).toUpperCase() + '</div>';
+  
+  var html = '<div style="max-height:500px;overflow-y:auto">';
+  html += '<div style="text-align:center;margin-bottom:20px">';
+  html += avatarPreview;
+  html += '<input type="file" id="editAvatarInput" accept="image/*" style="display:none" onchange="handleEditAvatar(this)">';
+  html += '<div style="font-size:12px;color:#888;margin-top:8px">点击头像可更换</div>';
+  html += '</div>';
+  
+  html += '<div style="margin-bottom:14px">';
+  html += '<label style="display:block;font-size:13px;font-weight:600;color:#333;margin-bottom:6px">用户名</label>';
+  html += '<input type="text" id="editUsername" value="' + escAttr(user.username) + '" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box">';
+  html += '</div>';
+  
+  html += '<div style="margin-bottom:14px">';
+  html += '<label style="display:block;font-size:13px;font-weight:600;color:#333;margin-bottom:6px">新密码（留空则不修改）</label>';
+  html += '<input type="password" id="editPassword" placeholder="输入新密码" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box">';
+  html += '</div>';
+  
+  html += '<div style="margin-bottom:14px">';
+  html += '<label style="display:block;font-size:13px;font-weight:600;color:#333;margin-bottom:6px">确认新密码</label>';
+  html += '<input type="password" id="editPassword2" placeholder="再次输入新密码" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box">';
+  html += '</div>';
+  
+  html += '<div style="display:flex;gap:10px;margin-top:20px">';
+  html += '<button onclick="saveEditUser(\'' + escAttr(username) + '\')" style="flex:1;padding:12px;background:#4361ee;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600">💾 保存修改</button>';
+  html += '<button onclick="openAdminPanel()" style="flex:1;padding:12px;background:#f0f0f0;color:#333;border:none;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600">取消</button>';
+  html += '</div>';
+  html += '</div>';
+  
+  var modal = document.getElementById('detailModal');
+  var content = document.getElementById('detailContent');
+  if (modal && content) {
+    content.innerHTML = '<h2 style="margin-bottom:16px">✏️ 编辑用户</h2>' + html;
+    modal.classList.add('show');
+  }
+}
+
+// 处理编辑头像上传
+function handleEditAvatar(input) {
+  var file = input.files[0];
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) {
+    toast('⚠️ 图片大小不能超过2MB');
+    return;
+  }
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var preview = document.getElementById('editAvatarPreview');
+    if (preview) {
+      preview.outerHTML = '<img id="editAvatarPreview" src="' + e.target.result + '" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid #e0e0e0;cursor:pointer" onclick="document.getElementById(\'editAvatarInput\').click()">';
+    }
+    // 保存临时头像数据
+    window._tempEditAvatar = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// 保存编辑用户
+function saveEditUser(oldUsername) {
+  var newUsername = document.getElementById('editUsername').value.trim();
+  var newPassword = document.getElementById('editPassword').value;
+  var newPassword2 = document.getElementById('editPassword2').value;
+  
+  if (!newUsername) {
+    toast('⚠️ 用户名不能为空');
+    return;
+  }
+  
+  if (newPassword || newPassword2) {
+    if (newPassword !== newPassword2) {
+      toast('⚠️ 两次输入的密码不一致');
+      return;
+    }
+    if (newPassword.length < 4) {
+      toast('⚠️ 密码长度至少4位');
+      return;
+    }
+  }
+  
+  var users = getUsers();
+  var user = users[oldUsername];
+  if (!user) {
+    toast('❌ 用户不存在');
+    return;
+  }
+  
+  // 如果用户名修改了，检查新用户名是否已存在
+  if (newUsername !== oldUsername) {
+    if (users[newUsername]) {
+      toast('⚠️ 用户名「' + newUsername + '」已存在');
+      return;
+    }
+    // 删除旧用户，添加新用户
+    delete users[oldUsername];
+    user.username = newUsername;
+    users[newUsername] = user;
+  }
+  
+  // 修改密码
+  if (newPassword) {
+    user.password = hashPassword(newPassword);
+  }
+  
+  // 修改头像
+  if (window._tempEditAvatar) {
+    user.avatar = window._tempEditAvatar;
+    window._tempEditAvatar = null;
+  }
+  
+  saveUsers(users);
+  toast('✅ 用户信息已更新');
+  
+  // 如果修改的是当前登录用户，更新当前用户信息
+  if (currentUser && currentUser.username === oldUsername) {
+    currentUser.username = newUsername;
+    sessionStorage.setItem(CURRENT_USER_KEY, JSON.stringify(currentUser));
+    updateUserUI();
+  }
+  
   openAdminPanel(); // 刷新管理后台
 }
 
