@@ -1,6 +1,6 @@
 
 // ===== 应用版本号（每次更新递增）=====
-const APP_VERSION = '1.3.3';
+const APP_VERSION = '1.3.4';
 const VERSION_KEY = 'app_version';
 
 // ===== 版本检测与数据保护 =====
@@ -1036,7 +1036,26 @@ async function loadDB() {
   let raw = null;
   try { raw = localStorage.getItem('gf_cost_db'); } catch(e) {}
   if (raw) {
-    try { DB = JSON.parse(raw); migrateDB(); return; } catch(e) {}
+    try {
+      DB = JSON.parse(raw);
+      migrateDB();
+      // 检查：如果本地数据款式少于10个，自动加载默认84款数据
+      var localStylesCount = (DB.styles || []).length;
+      if (localStylesCount < 10 && typeof DEFAULT_DATA !== 'undefined') {
+        console.log('📊 本地数据款式仅' + localStylesCount + '个，自动加载默认84款数据');
+        DB = JSON.parse(JSON.stringify(DEFAULT_DATA));
+        migrateDB();
+        try {
+          const dbStr = JSON.stringify(DB);
+          localStorage.setItem('gf_cost_db', dbStr);
+          console.log('默认数据已保存到本地，款式数:', DB.styles.length);
+        } catch(e) {
+          console.warn('保存到localStorage失败:', e);
+        }
+        idbSave(DB);
+      }
+      return;
+    } catch(e) {}
   }
   const fromIdb = await idbLoad();
   if (fromIdb) { DB = fromIdb; migrateDB(); return; }
