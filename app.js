@@ -1,6 +1,6 @@
 
 // ===== 应用版本号（每次更新递增）=====
-const APP_VERSION = '1.3.9';
+const APP_VERSION = '1.4.0';
 const VERSION_KEY = 'app_version';
 
 // ===== 版本检测与数据保护 =====
@@ -633,7 +633,10 @@ function openAdminPanel() {
   
   // 用户管理
   html += '<div style="margin-bottom:20px">';
-  html += '<div style="font-size:14px;font-weight:600;color:#333;margin-bottom:10px">👥 用户管理（' + userList.length + '个）</div>';
+  html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">';
+  html += '<div style="font-size:14px;font-weight:600;color:#333">👥 用户管理（' + userList.length + '个）</div>';
+  html += '<button onclick="showAddUser()" style="padding:6px 14px;background:#10b981;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px">➕ 添加用户</button>';
+  html += '</div>';
   if (userList.length === 0) {
     html += '<div style="text-align:center;padding:20px;color:#aaa;font-size:13px">暂无注册用户</div>';
   } else {
@@ -691,6 +694,117 @@ function deleteUser(username) {
   saveUsers(users);
   toast('✅ 已删除用户「' + username + '」');
   openAdminPanel(); // 刷新管理后台
+}
+
+// 添加用户
+function showAddUser() {
+  var html = '<div style="max-height:500px;overflow-y:auto">';
+  html += '<div style="text-align:center;margin-bottom:20px">';
+  html += '<div id="addAvatarPreview" style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:600;cursor:pointer;margin:0 auto" onclick="document.getElementById(\'addAvatarInput\').click()">👤</div>';
+  html += '<input type="file" id="addAvatarInput" accept="image/*" style="display:none" onchange="handleAddAvatar(this)">';
+  html += '<div style="font-size:12px;color:#888;margin-top:8px">点击头像可上传</div>';
+  html += '</div>';
+  
+  html += '<div style="margin-bottom:14px">';
+  html += '<label style="display:block;font-size:13px;font-weight:600;color:#333;margin-bottom:6px">用户名</label>';
+  html += '<input type="text" id="addUsername" placeholder="输入用户名" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box">';
+  html += '</div>';
+  
+  html += '<div style="margin-bottom:14px">';
+  html += '<label style="display:block;font-size:13px;font-weight:600;color:#333;margin-bottom:6px">密码</label>';
+  html += '<input type="password" id="addPassword" placeholder="输入密码（至少4位）" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box">';
+  html += '</div>';
+  
+  html += '<div style="margin-bottom:14px">';
+  html += '<label style="display:block;font-size:13px;font-weight:600;color:#333;margin-bottom:6px">确认密码</label>';
+  html += '<input type="password" id="addPassword2" placeholder="再次输入密码" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box">';
+  html += '</div>';
+  
+  html += '<div style="margin-bottom:14px">';
+  html += '<label style="display:block;font-size:13px;font-weight:600;color:#333;margin-bottom:6px">角色</label>';
+  html += '<select id="addRole" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box">';
+  html += '<option value="user">👤 普通用户</option>';
+  html += '<option value="admin">👑 管理员</option>';
+  html += '</select>';
+  html += '</div>';
+  
+  html += '<div style="display:flex;gap:10px;margin-top:20px">';
+  html += '<button onclick="addUser()" style="flex:1;padding:12px;background:#10b981;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600">✅ 添加用户</button>';
+  html += '<button onclick="openAdminPanel()" style="flex:1;padding:12px;background:#f0f0f0;color:#333;border:none;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600">取消</button>';
+  html += '</div>';
+  html += '</div>';
+  
+  var modal = document.getElementById('detailModal');
+  var content = document.getElementById('detailContent');
+  if (modal && content) {
+    content.innerHTML = '<h2 style="margin-bottom:16px">➕ 添加新用户</h2>' + html;
+    modal.classList.add('show');
+  }
+}
+
+// 处理添加用户头像上传
+function handleAddAvatar(input) {
+  var file = input.files[0];
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) {
+    toast('⚠️ 图片大小不能超过2MB');
+    return;
+  }
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var preview = document.getElementById('addAvatarPreview');
+    if (preview) {
+      preview.outerHTML = '<img id="addAvatarPreview" src="' + e.target.result + '" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid #e0e0e0;cursor:pointer;margin:0 auto" onclick="document.getElementById(\'addAvatarInput\').click()">';
+    }
+    window._tempAddAvatar = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// 添加用户
+function addUser() {
+  var username = document.getElementById('addUsername').value.trim();
+  var password = document.getElementById('addPassword').value;
+  var password2 = document.getElementById('addPassword2').value;
+  var role = document.getElementById('addRole').value;
+  
+  if (!username) {
+    toast('⚠️ 用户名不能为空');
+    return;
+  }
+  if (!password || password.length < 4) {
+    toast('⚠️ 密码长度至少4位');
+    return;
+  }
+  if (password !== password2) {
+    toast('⚠️ 两次输入的密码不一致');
+    return;
+  }
+  
+  var users = getUsers();
+  if (users[username]) {
+    toast('⚠️ 用户名「' + username + '」已存在');
+    return;
+  }
+  
+  var newUser = {
+    username: username,
+    password: hashPassword(password),
+    role: role,
+    isAdmin: role === 'admin',
+    createdAt: Date.now(),
+    uid: 'user_' + Date.now()
+  };
+  
+  if (window._tempAddAvatar) {
+    newUser.avatar = window._tempAddAvatar;
+    window._tempAddAvatar = null;
+  }
+  
+  users[username] = newUser;
+  saveUsers(users);
+  toast('✅ 用户「' + username + '」添加成功');
+  openAdminPanel();
 }
 
 // 编辑用户
