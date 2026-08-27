@@ -186,9 +186,23 @@ async function init() {
         setTimeout(function() { showWelcome(currentUser); }, 400);
       }
     } catch(e) {
-      // 未登录 → 显示登录提示，阻止加载工具
-      document.getElementById('unloginOverlay') && (document.getElementById('unloginOverlay').style.display = '');
-      return;
+      // API不可用 → 降级为纯前端本地模式
+      useAPI = false;
+      currentUser = { username: '本地用户', role: 'admin', isAdmin: true, uid: 'local' };
+      // 隐藏未登录遮罩层
+      var overlay = document.getElementById('unloginOverlay');
+      if (overlay) overlay.style.display = 'none';
+      // 显示用户信息和管理员功能
+      var badge = document.getElementById('userBadge');
+      if (badge) { badge.textContent = '👤 本地用户'; badge.style.display = ''; }
+      var adminBtn = document.getElementById('adminBtn');
+      if (adminBtn) adminBtn.style.display = '';
+      var logsTabBtn = document.getElementById('logsTabBtn');
+      if (logsTabBtn) logsTabBtn.style.display = '';
+      var mnavLogs = document.getElementById('mnavLogs');
+      if (mnavLogs) mnavLogs.style.display = '';
+      var changePwdBtn = document.getElementById('changePwdBtn');
+      if (changePwdBtn) changePwdBtn.style.display = 'none';
     }
   }
   await loadDB();
