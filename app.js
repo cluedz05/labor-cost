@@ -1,6 +1,6 @@
 
 // ===== 应用版本号（每次更新递增）=====
-const APP_VERSION = '1.4.1';
+const APP_VERSION = '1.4.2';
 const VERSION_KEY = 'app_version';
 
 // ===== 版本检测与数据保护 =====
@@ -844,26 +844,38 @@ function editUser(username) {
   html += '</div>';
   
   // 权限设置
-  var perms = user.permissions || {};
-  var permList = [
-    { key: 'canAddStyle', label: '➕ 添加款式' },
-    { key: 'canEditStyle', label: '✏️ 编辑款式' },
-    { key: 'canDeleteStyle', label: '🗑️ 删除款式' },
-    { key: 'canExport', label: '📥 导出数据' },
-    { key: 'canManageProcesses', label: '🔧 管理工序' },
-    { key: 'canManageUsers', label: '👥 管理用户' }
-  ];
-  html += '<div style="margin-bottom:14px">';
-  html += '<label style="display:block;font-size:13px;font-weight:600;color:#333;margin-bottom:8px">🔐 权限设置</label>';
-  html += '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;background:#f8f9fa;padding:12px;border-radius:8px">';
-  permList.forEach(function(p) {
-    var checked = perms[p.key] ? 'checked' : '';
-    html += '<label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;color:#333">';
-    html += '<input type="checkbox" id="perm_' + p.key + '" ' + checked + ' style="width:16px;height:16px;cursor:pointer">';
-    html += '<span>' + p.label + '</span>';
-    html += '</label>';
-  });
-  html += '</div></div>';
+  var isNormalUser = !user.isAdmin && user.role !== 'admin';
+  if (isNormalUser) {
+    // 普通用户固定为只读
+    html += '<div style="margin-bottom:14px">';
+    html += '<label style="display:block;font-size:13px;font-weight:600;color:#333;margin-bottom:8px">🔐 权限设置</label>';
+    html += '<div style="background:#fff3cd;padding:12px;border-radius:8px;border:1px solid #ffc107;color:#856404;font-size:13px">';
+    html += '<div style="font-weight:600;margin-bottom:6px">👤 普通用户（只读权限）</div>';
+    html += '<div>普通用户固定只能查看数据，不能进行添加、编辑、删除、导出等操作。</div>';
+    html += '</div></div>';
+  } else {
+    // 管理员可以编辑权限
+    var perms = user.permissions || {};
+    var permList = [
+      { key: 'canAddStyle', label: '➕ 添加款式' },
+      { key: 'canEditStyle', label: '✏️ 编辑款式' },
+      { key: 'canDeleteStyle', label: '🗑️ 删除款式' },
+      { key: 'canExport', label: '📥 导出数据' },
+      { key: 'canManageProcesses', label: '🔧 管理工序' },
+      { key: 'canManageUsers', label: '👥 管理用户' }
+    ];
+    html += '<div style="margin-bottom:14px">';
+    html += '<label style="display:block;font-size:13px;font-weight:600;color:#333;margin-bottom:8px">🔐 权限设置</label>';
+    html += '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;background:#f8f9fa;padding:12px;border-radius:8px">';
+    permList.forEach(function(p) {
+      var checked = perms[p.key] !== false ? 'checked' : '';
+      html += '<label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;color:#333">';
+      html += '<input type="checkbox" id="perm_' + p.key + '" ' + checked + ' style="width:16px;height:16px;cursor:pointer">';
+      html += '<span>' + p.label + '</span>';
+      html += '</label>';
+    });
+    html += '</div></div>';
+  }
   
   html += '<div style="display:flex;gap:10px;margin-top:20px">';
   html += '<button onclick="saveEditUser(\'' + escAttr(username) + '\')" style="flex:1;padding:12px;background:#4361ee;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600">💾 保存修改</button>';
@@ -952,15 +964,29 @@ function saveEditUser(oldUsername) {
   }
   
   // 保存权限设置
-  var permKeys = ['canAddStyle', 'canEditStyle', 'canDeleteStyle', 'canExport', 'canManageProcesses', 'canManageUsers'];
-  var permissions = {};
-  permKeys.forEach(function(key) {
-    var checkbox = document.getElementById('perm_' + key);
-    if (checkbox) {
-      permissions[key] = checkbox.checked;
-    }
-  });
-  user.permissions = permissions;
+  var isNormalUser = !user.isAdmin && user.role !== 'admin';
+  if (isNormalUser) {
+    // 普通用户固定为只读
+    user.permissions = {
+      canAddStyle: false,
+      canEditStyle: false,
+      canDeleteStyle: false,
+      canExport: false,
+      canManageProcesses: false,
+      canManageUsers: false
+    };
+  } else {
+    // 管理员可以编辑权限
+    var permKeys = ['canAddStyle', 'canEditStyle', 'canDeleteStyle', 'canExport', 'canManageProcesses', 'canManageUsers'];
+    var permissions = {};
+    permKeys.forEach(function(key) {
+      var checkbox = document.getElementById('perm_' + key);
+      if (checkbox) {
+        permissions[key] = checkbox.checked;
+      }
+    });
+    user.permissions = permissions;
+  }
   
   saveUsers(users);
   toast('✅ 用户信息已更新');
