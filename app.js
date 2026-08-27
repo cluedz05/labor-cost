@@ -499,9 +499,17 @@ function addExportRecord(styleName, styleId, format, itemCount) {
   return record;
 }
 
+// 获取某个款式的导出次数
+function getExportCount(styleId) {
+  var logs = getExportLogs();
+  // 用 == 比较，避免数字和字符串类型不匹配
+  return logs.filter(function(l) { return l.styleId == styleId; }).length;
+}
+
 function showExportRecords(styleId) {
   var logs = getExportLogs();
-  var styleLogs = logs.filter(function(l) { return l.styleId === styleId; });
+  // 用 == 比较，避免数字和字符串类型不匹配
+  var styleLogs = logs.filter(function(l) { return l.styleId == styleId; });
   
   if (styleLogs.length === 0) {
     toast('📋 该款式暂无导出记录');
@@ -1760,6 +1768,11 @@ function renderHistory() {
     const badge = s.status === 'approved'
       ? '<span class="status-badge approved">✅ 已审批</span>'
       : '<span class="status-badge pending">⏳ 待审批</span>';
+    // 导出次数
+    const exportCount = getExportCount(s.id);
+    const exportBadge = exportCount > 0
+      ? '<div style="text-align:right;margin-bottom:4px"><span style="font-size:11px;color:#8e44ad;background:#f3e8ff;padding:2px 8px;border-radius:10px;font-weight:600">📥 已导出' + exportCount + '次</span></div>'
+      : '';
     return `
       <div class="history-item" onclick="showDetail('${s.id}')">
         <img class="himg" src="${(s.imgs && s.imgs[0]) || 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22><rect fill=%22%23eee%22 width=%2280%22 height=%2280%22/><text x=%2240%22 y=%2245%22 text-anchor=%22middle%22 fill=%22%23ccc%22 font-size=%2212%22>无图</text></svg>'}" alt="款式图">
@@ -1774,7 +1787,10 @@ function renderHistory() {
           <div class="hprocs">🔧 ${procNames || '无工序'} · ${sels.length} 道工序</div>
           <div class="hprocs" style="color:#e94560;font-weight:600">💰 平车 ¥${sub.pingche.toFixed(2)} · 扎车 ¥${sub.zache.toFixed(2)} · 坎车 ¥${sub.kanche.toFixed(2)}</div>
         </div>
-        <div class="htotal">¥${total.toFixed(2)}</div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:4px">
+          ${exportBadge}
+          <div class="htotal">¥${total.toFixed(2)}</div>
+        </div>
         <button class="del-history" data-role-block onclick="event.stopPropagation(); deleteHistory('${s.id}')" title="删除">✕</button>
       </div>
     `;
@@ -1802,6 +1818,11 @@ function showDetail(id) {
   const total = (style.selections || []).reduce((sum, it) => sum + it.price * it.qty, 0);
   const sub = { pingche: 0, zache: 0, kanche: 0 };
   (style.selections || []).forEach(it => { if (sub[it.type] !== undefined) sub[it.type] += it.price * it.qty; });
+  // 导出次数
+  const exportCount = getExportCount(style.id);
+  const exportBadge = exportCount > 0
+    ? '<span style="font-size:11px;color:#8e44ad;background:#f3e8ff;padding:2px 10px;border-radius:10px;font-weight:600">📥 已导出' + exportCount + '次</span>'
+    : '';
 
   document.getElementById('detailContent').innerHTML = `
     <div style="display:flex;gap:16px;margin-bottom:14px;align-items:flex-start">
@@ -1809,6 +1830,7 @@ function showDetail(id) {
       <div style="flex:1;min-width:0">
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
           <span style="font-size:17px;font-weight:700;color:#1a1a2e">${escHtml(style.name)}</span>
+          ${exportBadge}
           <span style="font-size:12px;padding:2px 10px;border-radius:20px;font-weight:600;${style.status === 'approved' ? 'background:#dcfce7;color:#16a34a' : 'background:#fef9c3;color:#a16207'}">${style.status === 'approved' ? '✅ 已审批' : '⏳ 待审批'}</span>
           ${style.note ? '<span style="font-size:12px;padding:2px 10px;border-radius:20px;background:#f3f4f6;color:#6b7280;max-width:140px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis" title="' + escAttr(style.note||'') + '">📝 ' + escHtml(style.note) + '</span>' : ''}
           <span style="font-size:12px;color:#6b7280;margin-left:4px">📅 ${style.date}</span>
