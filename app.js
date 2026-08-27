@@ -2,7 +2,7 @@
 
 // ===== 应用版本号（每次更新递增）=====
 
-const APP_VERSION = '1.5.8';
+const APP_VERSION = '1.5.9';
 
 const VERSION_KEY = 'app_version';
 
@@ -4930,7 +4930,10 @@ function renderHistory() {
 
         </div>
 
-        <button class="del-history" data-role-block onclick="event.stopPropagation(); deleteHistory('${s.id}')" title="删除">✕</button>
+        <div style="position:absolute;top:8px;right:8px;display:flex;gap:4px">
+          ${s.status === 'approved' ? `<button class="del-history" data-role-block onclick="event.stopPropagation(); syncToLibrary('${s.id}')" title="同步到款式库" style="background:#10b981;color:#fff">📚</button>` : ''}
+          <button class="del-history" data-role-block onclick="event.stopPropagation(); deleteHistory('${s.id}')" title="删除">✕</button>
+        </div>
 
       </div>
 
@@ -7718,4 +7721,131 @@ if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initLibraryButtons);
 } else {
   initLibraryButtons();
+}
+
+
+// 同步已审批款式到款式库
+function syncToLibrary(styleId) {
+  var style = DB.styles.find(function(s) { return s.id === styleId; });
+  if (!style) {
+    toast('❌ 款式不存在');
+    return;
+  }
+  
+  if (style.status !== 'approved') {
+    toast('⚠️ 只有已审批的款式才能同步到款式库');
+    return;
+  }
+  
+  var library = getLibrary();
+  
+  // 检查是否已存在同名款式
+  var existingIdx = library.findIndex(function(item) { return item.name === style.name; });
+  
+  // 转换工序数据
+  var processes = (style.processes || []).map(function(p) {
+    return {
+      type: p.type || 'pingche',
+      name: p.name || '',
+      price: p.price || 0,
+      qty: p.qty || 1
+    };
+  });
+  
+  // 构建款式库数据
+  var libraryItem = {
+    id: 'lib_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+    name: style.name || '',
+    category: style.category || '',
+    tags: style.tags || [],
+    processes: processes,
+    image: (style.imgs && style.imgs[0]) || '',
+    note: style.note || '',
+    totalPrice: 0,
+    createdAt: new Date().toISOString(),
+    syncedFrom: styleId,
+    syncedAt: new Date().toISOString()
+  };
+  
+  // 计算总价
+  libraryItem.processes.forEach(function(p) {
+    libraryItem.totalPrice += (p.price || 0) * (p.qty || 1);
+  });
+  
+  if (existingIdx >= 0) {
+    // 更新已存在的款式
+    if (confirm('款式库中已存在同名款式"' + style.name + '"，是否更新？')) {
+      libraryItem.id = library[existingIdx].id;
+      libraryItem.createdAt = library[existingIdx].createdAt;
+      library[existingIdx] = libraryItem;
+      saveLibrary(library);
+      toast('✅ 款式已更新到款式库');
+    }
+  } else {
+    // 添加新款式
+    library.push(libraryItem);
+    saveLibrary(library);
+    toast('✅ 款式已同步到款式库');
+  }
+  
+  renderLibrary();
+}
+
+// 批量同步所有已审批款式到款式库
+function syncAllApprovedToLibrary() {
+  var approvedStyles = DB.styles.filter(function(s) { return s.status === 'approved'; });
+  if (approvedStyles.length === 0) {
+    toast('⚠️ 没有已审批的款式');
+    return;
+  }
+  
+  if (!confirm('确定要把 ' + approvedStyles.length + ' 个已审批款式同步到款式库吗？')) {
+    return;
+  }
+  
+  var library = getLibrary();
+  var added = 0;
+  var updated = 0;
+  
+  approvedStyles.forEach(function(style) {
+    var existingIdx = library.findIndex(function(item) { return item.name === style.name; });
+    
+    var processes = (style.processes || []).map(function(p) {
+      return {
+        type: p.type || 'pingche',
+        name: p.name || '',
+        price: p.price || 0,
+        qty: p.qty || 1
+      };
+    });
+    
+    var totalPrice = 0;
+    processes.forEach(function(p) { totalPrice += (p.price || 0) * (p.qty || 1); });
+    
+    var libraryItem = {
+      id: existingIdx >= 0 ? library[existingIdx].id : 'lib_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+      name: style.name || '',
+      category: style.category || '',
+      tags: style.tags || [],
+      processes: processes,
+      image: (style.imgs && style.imgs[0]) || '',
+      note: style.note || '',
+      totalPrice: totalPrice,
+      createdAt: existingIdx >= 0 ? library[existingIdx].createdAt : new Date().toISOString(),
+      syncedFrom: style.id,
+      syncedAt: new Date().toISOString()
+    };
+    
+    if (existingIdx >= 0) {
+      library[existingIdx] = libraryItem;
+      updated++;
+    } else {
+      library.push(libraryItem);
+      added++;
+    }
+  });
+  
+  saveLibrary(library);
+  renderLibrary();
+  toast('✅ 同步完成：新增 ' + added + ' 款，更新 ' + updated + ' 款');
 }

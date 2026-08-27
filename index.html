@@ -582,7 +582,10 @@
 
     <div class="card">
 
-      <div class="card-title"><span class="icon">📁</span> 历史款式</div>
+      <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+        <span><span class="icon">📁</span> 历史款式</span>
+        <button class="btn-add" data-role-block="" onclick="syncAllApprovedToLibrary()" style="margin:0;padding:8px 16px;background:#10b981;font-size:13px">📚 批量同步已审批到款式库</button>
+      </div>
 
       <div class="search-bar">
 
@@ -1028,7 +1031,7 @@
 
 <script src="default-data.js"></script>
 
-<script src="app.js?v=1.5.8"></script>
+<script src="app.js?v=1.5.9"></script>
 
 
 
