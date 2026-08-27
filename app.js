@@ -225,6 +225,16 @@ async function init() {
       document.getElementById('storageWarn').style.display = 'block';
     }
   }
+  
+  // ── 角色选择（纯前端模式）──
+  if (!useAPI) {
+    var savedRole = localStorage.getItem('app_role');
+    if (savedRole) {
+      selectRole(savedRole, true);
+    } else {
+      showRoleSelect();
+    }
+  }
 }
 
 // ===== 存储（localStorage + IndexedDB 双保险，联网模式走服务器 API）=====
@@ -232,6 +242,69 @@ let storageOK = true;
 let currentUser = null;
 const IDB_NAME = 'gf_cost_db_idb';
 const IDB_STORE = 'kv';
+
+// ===== 角色选择（纯前端模式）=====
+function selectRole(role, silent) {
+  if (!role) role = 'admin';
+  localStorage.setItem('app_role', role);
+  
+  var isAdmin = role === 'admin';
+  var badge = document.getElementById('userBadge');
+  var adminBtn = document.getElementById('adminBtn');
+  var logsTabBtn = document.getElementById('logsTabBtn');
+  var mnavLogs = document.getElementById('mnavLogs');
+  var changePwdBtn = document.getElementById('changePwdBtn');
+  var switchRoleBtn = document.getElementById('switchRoleBtn');
+  
+  // 更新用户徽章
+  if (badge) {
+    badge.textContent = isAdmin ? '👑 管理员' : '👤 普通用户';
+  }
+  
+  // 管理员功能显示/隐藏
+  if (adminBtn) adminBtn.style.display = isAdmin ? '' : 'none';
+  if (logsTabBtn) logsTabBtn.style.display = isAdmin ? '' : 'none';
+  if (mnavLogs) mnavLogs.style.display = isAdmin ? '' : 'none';
+  if (changePwdBtn) changePwdBtn.style.display = 'none'; // 纯前端模式都不需要修改密码
+  if (switchRoleBtn) switchRoleBtn.style.display = '';
+  
+  // 隐藏/显示导出导入按钮（普通用户只保留核心功能）
+  var topbarRight = document.querySelector('.topbar-right');
+  if (topbarRight) {
+    var btns = topbarRight.querySelectorAll('.btn-top');
+    btns.forEach(function(btn) {
+      var text = btn.textContent || '';
+      if (text.indexOf('导出数据') >= 0 || text.indexOf('导入备份') >= 0 || text.indexOf('合并同事') >= 0) {
+        btn.style.display = isAdmin ? '' : 'none';
+      }
+    });
+  }
+  
+  // 如果当前在操作日志标签且切换为普通用户，自动切回新款开发
+  if (!isAdmin) {
+    var activeTab = document.querySelector('.tab-btn.active');
+    if (activeTab && activeTab.dataset.tab === 'logs') {
+      document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+      document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
+      var devBtn = document.querySelector('[data-tab="dev"]');
+      if (devBtn) devBtn.classList.add('active');
+      document.getElementById('tab-dev').classList.add('active');
+    }
+  }
+  
+  // 隐藏角色选择弹窗
+  var overlay = document.getElementById('roleSelectOverlay');
+  if (overlay) overlay.style.display = 'none';
+  
+  if (!silent) {
+    toast(isAdmin ? '👑 已切换到管理员模式' : '👤 已切换到普通用户模式');
+  }
+}
+
+function showRoleSelect() {
+  var overlay = document.getElementById('roleSelectOverlay');
+  if (overlay) overlay.style.display = 'flex';
+}
 
 function idbOpen() {
   return new Promise((resolve) => {
