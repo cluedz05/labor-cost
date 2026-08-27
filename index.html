@@ -25,6 +25,7 @@
   <h1>👔 多绮爱服饰工序成本工具</h1>
   <button class="tab-btn active" data-tab="dev">📐 新款开发</button>
   <button class="tab-btn" data-tab="manage">⚙️ 工序管理</button>
+  <button class="tab-btn" data-tab="library">📚 款式库</button>
   <button class="tab-btn" data-tab="history">📁 历史款式</button>
   <button class="tab-btn" data-tab="recycle">🗑️ 回收站 <span id="recycleCount" style="display:none;background:#e94560;color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;margin-left:4px">0</span></button>
   <button class="tab-btn" data-tab="logs" id="logsTabBtn" style="">📊 操作日志</button>
@@ -237,6 +238,42 @@
         </div>
       <button class="btn-add" onclick="addProcess()">➕ 添加新工序</button>
       <button class="btn-add" data-role-block="" onclick="openBulkImport()" style="margin-left:10px;background:#4361ee">📥 批量导入工序</button>
+    </div>
+  </div>
+
+  <!-- ===== 款式库 ===== -->
+  <div id="tab-library" class="tab-content">
+    <div class="card">
+      <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+        <span><span class="icon">📚</span> 款式库 <span id="libraryCount" style="font-size:13px;color:#999;font-weight:normal">（0款）</span></span>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn-top" onclick="document.getElementById('libraryImportFile').click()" style="padding:6px 14px;font-size:12px;background:#4361ee">📥 导入Excel</button>
+          <button class="btn-top" onclick="exportLibrary()" style="padding:6px 14px;font-size:12px;background:#10b981">📤 导出Excel</button>
+          <button class="btn-top" onclick="addLibraryStyle()" style="padding:6px 14px;font-size:12px;background:#f59e0b">➕ 添加款式</button>
+        </div>
+      </div>
+      <input type="file" id="libraryImportFile" accept=".xlsx,.xls" style="display:none" onchange="importLibrary(event)">
+      
+      <div style="display:flex;gap:10px;margin:12px 0;flex-wrap:wrap">
+        <input type="text" id="librarySearch" placeholder="🔍 搜索款式名称、工序、标签…" oninput="renderLibrary()" autocomplete="off" style="flex:1;min-width:200px;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box">
+        <button class="btn-top" onclick="document.getElementById('libraryImageSearch').click()" style="padding:10px 16px;font-size:13px;background:#8b5cf6">🖼️ 以图搜款</button>
+        <input type="file" id="libraryImageSearch" accept="image/*" style="display:none" onchange="searchByImage(event)">
+        <select id="libraryCategory" onchange="renderLibrary()" style="padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px">
+          <option value="">全部分类</option>
+          <option value="针织">针织</option>
+          <option value="梭织">梭织</option>
+          <option value="婴童装">婴童装</option>
+          <option value="连衣裙">连衣裙</option>
+          <option value="套装">套装</option>
+          <option value="外套">外套</option>
+          <option value="牛仔裤">牛仔裤</option>
+          <option value="哈衣">哈衣</option>
+        </select>
+      </div>
+      
+      <div id="libraryList" class="library-list">
+        <div class="no-data">📚 款式库为空<br><span style="font-size:12px;color:#999">点击"导入Excel"或"添加款式"开始</span></div>
+      </div>
     </div>
   </div>
 
@@ -480,7 +517,7 @@
 </style>
 
 <script src="default-data.js"></script>
-<script src="app.js?v=1.4.2"></script>
+<script src="app.js?v=1.5.0"></script>
 
 <!-- 通知弹窗 -->
 <div class="modal-overlay" id="notifModal">

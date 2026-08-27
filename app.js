@@ -1,6 +1,6 @@
 
 // ===== 应用版本号（每次更新递增）=====
-const APP_VERSION = '1.4.2';
+const APP_VERSION = '1.5.0';
 const VERSION_KEY = 'app_version';
 
 // ===== 版本检测与数据保护 =====
@@ -3622,3 +3622,221 @@ async function pollNotifBadge() {
 
 
 init();
+
+// ===== 款式库功能 =====
+const LIBRARY_KEY = 'style_library';
+
+function getLibrary() {
+  try { return JSON.parse(localStorage.getItem(LIBRARY_KEY) || '[]'); } catch(e) { return []; }
+}
+
+function saveLibrary(library) {
+  localStorage.setItem(LIBRARY_KEY, JSON.stringify(library));
+}
+
+function renderLibrary() {
+  var library = getLibrary();
+  var search = (document.getElementById('librarySearch') || {}).value || '';
+  var category = (document.getElementById('libraryCategory') || {}).value || '';
+  var filtered = library.filter(function(item) {
+    if (category && item.category !== category) return false;
+    if (search) {
+      var keyword = search.toLowerCase();
+      var searchText = (item.name || '') + ' ' + (item.category || '') + ' ' + (item.tags || []).join(' ') + ' ' + (item.processes || []).map(function(p){return p.name;}).join(' ');
+      if (searchText.toLowerCase().indexOf(keyword) < 0) return false;
+    }
+    return true;
+  });
+  var countEl = document.getElementById('libraryCount');
+  if (countEl) countEl.textContent = '（' + filtered.length + '款）';
+  var listEl = document.getElementById('libraryList');
+  if (!listEl) return;
+  if (filtered.length === 0) {
+    listEl.innerHTML = '<div class="no-data">📚 没有找到匹配的款式<br><span style="font-size:12px;color:#999">试试其他关键词或分类</span></div>';
+    return;
+  }
+  var html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px">';
+  filtered.forEach(function(item, idx) {
+    var total = 0;
+    (item.processes || []).forEach(function(p) { total += (p.price || 0) * (p.qty || 1); });
+    var imgHtml = item.image 
+      ? '<img src="' + item.image + '" style="width:100%;height:160px;object-fit:cover;border-radius:8px 8px 0 0;cursor:pointer" onclick="viewLibraryImage(' + idx + ')">'
+      : '<div style="width:100%;height:160px;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;color:#fff;font-size:48px;border-radius:8px 8px 0 0">👔</div>';
+    var tagsHtml = (item.tags || []).map(function(t) { return '<span style="display:inline-block;background:#e0e7ff;color:#4338ca;padding:2px 8px;border-radius:10px;font-size:11px;margin:2px">' + escHtml(t) + '</span>'; }).join('');
+    html += '<div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.06)">';
+    html += imgHtml;
+    html += '<div style="padding:12px">';
+    html += '<div style="font-weight:600;font-size:15px;color:#1a1a2e;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + escHtml(item.name || '未命名') + '</div>';
+    html += '<div style="font-size:12px;color:#6b7280;margin-bottom:8px">分类：' + escHtml(item.category || '未分类') + ' | 工序：' + (item.processes || []).length + '道</div>';
+    html += '<div style="font-size:18px;font-weight:700;color:#e94560;margin-bottom:8px">¥' + total.toFixed(2) + '</div>';
+    html += '<div style="margin-bottom:10px;min-height:24px">' + tagsHtml + '</div>';
+    html += '<div style="display:flex;gap:6px">';
+    html += '<button onclick="loadLibraryStyle(' + idx + ')" style="flex:1;padding:6px;background:#4361ee;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px">📋 加载使用</button>';
+    html += '<button onclick="editLibraryStyle(' + idx + ')" style="padding:6px 10px;background:#f59e0b;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px">✏️</button>';
+    html += '<button onclick="deleteLibraryStyle(' + idx + ')" style="padding:6px 10px;background:#ef4444;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px">🗑️</button>';
+    html += '</div></div></div>';
+  });
+  html += '</div>';
+  listEl.innerHTML = html;
+}
+
+function viewLibraryImage(idx) {
+  var library = getLibrary();
+  var item = library[idx];
+  if (!item || !item.image) return;
+  var lightbox = document.getElementById('imgLightbox');
+  var img = document.getElementById('lightboxImg');
+  if (lightbox && img) { img.src = item.image; lightbox.style.display = 'flex'; }
+}
+
+function addLibraryStyle() {
+  var name = prompt('请输入款式名称：');
+  if (!name) return;
+  var category = prompt('请输入分类（如：针织、婴童装、连衣裙等）：', '针织') || '未分类';
+  var tags = prompt('请输入标签（用逗号分隔，如：短袖,圆领,婴童）：') || '';
+  var library = getLibrary();
+  library.unshift({
+    id: Date.now(), name: name, category: category,
+    tags: tags.split(/[,，]/).map(function(t){return t.trim();}).filter(Boolean),
+    image: '', processes: [], createdAt: Date.now()
+  });
+  saveLibrary(library); renderLibrary();
+  toast('✅ 已添加款式「' + name + '」');
+}
+
+function editLibraryStyle(idx) {
+  var library = getLibrary();
+  var item = library[idx];
+  if (!item) return;
+  var name = prompt('款式名称：', item.name || '');
+  if (name === null) return;
+  var category = prompt('分类：', item.category || '');
+  if (category === null) return;
+  var tags = prompt('标签（逗号分隔）：', (item.tags || []).join(','));
+  if (tags === null) return;
+  item.name = name; item.category = category;
+  item.tags = tags.split(/[,，]/).map(function(t){return t.trim();}).filter(Boolean);
+  library[idx] = item; saveLibrary(library); renderLibrary();
+  toast('✅ 已更新款式信息');
+}
+
+function deleteLibraryStyle(idx) {
+  var library = getLibrary();
+  var item = library[idx];
+  if (!item) return;
+  if (!confirm('确定删除款式「' + item.name + '」？')) return;
+  library.splice(idx, 1); saveLibrary(library); renderLibrary();
+  toast('✅ 已删除');
+}
+
+function loadLibraryStyle(idx) {
+  var library = getLibrary();
+  var item = library[idx];
+  if (!item) return;
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
+  var devBtn = document.querySelector('[data-tab="dev"]');
+  if (devBtn) devBtn.classList.add('active');
+  document.querySelectorAll('.tab-content').forEach(function(c){c.style.display='none';});
+  var devTab = document.getElementById('tab-dev');
+  if (devTab) devTab.style.display = 'block';
+  if (typeof loadStyle === 'function' && item.processes) {
+    var styleData = {
+      name: item.name, category: item.category,
+      date: new Date().toISOString().slice(0,10),
+      selections: item.processes.map(function(p) {
+        return { name: p.name, type: p.type, price: p.price, qty: p.qty || 1 };
+      })
+    };
+    loadStyle(styleData);
+  }
+  toast('✅ 已加载款式「' + item.name + '」');
+}
+
+function exportLibrary() {
+  var library = getLibrary();
+  if (library.length === 0) { toast('⚠️ 款式库为空，无法导出'); return; }
+  var typeNames = { pingche: '平车', zache: '扎车', kanche: '坎车' };
+  var rows = [['款式名称', '分类', '标签', '工序名称', '工序类型', '单价', '数量', '小计']];
+  library.forEach(function(item) {
+    var total = 0;
+    (item.processes || []).forEach(function(p) {
+      var subtotal = (p.price || 0) * (p.qty || 1);
+      total += subtotal;
+      rows.push([item.name || '', item.category || '', (item.tags || []).join(','), p.name || '', typeNames[p.type] || p.type || '', p.price || 0, p.qty || 1, subtotal.toFixed(2)]);
+    });
+    rows.push([item.name || '', '', '', '合计', '', '', '', total.toFixed(2)]);
+    rows.push(['', '', '', '', '', '', '', '']);
+  });
+  var ws = XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols'] = [{wch:20},{wch:10},{wch:20},{wch:30},{wch:10},{wch:8},{wch:8},{wch:10}];
+  var wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, '款式库');
+  var filename = '多绮爱服饰款式库_' + new Date().toISOString().slice(0,10) + '.xlsx';
+  XLSX.writeFile(wb, filename);
+  toast('✅ 已导出款式库：' + filename);
+}
+
+function importLibrary(event) {
+  var file = event.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var data = new Uint8Array(e.target.result);
+      var workbook = XLSX.read(data, {type: 'array'});
+      var sheetName = workbook.SheetNames[0];
+      var worksheet = workbook.Sheets[sheetName];
+      var jsonData = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+      var library = getLibrary();
+      var importCount = 0;
+      var currentStyle = null;
+      var typeMap = { '平车': 'pingche', '扎车': 'zache', '坎车': 'kanche' };
+      for (var i = 1; i < jsonData.length; i++) {
+        var row = jsonData[i];
+        if (!row || row.length === 0) continue;
+        var name = row[0] ? String(row[0]).trim() : '';
+        var category = row[1] ? String(row[1]).trim() : '';
+        var tags = row[2] ? String(row[2]).trim() : '';
+        var procName = row[3] ? String(row[3]).trim() : '';
+        var procType = row[4] ? String(row[4]).trim() : '';
+        var price = parseFloat(row[5]) || 0;
+        var qty = parseInt(row[6]) || 1;
+        if (name && name !== '合计' && procName !== '合计') {
+          if (currentStyle) { library.push(currentStyle); importCount++; }
+          currentStyle = {
+            id: Date.now() + Math.random(), name: name, category: category || '未分类',
+            tags: tags ? tags.split(/[,，]/).map(function(t){return t.trim();}).filter(Boolean) : [],
+            image: '', processes: [], createdAt: Date.now()
+          };
+          if (procName) { currentStyle.processes.push({ name: procName, type: typeMap[procType] || 'pingche', price: price, qty: qty }); }
+        } else if (currentStyle && procName && procName !== '合计') {
+          currentStyle.processes.push({ name: procName, type: typeMap[procType] || 'pingche', price: price, qty: qty });
+        }
+      }
+      if (currentStyle) { library.push(currentStyle); importCount++; }
+      saveLibrary(library); renderLibrary();
+      toast('✅ 成功导入 ' + importCount + ' 个款式');
+    } catch(err) {
+      console.error(err);
+      toast('❌ 导入失败：' + err.message);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+  event.target.value = '';
+}
+
+function searchByImage(event) {
+  var file = event.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var keyword = prompt('请输入款式关键词进行搜索（如：短袖、圆领、连衣裙等）：');
+    if (keyword) {
+      var searchInput = document.getElementById('librarySearch');
+      if (searchInput) { searchInput.value = keyword; renderLibrary(); }
+    }
+    toast('💡 以图搜索功能正在开发中，目前支持关键词搜索');
+  };
+  reader.readAsDataURL(file);
+  event.target.value = '';
+}
