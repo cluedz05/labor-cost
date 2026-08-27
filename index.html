@@ -247,16 +247,16 @@
       <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
         <span><span class="icon">📚</span> 款式库 <span id="libraryCount" style="font-size:13px;color:#999;font-weight:normal">（0款）</span></span>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <div onclick="document.getElementById('libraryImportFile').click()" style="min-width:110px;padding:8px 12px;background:#4361ee;color:#ffffff;font-size:13px;font-weight:600;text-align:center;border-radius:8px;cursor:pointer;user-select:none">📥 导入Excel</div>
-          <div onclick="exportLibrary()" style="min-width:110px;padding:8px 12px;background:#10b981;color:#ffffff;font-size:13px;font-weight:600;text-align:center;border-radius:8px;cursor:pointer;user-select:none">📤 导出Excel</div>
-          <div onclick="addLibraryStyle()" style="min-width:110px;padding:8px 12px;background:#f59e0b;color:#ffffff;font-size:13px;font-weight:600;text-align:center;border-radius:8px;cursor:pointer;user-select:none">➕ 添加款式</div>
+          <div onclick="document.getElementById('libraryImportFile').click()" style="min-width:120px;padding:10px 14px;background:#dbeafe;color:#1e40af;font-size:14px;font-weight:700;text-align:center;border:2px solid #3b82f6;border-radius:8px;cursor:pointer;user-select:none">📥 导入Excel</div>
+          <div onclick="exportLibrary()" style="min-width:120px;padding:10px 14px;background:#d1fae5;color:#065f46;font-size:14px;font-weight:700;text-align:center;border:2px solid #10b981;border-radius:8px;cursor:pointer;user-select:none">📤 导出Excel</div>
+          <div onclick="addLibraryStyle()" style="min-width:120px;padding:10px 14px;background:#fef3c7;color:#92400e;font-size:14px;font-weight:700;text-align:center;border:2px solid #f59e0b;border-radius:8px;cursor:pointer;user-select:none">➕ 添加款式</div>
         </div>
       </div>
       <input type="file" id="libraryImportFile" accept=".xlsx,.xls" style="display:none" onchange="importLibrary(event)">
       
       <div style="display:flex;gap:10px;margin:12px 0;flex-wrap:wrap">
         <input type="text" id="librarySearch" placeholder="🔍 搜索款式名称、工序、标签…" oninput="renderLibrary()" autocomplete="off" style="flex:1;min-width:200px;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box">
-        <div onclick="document.getElementById('libraryImageSearch').click()" style="padding:10px 14px;background:#8b5cf6;color:#ffffff;font-size:13px;font-weight:600;text-align:center;border-radius:8px;cursor:pointer;user-select:none">🖼️ 以图搜款</div>
+        <div onclick="document.getElementById('libraryImageSearch').click()" style="padding:10px 14px;background:#ede9fe;color:#5b21b6;font-size:14px;font-weight:700;text-align:center;border:2px solid #8b5cf6;border-radius:8px;cursor:pointer;user-select:none">🖼️ 以图搜款</div>
         <input type="file" id="libraryImageSearch" accept="image/*" style="display:none" onchange="searchByImage(event)">
         <select id="libraryCategory" onchange="renderLibrary()" style="padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px">
           <option value="">全部分类</option>
@@ -517,7 +517,7 @@
 </style>
 
 <script src="default-data.js"></script>
-<script src="app.js?v=1.5.5"></script>
+<script src="app.js?v=1.5.6"></script>
 
 <!-- 通知弹窗 -->
 <div class="modal-overlay" id="notifModal">
