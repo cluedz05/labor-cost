@@ -1,6 +1,6 @@
 
 // ===== 应用版本号（每次更新递增）=====
-const APP_VERSION = '1.4.0';
+const APP_VERSION = '1.4.1';
 const VERSION_KEY = 'app_version';
 
 // ===== 版本检测与数据保护 =====
@@ -843,6 +843,28 @@ function editUser(username) {
   html += '<input type="password" id="editPassword2" placeholder="再次输入新密码" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box">';
   html += '</div>';
   
+  // 权限设置
+  var perms = user.permissions || {};
+  var permList = [
+    { key: 'canAddStyle', label: '➕ 添加款式' },
+    { key: 'canEditStyle', label: '✏️ 编辑款式' },
+    { key: 'canDeleteStyle', label: '🗑️ 删除款式' },
+    { key: 'canExport', label: '📥 导出数据' },
+    { key: 'canManageProcesses', label: '🔧 管理工序' },
+    { key: 'canManageUsers', label: '👥 管理用户' }
+  ];
+  html += '<div style="margin-bottom:14px">';
+  html += '<label style="display:block;font-size:13px;font-weight:600;color:#333;margin-bottom:8px">🔐 权限设置</label>';
+  html += '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;background:#f8f9fa;padding:12px;border-radius:8px">';
+  permList.forEach(function(p) {
+    var checked = perms[p.key] ? 'checked' : '';
+    html += '<label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;color:#333">';
+    html += '<input type="checkbox" id="perm_' + p.key + '" ' + checked + ' style="width:16px;height:16px;cursor:pointer">';
+    html += '<span>' + p.label + '</span>';
+    html += '</label>';
+  });
+  html += '</div></div>';
+  
   html += '<div style="display:flex;gap:10px;margin-top:20px">';
   html += '<button onclick="saveEditUser(\'' + escAttr(username) + '\')" style="flex:1;padding:12px;background:#4361ee;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600">💾 保存修改</button>';
   html += '<button onclick="openAdminPanel()" style="flex:1;padding:12px;background:#f0f0f0;color:#333;border:none;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600">取消</button>';
@@ -928,6 +950,17 @@ function saveEditUser(oldUsername) {
     user.avatar = window._tempEditAvatar;
     window._tempEditAvatar = null;
   }
+  
+  // 保存权限设置
+  var permKeys = ['canAddStyle', 'canEditStyle', 'canDeleteStyle', 'canExport', 'canManageProcesses', 'canManageUsers'];
+  var permissions = {};
+  permKeys.forEach(function(key) {
+    var checkbox = document.getElementById('perm_' + key);
+    if (checkbox) {
+      permissions[key] = checkbox.checked;
+    }
+  });
+  user.permissions = permissions;
   
   saveUsers(users);
   toast('✅ 用户信息已更新');
@@ -2942,14 +2975,35 @@ function exportStyleXlsx() {
     return;
   }
   const typeNames = { pingche: '平车', zache: '扎车', kanche: '坎车' };
+  const typeOrder = ['pingche', 'zache', 'kanche'];
   const rows = [['工序名称*', '工序单价', '工序数量(样版可不填)', '备注(样版可不填)']];
-  style.selections.forEach(s => {
+  
+  // 按类型分组导出
+  typeOrder.forEach(function(type) {
+    var typeItems = style.selections.filter(function(s) { return s.type === type; });
+    if (typeItems.length === 0) return;
+    
+    var typeTotal = 0;
+    typeItems.forEach(function(s) {
+      var subtotal = s.price * s.qty;
+      typeTotal += subtotal;
+      rows.push([
+        s.name + ' (' + (typeNames[s.type] || s.type) + ')',
+        s.price,
+        s.qty,
+        ''
+      ]);
+    });
+    
+    // 添加类型合计行
     rows.push([
-      s.name + ' (' + (typeNames[s.type] || s.type) + ')',
-      s.price,
-      s.qty,
-      ''
+      (typeNames[type] || type) + '合计',
+      '',
+      '',
+      typeTotal.toFixed(2)
     ]);
+    // 添加空行分隔
+    rows.push(['', '', '', '']);
   });
   const ws = XLSX.utils.aoa_to_sheet(rows);
   ws['!cols'] = [{ wch: 28 }, { wch: 12 }, { wch: 16 }, { wch: 16 }];
