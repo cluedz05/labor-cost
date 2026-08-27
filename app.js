@@ -1,4 +1,88 @@
 
+// ===== 应用版本号（每次更新递增）=====
+const APP_VERSION = '1.2.0';
+const VERSION_KEY = 'app_version';
+
+// ===== 版本检测与数据保护 =====
+function checkVersionAndMigrate() {
+  var savedVersion = localStorage.getItem(VERSION_KEY);
+  if (!savedVersion) {
+    // 首次使用，保存版本号
+    localStorage.setItem(VERSION_KEY, APP_VERSION);
+    return { isFirstRun: true, isUpdate: false, oldVersion: null };
+  }
+  if (savedVersion !== APP_VERSION) {
+    // 检测到版本更新，做数据迁移（不覆盖已有数据）
+    console.log('🔄 检测到版本更新: ' + savedVersion + ' → ' + APP_VERSION);
+    // 数据迁移逻辑（目前数据结构兼容，只需更新版本号）
+    localStorage.setItem(VERSION_KEY, APP_VERSION);
+    return { isFirstRun: false, isUpdate: true, oldVersion: savedVersion };
+  }
+  return { isFirstRun: false, isUpdate: false, oldVersion: savedVersion };
+}
+
+// 显示更新提示条
+function showUpdateBanner(oldVersion) {
+  var banner = document.createElement('div');
+  banner.id = 'updateBanner';
+  banner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:linear-gradient(135deg,#10b981,#059669);color:#fff;padding:10px 20px;z-index:999999;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 10px rgba(0,0,0,0.2);font-size:14px';
+  banner.innerHTML = '<span>✨ 已更新到新版本 v' + APP_VERSION + '（从 v' + oldVersion + ' 更新），数据已自动保留</span><div style="display:flex;gap:10px"><button onclick="dismissUpdateBanner()" style="background:rgba(255,255,255,0.2);border:none;color:#fff;padding:4px 12px;border-radius:6px;cursor:pointer;font-size:12px">知道了</button></div>';
+  document.body.appendChild(banner);
+  // 调整页面顶部间距
+  document.body.style.paddingTop = '44px';
+}
+
+function dismissUpdateBanner() {
+  var banner = document.getElementById('updateBanner');
+  if (banner) banner.remove();
+  document.body.style.paddingTop = '';
+}
+
+// 定期检测新版本（每5分钟检查一次）
+let updateCheckTimer = null;
+function startUpdateChecker() {
+  if (updateCheckTimer) clearInterval(updateCheckTimer);
+  updateCheckTimer = setInterval(function() {
+    checkForNewVersion();
+  }, 5 * 60 * 1000); // 每5分钟检查一次
+}
+
+async function checkForNewVersion() {
+  try {
+    var r = await fetch('app.js?v=' + Date.now());
+    var text = await r.text();
+    // 从app.js中提取版本号
+    var match = text.match(/const APP_VERSION = '([^']+)'/);
+    if (match && match[1] && match[1] !== APP_VERSION) {
+      // 检测到新版本，显示更新提示
+      showNewVersionBanner(match[1]);
+    }
+  } catch(e) {
+    // 静默失败
+  }
+}
+
+function showNewVersionBanner(newVersion) {
+  if (document.getElementById('newVersionBanner')) return;
+  var banner = document.createElement('div');
+  banner.id = 'newVersionBanner';
+  banner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:linear-gradient(135deg,#4361ee,#3a56d4);color:#fff;padding:10px 20px;z-index:999999;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 10px rgba(0,0,0,0.2);font-size:14px';
+  banner.innerHTML = '<span>🚀 发现新版本 v' + newVersion + '，点击立即更新（数据不会丢失）</span><div style="display:flex;gap:10px"><button onclick="reloadForUpdate()" style="background:rgba(255,255,255,0.25);border:none;color:#fff;padding:4px 16px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">立即更新</button><button onclick="dismissNewVersionBanner()" style="background:rgba(255,255,255,0.15);border:none;color:#fff;padding:4px 12px;border-radius:6px;cursor:pointer;font-size:12px">稍后</button></div>';
+  document.body.appendChild(banner);
+  document.body.style.paddingTop = '44px';
+}
+
+function dismissNewVersionBanner() {
+  var banner = document.getElementById('newVersionBanner');
+  if (banner) banner.remove();
+  document.body.style.paddingTop = '';
+}
+
+function reloadForUpdate() {
+  // 刷新页面加载新版本，数据保存在localStorage中不会丢失
+  window.location.reload();
+}
+
 // ===== 屏蔽浏览器自动填充 =====
 (function() {
   // 生成随机字符串，防止浏览器匹配保存的表单值
@@ -216,6 +300,16 @@ async function init() {
   
   // ── 纯前端模式：检查登录状态 ──
   if (!useAPI) {
+    // 版本检测与数据保护（不覆盖已有数据）
+    var versionInfo = checkVersionAndMigrate();
+    if (versionInfo.isUpdate) {
+      // 延迟显示更新提示，等页面加载完成
+      setTimeout(function() {
+        showUpdateBanner(versionInfo.oldVersion);
+      }, 500);
+    }
+    // 启动新版本定期检测
+    startUpdateChecker();
     initUsers();
     checkLogin();
   }
