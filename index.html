@@ -1,547 +1,547 @@
-<html lang="zh-CN"><head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>澶氱划鐖辨湇楗板伐搴忔垚鏈伐鍏?/title>
-
-<meta name="description" content="澶氱划鐖辨湇楗板伐搴忔垚鏈伐鍏?- 鏈嶈鍔犲伐鎴愭湰绠＄悊绯荤粺">
-<meta name="keywords" content="鏈嶈鍔犲伐,宸ュ簭鎴愭湰,鎴愭湰绠＄悊,璁′欢宸ヨ祫,鏈嶈鐢熶骇">
-<meta name="author" content="澶氱划鐖辨湇楗?>
-<meta property="og:title" content="澶氱划鐖辨湇楗板伐搴忔垚鏈伐鍏?>
-<meta property="og:description" content="鏈嶈鍔犲伐鎴愭湰绠＄悊绯荤粺 - 宸ュ簭绠＄悊銆佹垚鏈牳绠椼€佹暟鎹鍑?>
-<meta property="og:type" content="website">
-
-<meta name="theme-color" content="#ff6600">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="鐜嬬偢宸ュ叿">
-
-
-<script src="xlsx.full.min.js"></script>
-<link rel="stylesheet" href="style.css"><link rel="stylesheet" href="style-extra.css"></head>
-<body>
-
-<!-- 椤堕儴瀵艰埅 -->
-<div class="topbar">
-  <h1>馃憯 澶氱划鐖辨湇楗板伐搴忔垚鏈伐鍏?/h1>
-  <button class="tab-btn active" data-tab="dev">馃搻 鏂版寮€鍙?/button>
-  <button class="tab-btn" data-tab="manage">鈿欙笍 宸ュ簭绠＄悊</button>
-  <button class="tab-btn" data-tab="library">馃摎 娆惧紡搴?/button>
-  <button class="tab-btn" data-tab="history">馃搧 鍘嗗彶娆惧紡</button>
-  <button class="tab-btn" data-tab="recycle">馃棏锔?鍥炴敹绔?<span id="recycleCount" style="display:none;background:#e94560;color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;margin-left:4px">0</span></button>
-  <button class="tab-btn" data-tab="logs" id="logsTabBtn" style="">馃搳 鎿嶄綔鏃ュ織</button>
-  <button class="btn-top" id="adminBtn" onclick="openAdminPanel()" style="background: rgba(233, 69, 96, 0.2); border: 1px solid rgba(233, 69, 96, 0.4); color: rgb(255, 138, 154);">馃憫 绠＄悊鍚庡彴</button>
-  <div class="topbar-right">
-    <button class="btn-top" id="notifBell" onclick="showNotifyModal()" style="display: inline-flex; position: relative;">馃敂 <span id="notifBadge" style="display:none;position:absolute;top:-6px;right:-6px;background:#e94560;color:#fff;border-radius:50%;width:18px;height:18px;font-size:11px;line-height:18px;text-align:center;font-weight:700">0</span></button>
-        <span id="userBadge" style="font-size: 12px; color: rgba(255, 255, 255, 0.5);">馃懁 鏈櫥褰?/span>
-    <button class="btn-top" id="logoutBtn" onclick="doLogout()" style="">馃毆 閫€鍑虹櫥褰?/button>
-    <button class="btn-top" id="changePwdBtn" onclick="openChangePwd()" style="background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.2);">馃攽 淇敼瀵嗙爜</button>
-    <button class="btn-top" data-role-block="" onclick="exportData()">馃捑 瀵煎嚭鏁版嵁</button>
-    <button class="btn-top" data-role-block="" onclick="showBackupManager()" style="background:rgba(16,185,129,0.2);border-color:rgba(16,185,129,0.4);color:#6ee7b7">馃梻锔?澶囦唤绠＄悊</button>
-    <button class="btn-top" data-role-block="" onclick="importMode='replace';document.getElementById('importFile').click()">馃搨 瀵煎叆澶囦唤</button>
-    <button class="btn-top" data-role-block="" onclick="importMode='merge';document.getElementById('importFile').click()">馃攧 鍚堝苟鍚屼簨鏁版嵁</button>
-    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
-  </div>
-</div>
-
-<div id="storageWarn">鈿狅笍 褰撳墠娴忚鍣ㄦ棤娉曚繚瀛樻暟鎹紙澶氫负鐢?Safari 鎵撳紑鏈湴鏂囦欢鎵€鑷达級锛岃鐢?<b>Chrome / Edge</b> 鍙屽嚮鎵撳紑鏈枃浠讹紝閬垮厤鏁版嵁涓㈠け</div>
-
-<div id="syncBar" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9998;background:linear-gradient(90deg,#10b981,#059669);color:#fff;padding:8px 16px;text-align:center;font-size:14px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,0.15);animation:slideDown 0.3s ease"><span id="syncBarText">鉁?宸插悓姝ユ湇鍔″櫒鏈€鏂版暟鎹?/span></div>
-
-<div id="unloginOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:none;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;padding:40px">
-  <div style="font-size:64px;margin-bottom:20px">馃攼</div>
-  <h2 style="font-size:24px;margin-bottom:12px">璇峰厛鐧诲綍</h2>
-  <p style="color:rgba(255,255,255,0.6);font-size:15px;margin-bottom:28px">鏈伐鍏烽渶瑕佺櫥褰曞悗鎵嶈兘浣跨敤<br>鏁版嵁淇濆瓨鍦ㄦ湇鍔″櫒锛屽浜哄疄鏃跺叡浜?/p>
-  <a href="/" style="background:#e94560;color:#fff;padding:14px 36px;border-radius:12px;font-size:16px;font-weight:700;text-decoration:none;box-shadow:0 6px 20px rgba(233,69,96,0.4)">鍘荤櫥褰?/ 娉ㄥ唽</a>
-</div>
-
-<!-- 鐧诲綍/娉ㄥ唽寮圭獥 -->
-<div id="loginOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99999;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;padding:40px">
-  <div style="background:#fff;border-radius:20px;padding:36px 32px;max-width:400px;width:90%;color:#333;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
-    <div style="font-size:48px;margin-bottom:8px">馃憯</div>
-    <h2 style="font-size:22px;font-weight:700;color:#1a1a2e;margin-bottom:4px">澶氱划鐖辨湇楗板伐搴忔垚鏈伐鍏?/h2>
-    <p style="font-size:13px;color:#888;margin-bottom:24px" id="loginSubtitle">璇风櫥褰曞悗浣跨敤</p>
-    
-    <!-- 鐧诲綍琛ㄥ崟 -->
-    <div id="loginForm">
-      <div class="field-group" style="margin-bottom:14px;text-align:left">
-        <div class="field-label" style="font-size:13px;font-weight:600;margin-bottom:6px;color:#555">馃懁 鐢ㄦ埛鍚?/div>
-        <input class="field-input" type="text" id="loginUsername" placeholder="璇疯緭鍏ョ敤鎴峰悕" autocomplete="username" style="width:100%;padding:12px;border:1.5px solid #ddd;border-radius:10px;font-size:14px;box-sizing:border-box;outline:none">
-      </div>
-      <div class="field-group" style="margin-bottom:8px;text-align:left">
-        <div class="field-label" style="font-size:13px;font-weight:600;margin-bottom:6px;color:#555">馃攽 瀵嗙爜</div>
-        <input class="field-input" type="password" id="loginPassword" placeholder="璇疯緭鍏ュ瘑鐮? autocomplete="current-password" style="width:100%;padding:12px;border:1.5px solid #ddd;border-radius:10px;font-size:14px;box-sizing:border-box;outline:none" onkeydown="if(event.key==='Enter')doLogin()">
-      </div>
-      <p id="loginMsg" style="font-size:13px;color:#e94560;margin:8px 0;min-height:18px"></p>
-      <button onclick="doLogin()" style="width:100%;height:46px;background:linear-gradient(135deg,#e94560,#c2324f);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;margin-bottom:12px">馃敁 鐧诲綍</button>
-      <p style="font-size:13px;color:#888;margin:0">杩樻病鏈夎处鍙凤紵<a href="javascript:void(0)" onclick="showRegister()" style="color:#e94560;font-weight:600;text-decoration:none">绔嬪嵆娉ㄥ唽</a></p>
-    </div>
-    
-    <!-- 娉ㄥ唽琛ㄥ崟 -->
-    <div id="registerForm" style="display:none">
-      <div class="field-group" style="margin-bottom:14px;text-align:left">
-        <div class="field-label" style="font-size:13px;font-weight:600;margin-bottom:6px;color:#555">馃懁 鐢ㄦ埛鍚?/div>
-        <input class="field-input" type="text" id="regUsername" placeholder="璇疯緭鍏ョ敤鎴峰悕锛?-20浣嶏級" autocomplete="username" style="width:100%;padding:12px;border:1.5px solid #ddd;border-radius:10px;font-size:14px;box-sizing:border-box;outline:none">
-      </div>
-      <div class="field-group" style="margin-bottom:14px;text-align:left">
-        <div class="field-label" style="font-size:13px;font-weight:600;margin-bottom:6px;color:#555">馃攽 瀵嗙爜</div>
-        <input class="field-input" type="password" id="regPassword" placeholder="璇疯緭鍏ュ瘑鐮侊紙鑷冲皯4浣嶏級" autocomplete="new-password" style="width:100%;padding:12px;border:1.5px solid #ddd;border-radius:10px;font-size:14px;box-sizing:border-box;outline:none">
-      </div>
-      <div class="field-group" style="margin-bottom:8px;text-align:left">
-        <div class="field-label" style="font-size:13px;font-weight:600;margin-bottom:6px;color:#555">馃攽 纭瀵嗙爜</div>
-        <input class="field-input" type="password" id="regPassword2" placeholder="璇峰啀娆¤緭鍏ュ瘑鐮? autocomplete="new-password" style="width:100%;padding:12px;border:1.5px solid #ddd;border-radius:10px;font-size:14px;box-sizing:border-box;outline:none" onkeydown="if(event.key==='Enter')doRegister()">
-      </div>
-      <p id="regMsg" style="font-size:13px;color:#e94560;margin:8px 0;min-height:18px"></p>
-      <button onclick="doRegister()" style="width:100%;height:46px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;margin-bottom:12px">馃摑 娉ㄥ唽</button>
-      <p style="font-size:13px;color:#888;margin:0">宸叉湁璐﹀彿锛?a href="javascript:void(0)" onclick="showLogin()" style="color:#10b981;font-weight:600;text-decoration:none">杩斿洖鐧诲綍</a></p>
-    </div>
-  </div>
-</div>
-
-<!-- 寰呭鎵归伄缃?-->
-<div id="pendingOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:9998;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;padding:40px">
-  <div style="font-size:64px;margin-bottom:20px">鈴?/div>
-  <h2 style="font-size:24px;margin-bottom:12px">璐﹀彿绛夊緟瀹℃壒</h2>
-  <p style="color:rgba(255,255,255,0.6);font-size:15px;margin-bottom:24px">鎮ㄧ殑璐﹀彿姝ｅ湪绛夊緟绠＄悊鍛樺鎵?br>璇疯仈绯荤鐞嗗憳寮€閫氭潈闄愬悗鍐嶈瘯</p>
-  <div style="background:rgba(233,69,96,0.15);border:1px solid rgba(233,69,96,0.3);border-radius:12px;padding:16px 28px;font-size:14px;color:#ff8a8a;margin-bottom:28px">鎻愮ず锛氱鐞嗗憳(admin) 鐧诲綍鍚庡彲鍦ㄦ椤甸潰<br>銆岎煈?绠＄悊鍚庡彴 鈫?鐢ㄦ埛鏉冮檺绠＄悊銆嶄腑瀹℃壒璐﹀彿</div>
-  <a href="/" style="background:#444;color:rgba(255,255,255,0.7);padding:12px 28px;border-radius:12px;font-size:14px;text-decoration:none">馃懁 鍒囨崲璐﹀彿</a>
-</div>
-
-<div class="main">
-
-  <!-- ===== 鏂版寮€鍙?===== -->
-  <div id="tab-dev" class="tab-content active">
-    <div class="card">
-      <div class="card-title"><span class="icon">馃憯</span> 娆惧紡淇℃伅</div>
-      <div class="style-header">
-        <div class="img-grid-row" id="imgGrid"><div class="img-upload-box" id="imgSlot0" ondragover="onImgDragOver(event,0)" ondragenter="onImgDragEnter(event,0)" ondragleave="onImgDragLeave(event,0)" ondrop="onImgDrop(event,0)" onclick="openImgSlot(0)">
-      <div class="placeholder"><span class="icon">馃摲</span><span>绗?寮?br><span style="font-size:11px;color:#bbb">鐐瑰嚮鎴栨嫋鍏ユ垨Ctrl+V绮樿创</span></span></div>
-    </div></div>
-        <input type="file" id="imgInput" accept="image/*" style="display:none" onchange="imgChange(event)">
-        <div class="style-info">
-          <div class="row" style="display:contents">
-            <div class="field-cell field-pos">
-              <span class="fp-label">娆惧彿 / 娆惧悕</span>
-              <input type="text" id="styleName" placeholder="渚嬪锛歋2501 濂宠杩炶。瑁? autocomplete="off">
-            </div>
-            <div class="field-cell field-pos">
-              <span class="fp-label">澶囨敞</span>
-              <input type="text" id="styleNote" placeholder="閫夊～锛屽棰滆壊/闈㈡枡" autocomplete="off">
-            </div>
-            <div class="field-cell field-pos">
-              <span class="fp-label">鐘舵€?/span>
-              <select id="styleStatus">
-                <option value="pending">鈴?寰呭鎵?/option>
-                <option value="approved">鉁?宸插鎵?/option>
-              </select>
-            </div>
-            <div class="field-cell field-pos">
-              <span class="fp-label">鍒涘缓鏃ユ湡</span>
-              <input type="text" id="styleDate" readonly="">
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title"><span class="icon">馃搵</span> 绮樿创瀵煎叆琛ㄦ牸</div>
-      <div style="margin-bottom:12px;color:#666;font-size:13px">
-        浠?Excel 澶嶅埗琛ㄦ牸鍚庣矘璐村埌涓嬫柟锛屾牸寮忥細<b>宸ュ簭鍚嶇О | 鍗曚环 | 绉嶇被</b>锛?鍒楋級銆傚伐搴忎笉瀛樺湪浼氳嚜鍔ㄦ坊鍔犲埌宸ュ簭搴撱€?
-      </div>
-      <textarea id="pasteArea" placeholder="鍦ㄦ绮樿创琛ㄦ牸鏁版嵁...
-绀轰緥锛?
-鍋氫笂涓嬮瀹氬敍鍘嬮棬杈圭嚎	2.2	骞宠溅
-鍒掍綅杞﹀彛琚?瑁呰鐩?1.6	骞宠溅
-鍋氳鍙ｄ竴鏁村	1.6	骞宠溅
-琛剼鍗疯竟	0.4	骞宠溅
-鍩嬭偐涓婅鍩嬪す钀藉敍	0.6	鎵庤溅" style="width:100%;height:120px;padding:12px;border:1px solid #ddd;border-radius:8px;font-size:13px;resize:vertical" onpaste="handlePasteTable(event)" autocomplete="off" name="_x4xottvsu_pasteArea"></textarea>
-      <div style="display:flex;gap:10px;margin-top:12px">
-        <button class="btn-add" onclick="parsePastedTable()">馃摜 瑙ｆ瀽骞跺鍏?/button>
-        <button class="btn-top" onclick="document.getElementById('pasteArea').value=''">娓呯┖</button>
-        <span id="pasteResult" style="margin-left:auto;color:#666;font-size:13px;line-height:36px"></span>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">
-        <span><span class="icon">馃敡</span> 宸ュ簭閫夋嫨</span>
-        <button class="btn-add" data-role-block="" style="margin:0;padding:6px 14px;font-size:12px;background:linear-gradient(135deg,#e94560,#c13050);color:#fff;border:none;border-radius:8px;cursor:pointer" onclick="openQuickAddProcess()">鉃?鏂板宸ュ簭</button>
-      </div>
-      <div class="search-bar" style="margin-bottom:14px">
-        <input type="text" id="procFilter" name="_x4xottvsu_procFilter" placeholder="馃攳 杈撳叆宸ュ簭鍚嶇瓫閫夛紙涓夊垎绫诲悓姝ワ級" oninput="processFilter=this.value.trim();renderProcessSelect()" autocomplete="off">
-        <button class="btn-add" style="margin:0;padding:10px 16px;white-space:nowrap" onclick="document.getElementById('procFilter').value='';processFilter='';renderProcessSelect()">娓呯┖绛涢€?/button>
-      </div>
-      <div class="process-select-section">
-        <div class="process-col">
-          <div class="process-col-header pingche">馃毑 骞宠溅</div>
-          <div class="process-col-items" id="col-pingche">
-          </div>
-        </div>
-        <div class="process-col">
-          <div class="process-col-header zache">鈿?鎵庤溅</div>
-          <div class="process-col-items" id="col-zache">
-          </div>
-        </div>
-        <div class="process-col">
-          <div class="process-col-header kanche">馃敧 鍧庤溅</div>
-          <div class="process-col-items" id="col-kanche">
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title" style="display:flex;justify-content:space-between;align-items:center"><span><span class="icon">馃搵</span> 宸ュ簭鏄庣粏姹囨€?/span><button class="btn-top" data-role-block="" onclick="clearAllSelected()" style="padding:6px 12px;font-size:12px">馃棏锔?娓呯┖鍏ㄩ儴</button></div>
-      <table class="selected-table">
-        <thead>
-          <tr>
-            <th>宸ュ簭鍚嶇О</th>
-            <th>绫诲瀷</th>
-            <th>鏁伴噺</th>
-            <th>鍗曚环</th>
-            <th>灏忚</th>
-            <th style="width:50px">鎿嶄綔</th>
-          </tr>
-        </thead>
-        <tbody id="selectedBody"></tbody>
-      </table>
-      <div class="summary-bar">
-        <div class="summary-breakdown">
-          <div class="bd-item"><span class="bd-label">馃毑 骞宠溅</span><span class="bd-val" id="subPingche">楼0.00</span></div>
-          <div class="bd-item"><span class="bd-label">鈿?鎵庤溅</span><span class="bd-val" id="subZache">楼0.00</span></div>
-          <div class="bd-item"><span class="bd-label">馃敧 鍧庤溅</span><span class="bd-val" id="subKanche">楼0.00</span></div>
-        </div>
-        <div style="text-align:right">
-          <div class="total-label" id="totalCount" style="font-size:12px">鍏?0 閬撳伐搴?/div>
-          <div class="total-money" id="totalMoney">楼0.00<small> 鍏?/small></div>
-        </div>
-      </div>
-      <div class="action-btns">
-        <button class="btn-action save" data-role-block="" onclick="saveStyle()">馃捑 淇濆瓨娆惧紡</button>
-        <button class="btn-action print" onclick="openPrint()">馃枿锔?鎵撳嵃 / 棰勮</button>
-        <button class="btn-action clear" data-role-block="" onclick="clearStyle()">馃棏锔?娓呯┖</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== 宸ュ簭绠＄悊 ===== -->
-  <div id="tab-manage" class="tab-content">
-    <div class="card">
-      <div class="card-title"><span class="icon">鈿欙笍</span> 宸ュ簭鍗曚环绠＄悊</div>
-      <div class="machine-tabs">
-        <button class="machine-tab pingche active" onclick="switchMachine('pingche')">馃毑 骞宠溅</button>
-        <button class="machine-tab zache" onclick="switchMachine('zache')">鈿?鎵庤溅</button>
-        <button class="machine-tab kanche" onclick="switchMachine('kanche')">馃敧 鍧庤溅</button>
-      </div>
-      <input type="text" id="manageSearch" placeholder="馃攳 鎼滅储宸ュ簭鍚嶇О鈥? oninput="renderManageList()" autocomplete="off" style="width:100%;margin:12px 0;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box" name="_x4xottvsu_manageSearch">
-      <div class="process-list" id="manageList">
-        </div>
-      <button class="btn-add" onclick="addProcess()">鉃?娣诲姞鏂板伐搴?/button>
-      <button class="btn-add" data-role-block="" onclick="openBulkImport()" style="margin-left:10px;background:#4361ee">馃摜 鎵归噺瀵煎叆宸ュ簭</button>
-    </div>
-  </div>
-
-  <!-- ===== 娆惧紡搴?===== -->
-  <div id="tab-library" class="tab-content">
-    <div class="card">
-      <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
-        <span><span class="icon">馃摎</span> 娆惧紡搴?<span id="libraryCount" style="font-size:13px;color:#999;font-weight:normal">锛?娆撅級</span></span>
-        <div id="libraryButtons" style="display:flex;gap:8px;flex-wrap:wrap"></div>
-      </div>
-      <input type="file" id="libraryImportFile" accept=".xlsx,.xls" style="display:none" onchange="importLibrary(event)">
-      
-      <div style="display:flex;gap:10px;margin:12px 0;flex-wrap:wrap">
-        <input type="text" id="librarySearch" placeholder="馃攳 鎼滅储娆惧紡鍚嶇О銆佸伐搴忋€佹爣绛锯€? oninput="renderLibrary()" autocomplete="off" style="flex:1;min-width:200px;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box">
-        <div id="libraryImageSearchBtn"></div>
-        <input type="file" id="libraryImageSearch" accept="image/*" style="display:none" onchange="searchByImage(event)">
-        <select id="libraryCategory" onchange="renderLibrary()" style="padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px">
-          <option value="">鍏ㄩ儴鍒嗙被</option>
-          <option value="閽堢粐">閽堢粐</option>
-          <option value="姊粐">姊粐</option>
-          <option value="濠寸瑁?>濠寸瑁?/option>
-          <option value="杩炶。瑁?>杩炶。瑁?/option>
-          <option value="濂楄">濂楄</option>
-          <option value="澶栧">澶栧</option>
-          <option value="鐗涗粩瑁?>鐗涗粩瑁?/option>
-          <option value="鍝堣。">鍝堣。</option>
-        </select>
-      </div>
-      
-      <div id="libraryList" class="library-list">
-        <div class="no-data">馃摎 娆惧紡搴撲负绌?br><span style="font-size:12px;color:#999">鐐瑰嚮"瀵煎叆Excel"鎴?娣诲姞娆惧紡"寮€濮?/span></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== 鍥炴敹绔?===== -->
-  <div id="tab-recycle" class="tab-content">
-    <div class="card">
-      <div class="card-title" style="display:flex;justify-content:space-between;align-items:center">
-        <span><span class="icon">馃棏锔?/span> 鍥炴敹绔?/span>
-        <button class="btn-top" data-role-block="" onclick="emptyRecycleBin()" style="padding:6px 14px;font-size:12px;background:#dc2626">馃敟 娓呯┖鍥炴敹绔?/button>
-      </div>
-      <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:12px;margin-bottom:16px;font-size:13px;color:#9a3412">
-        馃挕 <b>鍥炴敹绔欒鏄?/b>锛氬垹闄ょ殑娆惧紡浼氬湪姝や繚鐣?<b>30澶?/b>锛屾湡闂村彲浠ユ仮澶嶃€傝秴杩?30 澶╃殑娆惧紡浼氳嚜鍔ㄦ竻鐞嗐€?
-      </div>
-      <div id="recycleList" class="recycle-list"><div class="no-data">馃摥 鍥炴敹绔欎负绌?br><span style="font-size:12px;color:#999">鍒犻櫎鐨勬寮忎細鍦ㄦ淇濈暀30澶╋紝涔嬪悗鑷姩娓呯悊</span></div></div>
-    </div>
-  </div>
-
-  <!-- ===== 鍘嗗彶娆惧紡 ===== -->
-  <div id="tab-history" class="tab-content">
-    <div class="card">
-      <div class="card-title"><span class="icon">馃搧</span> 鍘嗗彶娆惧紡</div>
-      <div class="search-bar">
-        <input type="text" id="searchInput" placeholder="馃攳 鎼滅储娆惧彿/娆惧悕鈥? oninput="renderHistory()" autocomplete="off" name="_x4xottvsu_searchInput">
-        <button class="btn-add" data-role-block="" onclick="clearHistorySearch()" style="margin:0;padding:10px 16px;background:#6b7280">馃攳 娓呴櫎绛涢€?/button>
-      </div>
-      <div class="history-list" id="historyList">
-        <div class="no-data">馃摥 鏆傛棤淇濆瓨鐨勬寮?br><span style="font-size:13px">鍦ㄦ柊娆惧紑鍙戜腑淇濆瓨娆惧紡鍚庝細鑷姩鍑虹幇鍦ㄨ繖閲?/span></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== 鎿嶄綔鏃ュ織 ===== -->
-  <div id="tab-logs" class="tab-content">
-    <div class="card">
-      <div class="card-title"><span class="icon">馃搳</span> 鎿嶄綔鏃ュ織 <span id="logTotal" style="font-size:13px;color:#888;font-weight:400"></span></div>
-      <div class="search-bar" style="gap:8px;flex-wrap:wrap;margin-bottom:14px">
-        <select id="logTimeFilter" onchange="loadLogs(true)" style="padding:9px 12px;border:1.5px solid #ddd;border-radius:8px;font-size:13px;font-family:inherit">
-          <option value="0">鍏ㄩ儴鏃堕棿</option>
-          <option value="7">鏈€杩?7 澶?/option>
-          <option value="30">鏈€杩?30 澶?/option>
-          <option value="90">鏈€杩?90 澶?/option>
-        </select>
-        <select id="logUserFilter" onchange="loadLogs(true)" style="padding:9px 12px;border:1.5px solid #ddd;border-radius:8px;font-size:13px;font-family:inherit">
-          <option value="">馃懁 鍏ㄩ儴鐢ㄦ埛</option>
-        </select>
-        <select id="logActionFilter" onchange="loadLogs(true)" style="padding:9px 12px;border:1.5px solid #ddd;border-radius:8px;font-size:13px;font-family:inherit">
-          <option value="">鈿欙笍 鍏ㄩ儴鎿嶄綔</option>
-          <option value="login">馃敁 鐧诲綍</option>
-          <option value="logout">馃敀 閫€鍑?/option>
-          <option value="register">馃摑 娉ㄥ唽</option>
-          <option value="save_style">馃捑 淇濆瓨娆惧紡</option>
-          <option value="delete_style">馃棏锔?鍒犻櫎娆惧紡</option>
-          <option value="restore_style">鈾伙笍 鎭㈠娆惧紡</option>
-          <option value="permanent_delete">馃敟 褰诲簳鍒犻櫎</option>
-          <option value="approve">鉁?閫氳繃瀹℃壒</option>
-          <option value="reject">鈫╋笍 閫€鍥炲鎵?/option>
-          <option value="empty_recycle">馃棏锔?娓呯┖鍥炴敹绔?/option>
-          <option value="clear_history">馃棏锔?娓呯┖娆惧紡</option>
-          <option value="import">馃搨 瀵煎叆澶囦唤</option>
-          <option value="merge">馃攧 鍚堝苟鏁版嵁</option>
-          <option value="export">馃捑 瀵煎嚭鏁版嵁</option>
-          <option value="clear_logs">馃棏锔?娓呯┖鏃ュ織</option>
-        </select>
-        <input type="text" id="logKeyword" placeholder="馃攳 鎼滅储璇︽儏鈥? oninput="loadLogs(true)" style="padding:9px 12px;border:1.5px solid #ddd;border-radius:8px;font-size:13px;font-family:inherit;flex:1;min-width:160px" autocomplete="off">
-        <button class="btn-add" onclick="loadLogs(true)" style="margin:0;padding:9px 14px">馃攧 鍒锋柊</button>
-      </div>
-      <div id="logsList"></div>
-      <div id="loadMoreLogs" style="display:none;text-align:center;padding:16px">
-        <button class="btn-add" onclick="loadLogs(false)" style="background:#4361ee">馃摜 鍔犺浇鏇村锛?span id="loadMoreCount">0</span>鏉★級</button>
-      </div>
-    </div>
-  </div>
-
-</div>
-<!-- 鈺愨晲鈺愨晲鈺愨晲鈺?鎵嬫満搴曢儴瀵艰埅鏍?鈺愨晲鈺愨晲鈺愨晲鈺?-->
-<nav class="mobile-nav" id="mobileNav">
-  <button class="mnav-btn active" data-tab="dev" onclick="mobileSwitchTab('dev')">
-    <span class="mnav-icon">馃搻</span><span class="mnav-label">鏂版寮€鍙?/span>
-  </button>
-  <button class="mnav-btn" data-tab="manage" onclick="mobileSwitchTab('manage')">
-    <span class="mnav-icon">鈿欙笍</span><span class="mnav-label">宸ュ簭绠＄悊</span>
-  </button>
-  <button class="mnav-btn" data-tab="history" onclick="mobileSwitchTab('history')">
-    <span class="mnav-icon">馃搧</span><span class="mnav-label">鍘嗗彶娆惧紡</span>
-  </button>
-  <button class="mnav-btn" data-tab="recycle" onclick="mobileSwitchTab('recycle')">
-    <span class="mnav-icon">馃棏锔?/span><span class="mnav-label">鍥炴敹绔?/span>
-  </button>
-  <button class="mnav-btn" data-tab="logs" id="mnavLogs" style="" onclick="mobileSwitchTab('logs')">
-    <span class="mnav-icon">馃搳</span><span class="mnav-label">鎿嶄綔鏃ュ織</span>
-  </button>
-  <button class="mnav-btn" id="mnavNotif" style="display: inline-flex;" onclick="showNotifyModal()">
-    <span class="mnav-icon">馃敂</span><span class="mnav-label">閫氱煡</span>
-  </button>
-</nav>
-
-
-
-<!-- 鎵撳嵃棰勮寮圭獥 -->
-<div class="modal-overlay" id="printModal">
-  <div class="modal" style="max-width:700px">
-    <button class="modal-close" onclick="closePrint()">鉁?/button>
-    <h2>馃搫 娆惧紡鎴愭湰鍗曢瑙?/h2>
-    <div class="print-view" id="printView"></div>
-    <div style="margin-top:20px;display:flex;gap:10px;justify-content:flex-end">
-      <button class="btn-action" style="background:#f0f0f0;color:#333" onclick="closePrint()">鍏抽棴</button>
-      <button class="btn-action print" onclick="doPrint()">馃枿锔?鎵撳嵃</button>
-    </div>
-  </div>
-</div>
-
-<!-- 鎵归噺瀵煎叆宸ュ簭寮圭獥 -->
-<div class="modal-overlay" id="bulkModal">
-  <div class="modal">
-    <button class="modal-close" onclick="closeBulkImport()">鉁?/button>
-    <h2>馃摜 鎵归噺瀵煎叆宸ュ簭</h2>
-    <p style="font-size:13px;color:#666;margin-bottom:10px;line-height:1.8">
-      鏀寔浠?Excel 澶嶅埗绮樿创锛堝埗琛ㄧ鍒嗛殧锛夋垨鐩存帴杈撳叆銆傛瘡琛屼竴鏉★細<br>
-      鈥?<b>宸ュ簭鍚?鍗曚环</b> 鈫?瀵煎叆鍒板綋鍓嶅垎绫伙紙<span id="bulkTypeLabel" style="color:#e94560;font-weight:700"></span>锛?br>
-      鈥?<b>鍒嗙被,宸ュ簭鍚?鍗曚环</b> 鈫?濡傦細骞宠溅,涓婇,1.5锛堣嚜鍔ㄥ綊绫诲埌瀵瑰簲鍒嗙被锛?br>
-      鍒嗙被鍚嶇О鍙锛氬钩杞?/ 鎵庤溅 / 鍧庤溅
-    </p>
-    <textarea id="bulkText" style="width:100%;height:220px;border:1px solid #ddd;border-radius:8px;padding:12px;font-family:inherit;font-size:14px;outline:none;resize:vertical" placeholder="绀轰緥锛?
-涓婇,1.5
-涓婅,2.0
-閿佽竟,0.8
-骞宠溅,涓婅叞,1.2
-鎵庤溅,缁风紳,0.6" autocomplete="off"></textarea>
-    <div style="margin-top:16px;display:flex;gap:10px;justify-content:flex-end">
-      <button class="btn-action" style="background:#f0f0f0;color:#333" onclick="closeBulkImport()">鍙栨秷</button>
-      <button class="btn-action save" data-role-block="" onclick="doBulkImport()">馃摜 瀵煎叆</button>
-    </div>
-  </div>
-</div>
-
-<!-- 娆惧紡璇︽儏寮圭獥 -->
-<!-- 淇敼瀵嗙爜寮圭獥 -->
-<!-- 蹇€熸柊澧炲伐搴忓脊绐?-->
-<div class="modal-overlay" id="quickAddProcessModal">
-  <div class="modal" style="max-width:440px">
-    <h2 style="font-size:18px;margin-bottom:4px">鉃?蹇€熸柊澧炲伐搴?/h2>
-    <p style="font-size:12px;color:#999;margin-bottom:16px">鏂板鍚庤嚜鍔ㄥ嚭鐜板湪宸ュ簭閫夋嫨鍖猴紝鏀寔蹇嵎鍕鹃€?/p>
-    <div style="margin-bottom:16px">
-      <div style="font-size:13px;font-weight:600;margin-bottom:8px;color:#333">宸ュ簭绫诲瀷</div>
-      <div style="display:flex;gap:8px">
-        <label class="machine-btn selected" data-m="pingche" onclick="selectMachineType(this)">馃毑 骞宠溅</label>
-        <label class="machine-btn" data-m="zache" onclick="selectMachineType(this)">鈿?鎵庤溅</label>
-        <label class="machine-btn" data-m="kanche" onclick="selectMachineType(this)">馃敧 鍧庤溅</label>
-      </div>
-    </div>
-    <div class="field-group">
-      <div class="field-label">宸ュ簭鍚嶇О</div>
-      <input class="field-input" type="text" id="quickProcName" placeholder="杈撳叆宸ュ簭鍚嶇О锛屽锛氫笂鎷夐摼銆佸悎渚х紳" autocomplete="off">
-    </div>
-    <div class="field-group">
-      <div class="field-label">鍗曚环锛堝厓/浠讹級</div>
-      <input class="field-input" type="number" id="quickProcPrice" placeholder="杈撳叆鍗曚环锛屽锛?.5" min="0" step="0.01" autocomplete="off">
-    </div>
-    <div id="quickProcMsg" class="modal-msg" style="min-height:18px;margin-bottom:10px;font-size:13px"></div>
-    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px">
-      <button class="btn-action" style="background:#f0f0f0;color:#333" onclick="closeQuickAddProcess()">鍙栨秷</button>
-      <button class="btn-action save" data-role-block="" onclick="doQuickAddProcess()">鉁?纭娣诲姞</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="changePwdModal">
-  <div class="modal">
-    <h2 style="font-size:18px;margin-bottom:4px">馃攽 淇敼鐧诲綍瀵嗙爜</h2>
-    <p id="changePwdMsg" class="modal-msg" style="min-height:18px;margin-bottom:14px;font-size:13px"></p>
-    <div class="field-group">
-      <div class="field-label">鏃у瘑鐮?/div>
-      <input class="field-input" type="password" id="oldPwdInput" placeholder="杈撳叆褰撳墠瀵嗙爜" autocomplete="current-password">
-    </div>
-    <div class="field-group">
-      <div class="field-label">鏂板瘑鐮?<span style="color:#999;font-size:12px">锛堣嚦灏?浣嶏級</span></div>
-      <input class="field-input" type="password" id="newPwdInput" placeholder="杈撳叆鏂板瘑鐮侊紙鑷冲皯4浣嶏級" autocomplete="new-password">
-    </div>
-    <div class="field-group">
-      <div class="field-label">纭鏂板瘑鐮?/div>
-      <input class="field-input" type="password" id="newPwd2Input" placeholder="鍐嶈緭涓€娆℃柊瀵嗙爜" autocomplete="new-password">
-    </div>
-    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px">
-      <button class="btn-action" style="background:#f0f0f0;color:#333" onclick="closeChangePwd()">鍙栨秷</button>
-      <button class="btn-action save" onclick="doChangePwd()">鉁?纭淇敼</button>
-    </div>
-  </div>
-</div>
-
-<!-- 鍥剧墖鍏ㄥ睆棰勮 -->
-<div class="modal-overlay" id="imgLightbox" style="display:none;background:rgba(0,0,0,0.95);z-index:100000;cursor:zoom-out" onclick="closeLightbox(event)">
-  <img id="lightboxImg" src="" style="max-width:95vw;max-height:95vh;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(1);transform-origin:center center;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.6);cursor:zoom-in;transition:transform 0.15s ease-out" onclick="event.stopPropagation();lbToggleZoom()">
-  <div style="position:fixed;top:20px;right:20px;color:#fff;font-size:28px;cursor:pointer;opacity:0.7;z-index:2" onclick="closeLightbox(event)">鉁?/div>
-  <div id="lightboxCounter" style="position:fixed;top:20px;left:20px;color:#fff;font-size:14px;opacity:0.7;user-select:none;z-index:2"></div>
-  <div style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%);display:flex;gap:16px;align-items:center;z-index:2">
-    <button onclick="event.stopPropagation();lbZoom(-0.25)" style="width:44px;height:44px;border-radius:50%;border:none;background:rgba(255,255,255,0.2);color:#fff;font-size:20px;cursor:pointer">鉃?/button>
-    <span id="lbScaleText" style="color:#fff;font-size:14px;min-width:48px;text-align:center;user-select:none">100%</span>
-    <button onclick="event.stopPropagation();lbZoom(0.25)" style="width:44px;height:44px;border-radius:50%;border:none;background:rgba(255,255,255,0.2);color:#fff;font-size:20px;cursor:pointer">鉃?/button>
-  </div>
-</div>
-
-<div class="modal-overlay" id="detailModal" onclick="if(event.target===this)closeDetail()">
-  <div class="modal" style="max-width:700px;max-height:90vh;padding-bottom:16px;overflow-y:auto">
-    <button class="modal-close" onclick="closeDetail()">鉁?/button>
-    <h2>馃憯 娆惧紡璇︽儏</h2>
-    <div id="detailContent"></div>
-    <div style="margin-top:16px;padding-top:14px;border-top:1px solid #eee;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn-action save" data-role-block="" onclick="saveDetailChanges()">馃捑 淇濆瓨淇敼</button>
-        <button class="btn-action" id="approveBtn" data-role-block="" onclick="toggleApprove()">鉁?閫氳繃瀹℃壒</button>
-        <button class="btn-action save" data-role-block="" onclick="loadFromHistory()">馃摑 鍔犺浇鍒版娆惧紡</button>
-        <button class="btn-action clear" data-role-block="" onclick="deleteCurrentHistory()">馃棏锔?鍒犻櫎</button>
-        <button class="btn-action" style="background:#27ae60;color:#fff" data-role-block="" onclick="exportStyleXlsx()">馃摜 瀵煎嚭宸ュ簭琛?/button>
-        <button class="btn-action" style="background:#8e44ad;color:#fff" data-role-block="" onclick="showExportRecords(currentHistoryId)">馃搵 瀵煎嚭璁板綍</button>
-      </div>
-      <button class="btn-action" style="background:#f0f0f0;color:#333;padding:10px 24px;font-size:15px;border-radius:10px" onclick="closeDetail()">鉁?鍏抽棴</button>
-    </div>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
-
-<!-- 鈹€鈹€ 娆㈣繋寮圭獥 鈹€鈹€ -->
-<div id="welcomeModal" style="display:none;position:fixed;inset:0;z-index:99999;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);font-family:inherit">
-  <div style="background:#fff;border-radius:20px;padding:32px 28px;max-width:380px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.18);animation:wbSlideIn .3s ease">
-    <div style="font-size:48px;margin-bottom:8px" id="wbEmoji">馃憢</div>
-    <div style="font-size:22px;font-weight:700;color:#1a1a2e;margin-bottom:4px">娆㈣繋鍥炴潵锛?span id="wbName"></span>锛?/div>
-    <div style="font-size:14px;color:#888;margin-bottom:20px" id="wbTime"></div>
-    <div id="wbRoleBadge" style="display:inline-block;font-size:12px;padding:3px 14px;border-radius:20px;margin-bottom:20px"></div>
-    <div style="background:#f8f9ff;border-radius:12px;padding:14px;margin-bottom:20px;text-align:left">
-      <div style="font-size:13px;color:#555;margin-bottom:6px;font-weight:600">馃搶 蹇嵎鎿嶄綔</div>
-      <div style="font-size:13px;color:#666;line-height:1.8">
-        <span id="wbTip1"></span>
-      </div>
-    </div>
-    <button onclick="closeWelcome()" style="width:100%;height:48px;background:linear-gradient(135deg,#e94560,#c2324f);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer">寮€濮嬩娇鐢?鉁?/button>
-  </div>
-</div>
-<style>
-@keyframes wbSlideIn{from{opacity:0;transform:translateY(-20px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
-</style>
-
-<script src="default-data.js"></script>
-<script src="app.js?v=1.5.7"></script>
-
-<!-- 閫氱煡寮圭獥 -->
-<div class="modal-overlay" id="notifModal">
-  <div class="modal" style="max-width:500px;max-height:80vh;display:flex;flex-direction:column">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-shrink:0">
-      <h3 style="margin:0">馃敂 鎴戠殑閫氱煡 <span id="notifUnread" style="color:#e94560;font-size:14px"></span></h3>
-      <button class="modal-close" onclick="closeNotifyModal()">鉁?/button>
-    </div>
-    <div id="notifList" style="overflow-y:auto;flex:1;min-height:0"></div>
-  </div>
-</div>
-
-<!-- 鈹€鈹€ 娆㈣繋寮圭獥 鈹€鈹€ -->
-<div id="welcomeModal" style="display:none;position:fixed;inset:0;z-index:99999;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);font-family:inherit">
-  <div style="background:#fff;border-radius:20px;padding:32px 28px;max-width:380px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.18);animation:wbSlideIn .3s ease">
-    <div style="font-size:48px;margin-bottom:8px" id="wbEmoji">馃憢</div>
-    <div style="font-size:22px;font-weight:700;color:#1a1a2e;margin-bottom:4px">娆㈣繋鍥炴潵锛?span id="wbName"></span>锛?/div>
-    <div style="font-size:13px;color:#888;margin-bottom:20px" id="wbTime"></div>
-    <div id="wbRoleBadge" style="display:inline-block;font-size:12px;padding:3px 14px;border-radius:20px;margin-bottom:20px"></div>
-    <div style="background:#f8f9ff;border-radius:12px;padding:14px;margin-bottom:20px;text-align:left">
-      <div style="font-size:13px;color:#555;margin-bottom:6px;font-weight:600">馃搶 蹇嵎鎿嶄綔</div>
-      <div style="font-size:13px;color:#666;line-height:1.8" id="wbTip1"></div>
-    </div>
-    <button onclick="closeWelcome()" style="width:100%;height:48px;background:linear-gradient(135deg,#e94560,#c2324f);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer">寮€濮嬩娇鐢?鉁?/button>
-  </div>
-</div>
-
-
-
-
-</body></html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>多绮爱服饰工序成朷?/title>
+
+<meta name="description" content="多绮爱服饰工序成朷?- 服加工成本管理系统">
+<meta name="keywords" content="服加工,工序成本,成本管理,计件工资,服生产">
+<meta name="author" content="多绮爱服?>
+<meta property="og:title" content="多绮爱服饰工序成朷?>
+<meta property="og:description" content="服加工成本管理系统 - 工序管理、成朠算数?>
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#ff6600">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="王炸工具">
+
+
+<script src="xlsx.full.min.js"></script>
+<link rel="stylesheet" href="style.css"><link rel="stylesheet" href="style-extra.css"></head>
+<body>
+
+<!-- 顶部导航 -->
+<div class="topbar">
+  <h1>👔 多绮爱服饰工序成朷?/h1>
+  <button class="tab-btn active" data-tab="dev">📐 新?/button>
+  <button class="tab-btn" data-tab="manage">⚙️ 工序管理</button>
+  <button class="tab-btn" data-tab="library">📚 款式?/button>
+  <button class="tab-btn" data-tab="history">📁 历史款式</button>
+  <button class="tab-btn" data-tab="recycle">🗑?回收?<span id="recycleCount" style="display:none;background:#e94560;color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;margin-left:4px">0</span></button>
+  <button class="tab-btn" data-tab="logs" id="logsTabBtn" style="">📊 操作日志</button>
+  <button class="btn-top" id="adminBtn" onclick="openAdminPanel()" style="background: rgba(233, 69, 96, 0.2); border: 1px solid rgba(233, 69, 96, 0.4); color: rgb(255, 138, 154);">👑 管理后台</button>
+  <div class="topbar-right">
+    <button class="btn-top" id="notifBell" onclick="showNotifyModal()" style="display: inline-flex; position: relative;">🔔 <span id="notifBadge" style="display:none;position:absolute;top:-6px;right:-6px;background:#e94560;color:#fff;border-radius:50%;width:18px;height:18px;font-size:11px;line-height:18px;text-align:center;font-weight:700">0</span></button>
+        <span id="userBadge" style="font-size: 12px; color: rgba(255, 255, 255, 0.5);">👤 朙?/span>
+    <button class="btn-top" id="logoutBtn" onclick="doLogout()" style="">🚪 出登?/button>
+    <button class="btn-top" id="changePwdBtn" onclick="openChangePwd()" style="background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.2);">🔑 俔密码</button>
+    <button class="btn-top" data-role-block="" onclick="exportData()">💾 导出数据</button>
+    <button class="btn-top" data-role-block="" onclick="showBackupManager()" style="background:rgba(16,185,129,0.2);border-color:rgba(16,185,129,0.4);color:#6ee7b7">🗂?备份管理</button>
+    <button class="btn-top" data-role-block="" onclick="importMode='replace';document.getElementById('importFile').click()">📂 导入备份</button>
+    <button class="btn-top" data-role-block="" onclick="importMode='merge';document.getElementById('importFile').click()">🔄 合并同事数据</button>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+  </div>
+</div>
+
+<div id="storageWarn">⚠️ 当前浏器无法保存数捼多为?Safari 打开朜文件致），?<b>Chrome / Edge</b> 双击打开朖件，避免数据丢失</div>
+
+<div id="syncBar" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9998;background:linear-gradient(90deg,#10b981,#059669);color:#fff;padding:8px 16px;text-align:center;font-size:14px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,0.15);animation:slideDown 0.3s ease"><span id="syncBarText">?已同步服务器新数?/span></div>
+
+<div id="unloginOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:none;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;padding:40px">
+  <div style="font-size:64px;margin-bottom:20px">🔐</div>
+  <h2 style="font-size:24px;margin-bottom:12px">请先登录</h2>
+  <p style="color:rgba(255,255,255,0.6);font-size:15px;margin-bottom:28px">朷具需要登录后才能使用<br>数据保存在服务器，人实时共?/p>
+  <a href="/" style="background:#e94560;color:#fff;padding:14px 36px;border-radius:12px;font-size:16px;font-weight:700;text-decoration:none;box-shadow:0 6px 20px rgba(233,69,96,0.4)">去登?/ 注册</a>
+</div>
+
+<!-- 登录/注册弹窗 -->
+<div id="loginOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99999;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;padding:40px">
+  <div style="background:#fff;border-radius:20px;padding:36px 32px;max-width:400px;width:90%;color:#333;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
+    <div style="font-size:48px;margin-bottom:8px">👔</div>
+    <h2 style="font-size:22px;font-weight:700;color:#1a1a2e;margin-bottom:4px">多绮爱服饰工序成朷?/h2>
+    <p style="font-size:13px;color:#888;margin-bottom:24px" id="loginSubtitle">请登录后使用</p>
+    
+    <!-- 登录表单 -->
+    <div id="loginForm">
+      <div class="field-group" style="margin-bottom:14px;text-align:left">
+        <div class="field-label" style="font-size:13px;font-weight:600;margin-bottom:6px;color:#555">👤 用户?/div>
+        <input class="field-input" type="text" id="loginUsername" placeholder="请输入用户名" autocomplete="username" style="width:100%;padding:12px;border:1.5px solid #ddd;border-radius:10px;font-size:14px;box-sizing:border-box;outline:none">
+      </div>
+      <div class="field-group" style="margin-bottom:8px;text-align:left">
+        <div class="field-label" style="font-size:13px;font-weight:600;margin-bottom:6px;color:#555">🔑 密码</div>
+        <input class="field-input" type="password" id="loginPassword" placeholder="请输入密? autocomplete="current-password" style="width:100%;padding:12px;border:1.5px solid #ddd;border-radius:10px;font-size:14px;box-sizing:border-box;outline:none" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <p id="loginMsg" style="font-size:13px;color:#e94560;margin:8px 0;min-height:18px"></p>
+      <button onclick="doLogin()" style="width:100%;height:46px;background:linear-gradient(135deg,#e94560,#c2324f);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;margin-bottom:12px">🔓 登录</button>
+      <p style="font-size:13px;color:#888;margin:0">还没有账号？<a href="javascript:void(0)" onclick="showRegister()" style="color:#e94560;font-weight:600;text-decoration:none">立即注册</a></p>
+    </div>
+    
+    <!-- 注册表单 -->
+    <div id="registerForm" style="display:none">
+      <div class="field-group" style="margin-bottom:14px;text-align:left">
+        <div class="field-label" style="font-size:13px;font-weight:600;margin-bottom:6px;color:#555">👤 用户?/div>
+        <input class="field-input" type="text" id="regUsername" placeholder="请输入用户名?-20位）" autocomplete="username" style="width:100%;padding:12px;border:1.5px solid #ddd;border-radius:10px;font-size:14px;box-sizing:border-box;outline:none">
+      </div>
+      <div class="field-group" style="margin-bottom:14px;text-align:left">
+        <div class="field-label" style="font-size:13px;font-weight:600;margin-bottom:6px;color:#555">🔑 密码</div>
+        <input class="field-input" type="password" id="regPassword" placeholder="请输入密码（至少4位）" autocomplete="new-password" style="width:100%;padding:12px;border:1.5px solid #ddd;border-radius:10px;font-size:14px;box-sizing:border-box;outline:none">
+      </div>
+      <div class="field-group" style="margin-bottom:8px;text-align:left">
+        <div class="field-label" style="font-size:13px;font-weight:600;margin-bottom:6px;color:#555">🔑 密码</div>
+        <input class="field-input" type="password" id="regPassword2" placeholder="请再次输入密? autocomplete="new-password" style="width:100%;padding:12px;border:1.5px solid #ddd;border-radius:10px;font-size:14px;box-sizing:border-box;outline:none" onkeydown="if(event.key==='Enter')doRegister()">
+      </div>
+      <p id="regMsg" style="font-size:13px;color:#e94560;margin:8px 0;min-height:18px"></p>
+      <button onclick="doRegister()" style="width:100%;height:46px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;margin-bottom:12px">📝 注册</button>
+      <p style="font-size:13px;color:#888;margin:0">已有账号?a href="javascript:void(0)" onclick="showLogin()" style="color:#10b981;font-weight:600;text-decoration:none">返回登录</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- 待批遮?-->
+<div id="pendingOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:9998;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;padding:40px">
+  <div style="font-size:64px;margin-bottom:20px">?/div>
+  <h2 style="font-size:24px;margin-bottom:12px">账号等待审批</h2>
+  <p style="color:rgba(255,255,255,0.6);font-size:15px;margin-bottom:24px">您的账号正在等待管理员?br>请联系理员通权限后再试</p>
+  <div style="background:rgba(233,69,96,0.15);border:1px solid rgba(233,69,96,0.3);border-radius:12px;padding:16px 28px;font-size:14px;color:#ff8a8a;margin-bottom:28px">提示：理员(admin) 登录后可在页面<br>「?管理后台 ?用户权限管理」中审批账号</div>
+  <a href="/" style="background:#444;color:rgba(255,255,255,0.7);padding:12px 28px;border-radius:12px;font-size:14px;text-decoration:none">👤 切换账号</a>
+</div>
+
+<div class="main">
+
+  <!-- ===== 新?===== -->
+  <div id="tab-dev" class="tab-content active">
+    <div class="card">
+      <div class="card-title"><span class="icon">👔</span> 款式信息</div>
+      <div class="style-header">
+        <div class="img-grid-row" id="imgGrid"><div class="img-upload-box" id="imgSlot0" ondragover="onImgDragOver(event,0)" ondragenter="onImgDragEnter(event,0)" ondragleave="onImgDragLeave(event,0)" ondrop="onImgDrop(event,0)" onclick="openImgSlot(0)">
+      <div class="placeholder"><span class="icon">📷</span><span>??br><span style="font-size:11px;color:#bbb">点击或拖入或Ctrl+V粘贴</span></span></div>
+    </div></div>
+        <input type="file" id="imgInput" accept="image/*" style="display:none" onchange="imgChange(event)">
+        <div class="style-info">
+          <div class="row" style="display:contents">
+            <div class="field-cell field-pos">
+              <span class="fp-label">款号 / 款名</span>
+              <input type="text" id="styleName" placeholder="例：S2501 女连衣? autocomplete="off">
+            </div>
+            <div class="field-cell field-pos">
+              <span class="fp-label">备注</span>
+              <input type="text" id="styleNote" placeholder="选填，颜色/面料" autocomplete="off">
+            </div>
+            <div class="field-cell field-pos">
+              <span class="fp-label">状?/span>
+              <select id="styleStatus">
+                <option value="pending">?待?/option>
+                <option value="approved">?已?/option>
+              </select>
+            </div>
+            <div class="field-cell field-pos">
+              <span class="fp-label">创建日期</span>
+              <input type="text" id="styleDate" readonly="">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">📋</span> 粘贴导入表格</div>
+      <div style="margin-bottom:12px;color:#666;font-size:13px">
+        ?Excel 复制表格后粘贴到下方，格式：<b>工序名称 | 单价 | 种类</b>?列）。工序不存在会自动添加到工序库?
+      </div>
+      <textarea id="pasteArea" placeholder="在粘贴表格数据...
+示例?
+做上下定唛压门边线	2.2	平车
+划位车口?装?1.6	平车
+做口一整	1.6	平车
+衄卷边	0.4	平车
+埋肩上埋夹落唛	0.6	扎车" style="width:100%;height:120px;padding:12px;border:1px solid #ddd;border-radius:8px;font-size:13px;resize:vertical" onpaste="handlePasteTable(event)" autocomplete="off" name="_x4xottvsu_pasteArea"></textarea>
+      <div style="display:flex;gap:10px;margin-top:12px">
+        <button class="btn-add" onclick="parsePastedTable()">📥 解析并?/button>
+        <button class="btn-top" onclick="document.getElementById('pasteArea').value=''">清空</button>
+        <span id="pasteResult" style="margin-left:auto;color:#666;font-size:13px;line-height:36px"></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span><span class="icon">🔧</span> 工序选择</span>
+        <button class="btn-add" data-role-block="" style="margin:0;padding:6px 14px;font-size:12px;background:linear-gradient(135deg,#e94560,#c13050);color:#fff;border:none;border-radius:8px;cursor:pointer" onclick="openQuickAddProcess()">?新工序</button>
+      </div>
+      <div class="search-bar" style="margin-bottom:14px">
+        <input type="text" id="procFilter" name="_x4xottvsu_procFilter" placeholder="🔍 输入工序名筛选（三分类同步）" oninput="processFilter=this.value.trim();renderProcessSelect()" autocomplete="off">
+        <button class="btn-add" style="margin:0;padding:10px 16px;white-space:nowrap" onclick="document.getElementById('procFilter').value='';processFilter='';renderProcessSelect()">清空筛?/button>
+      </div>
+      <div class="process-select-section">
+        <div class="process-col">
+          <div class="process-col-header pingche">🚲 平车</div>
+          <div class="process-col-items" id="col-pingche">
+          </div>
+        </div>
+        <div class="process-col">
+          <div class="process-col-header zache">?扎车</div>
+          <div class="process-col-items" id="col-zache">
+          </div>
+        </div>
+        <div class="process-col">
+          <div class="process-col-header kanche">🔪 坎车</div>
+          <div class="process-col-items" id="col-kanche">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title" style="display:flex;justify-content:space-between;align-items:center"><span><span class="icon">📋</span> 工序明细汇?/span><button class="btn-top" data-role-block="" onclick="clearAllSelected()" style="padding:6px 12px;font-size:12px">🗑?清空全部</button></div>
+      <table class="selected-table">
+        <thead>
+          <tr>
+            <th>工序名称</th>
+            <th>类型</th>
+            <th>数量</th>
+            <th>单价</th>
+            <th>小</th>
+            <th style="width:50px">操作</th>
+          </tr>
+        </thead>
+        <tbody id="selectedBody"></tbody>
+      </table>
+      <div class="summary-bar">
+        <div class="summary-breakdown">
+          <div class="bd-item"><span class="bd-label">🚲 平车</span><span class="bd-val" id="subPingche">¥0.00</span></div>
+          <div class="bd-item"><span class="bd-label">?扎车</span><span class="bd-val" id="subZache">¥0.00</span></div>
+          <div class="bd-item"><span class="bd-label">🔪 坎车</span><span class="bd-val" id="subKanche">¥0.00</span></div>
+        </div>
+        <div style="text-align:right">
+          <div class="total-label" id="totalCount" style="font-size:12px">?0 道工?/div>
+          <div class="total-money" id="totalMoney">¥0.00<small> ?/small></div>
+        </div>
+      </div>
+      <div class="action-btns">
+        <button class="btn-action save" data-role-block="" onclick="saveStyle()">💾 保存款式</button>
+        <button class="btn-action print" onclick="openPrint()">🖨?打印 / 预</button>
+        <button class="btn-action clear" data-role-block="" onclick="clearStyle()">🗑?清空</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 工序管理 ===== -->
+  <div id="tab-manage" class="tab-content">
+    <div class="card">
+      <div class="card-title"><span class="icon">⚙️</span> 工序单价管理</div>
+      <div class="machine-tabs">
+        <button class="machine-tab pingche active" onclick="switchMachine('pingche')">🚲 平车</button>
+        <button class="machine-tab zache" onclick="switchMachine('zache')">?扎车</button>
+        <button class="machine-tab kanche" onclick="switchMachine('kanche')">🔪 坎车</button>
+      </div>
+      <input type="text" id="manageSearch" placeholder="🔍 搜索工序名称? oninput="renderManageList()" autocomplete="off" style="width:100%;margin:12px 0;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box" name="_x4xottvsu_manageSearch">
+      <div class="process-list" id="manageList">
+        </div>
+      <button class="btn-add" onclick="addProcess()">?添加新工?/button>
+      <button class="btn-add" data-role-block="" onclick="openBulkImport()" style="margin-left:10px;background:#4361ee">📥 批量导入工序</button>
+    </div>
+  </div>
+
+  <!-- ===== 款式?===== -->
+  <div id="tab-library" class="tab-content">
+    <div class="card">
+      <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+        <span><span class="icon">📚</span> 款式?<span id="libraryCount" style="font-size:13px;color:#999;font-weight:normal">?款）</span></span>
+        <div id="libraryButtons" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+      </div>
+      <input type="file" id="libraryImportFile" accept=".xlsx,.xls" style="display:none" onchange="importLibrary(event)">
+      
+      <div style="display:flex;gap:10px;margin:12px 0;flex-wrap:wrap">
+        <input type="text" id="librarySearch" placeholder="🔍 搜索款式名称、工序标签? oninput="renderLibrary()" autocomplete="off" style="flex:1;min-width:200px;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box">
+        <div id="libraryImageSearchBtn"></div>
+        <input type="file" id="libraryImageSearch" accept="image/*" style="display:none" onchange="searchByImage(event)">
+        <select id="libraryCategory" onchange="renderLibrary()" style="padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px">
+          <option value="">全部分类</option>
+          <option value="针织">针织</option>
+          <option value="梻">梻</option>
+          <option value="婴?>婴?/option>
+          <option value="连衣?>连衣?/option>
+          <option value="套">套</option>
+          <option value="外">外</option>
+          <option value="牛仔?>牛仔?/option>
+          <option value="哈衣">哈衣</option>
+        </select>
+      </div>
+      
+      <div id="libraryList" class="library-list">
+        <div class="no-data">📚 款式库为?br><span style="font-size:12px;color:#999">点击"导入Excel"?添加款式"?/span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 回收?===== -->
+  <div id="tab-recycle" class="tab-content">
+    <div class="card">
+      <div class="card-title" style="display:flex;justify-content:space-between;align-items:center">
+        <span><span class="icon">🗑?/span> 回收?/span>
+        <button class="btn-top" data-role-block="" onclick="emptyRecycleBin()" style="padding:6px 14px;font-size:12px;background:#dc2626">🔥 清空回收?/button>
+      </div>
+      <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:12px;margin-bottom:16px;font-size:13px;color:#9a3412">
+        💡 <b>回收站?/b>：删除的款式会在此保?<b>30?/b>，期间可以恢复超?30 天的款式会自动清理?
+      </div>
+      <div id="recycleList" class="recycle-list"><div class="no-data">📭 回收站为?br><span style="font-size:12px;color:#999">删除的式会在保留30天，之后臊清理</span></div></div>
+    </div>
+  </div>
+
+  <!-- ===== 历史款式 ===== -->
+  <div id="tab-history" class="tab-content">
+    <div class="card">
+      <div class="card-title"><span class="icon">📁</span> 历史款式</div>
+      <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="🔍 搜索款号/款名? oninput="renderHistory()" autocomplete="off" name="_x4xottvsu_searchInput">
+        <button class="btn-add" data-role-block="" onclick="clearHistorySearch()" style="margin:0;padding:10px 16px;background:#6b7280">🔍 清除筛?/button>
+      </div>
+      <div class="history-list" id="historyList">
+        <div class="no-data">📭 暂无保存的?br><span style="font-size:13px">在新款开发中保存款式后会臊出现在这?/span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 操作日志 ===== -->
+  <div id="tab-logs" class="tab-content">
+    <div class="card">
+      <div class="card-title"><span class="icon">📊</span> 操作日志 <span id="logTotal" style="font-size:13px;color:#888;font-weight:400"></span></div>
+      <div class="search-bar" style="gap:8px;flex-wrap:wrap;margin-bottom:14px">
+        <select id="logTimeFilter" onchange="loadLogs(true)" style="padding:9px 12px;border:1.5px solid #ddd;border-radius:8px;font-size:13px;font-family:inherit">
+          <option value="0">全部时间</option>
+          <option value="7">?7 ?/option>
+          <option value="30">?30 ?/option>
+          <option value="90">?90 ?/option>
+        </select>
+        <select id="logUserFilter" onchange="loadLogs(true)" style="padding:9px 12px;border:1.5px solid #ddd;border-radius:8px;font-size:13px;font-family:inherit">
+          <option value="">👤 全部用户</option>
+        </select>
+        <select id="logActionFilter" onchange="loadLogs(true)" style="padding:9px 12px;border:1.5px solid #ddd;border-radius:8px;font-size:13px;font-family:inherit">
+          <option value="">⚙️ 全部操作</option>
+          <option value="login">🔓 登录</option>
+          <option value="logout">🔒 ?/option>
+          <option value="register">📝 注册</option>
+          <option value="save_style">💾 保存款式</option>
+          <option value="delete_style">🗑?删除款式</option>
+          <option value="restore_style">♻️ 恢款式</option>
+          <option value="permanent_delete">🔥 彻底删除</option>
+          <option value="approve">?通过审批</option>
+          <option value="reject">↩️ 回?/option>
+          <option value="empty_recycle">🗑?清空回收?/option>
+          <option value="clear_history">🗑?清空款式</option>
+          <option value="import">📂 导入备份</option>
+          <option value="merge">🔄 合并数据</option>
+          <option value="export">💾 导出数据</option>
+          <option value="clear_logs">🗑?清空日志</option>
+        </select>
+        <input type="text" id="logKeyword" placeholder="🔍 搜索详情? oninput="loadLogs(true)" style="padding:9px 12px;border:1.5px solid #ddd;border-radius:8px;font-size:13px;font-family:inherit;flex:1;min-width:160px" autocomplete="off">
+        <button class="btn-add" onclick="loadLogs(true)" style="margin:0;padding:9px 14px">🔄 刷新</button>
+      </div>
+      <div id="logsList"></div>
+      <div id="loadMoreLogs" style="display:none;text-align:center;padding:16px">
+        <button class="btn-add" onclick="loadLogs(false)" style="background:#4361ee">📥 加载更?span id="loadMoreCount">0</span>条）</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+<!-- ══════?手机底部导航?══════?-->
+<nav class="mobile-nav" id="mobileNav">
+  <button class="mnav-btn active" data-tab="dev" onclick="mobileSwitchTab('dev')">
+    <span class="mnav-icon">📐</span><span class="mnav-label">新?/span>
+  </button>
+  <button class="mnav-btn" data-tab="manage" onclick="mobileSwitchTab('manage')">
+    <span class="mnav-icon">⚙️</span><span class="mnav-label">工序管理</span>
+  </button>
+  <button class="mnav-btn" data-tab="history" onclick="mobileSwitchTab('history')">
+    <span class="mnav-icon">📁</span><span class="mnav-label">历史款式</span>
+  </button>
+  <button class="mnav-btn" data-tab="recycle" onclick="mobileSwitchTab('recycle')">
+    <span class="mnav-icon">🗑?/span><span class="mnav-label">回收?/span>
+  </button>
+  <button class="mnav-btn" data-tab="logs" id="mnavLogs" style="" onclick="mobileSwitchTab('logs')">
+    <span class="mnav-icon">📊</span><span class="mnav-label">操作日志</span>
+  </button>
+  <button class="mnav-btn" id="mnavNotif" style="display: inline-flex;" onclick="showNotifyModal()">
+    <span class="mnav-icon">🔔</span><span class="mnav-label">通知</span>
+  </button>
+</nav>
+
+
+
+<!-- 打印预弹窗 -->
+<div class="modal-overlay" id="printModal">
+  <div class="modal" style="max-width:700px">
+    <button class="modal-close" onclick="closePrint()">?/button>
+    <h2>📄 款式成本单?/h2>
+    <div class="print-view" id="printView"></div>
+    <div style="margin-top:20px;display:flex;gap:10px;justify-content:flex-end">
+      <button class="btn-action" style="background:#f0f0f0;color:#333" onclick="closePrint()">关闭</button>
+      <button class="btn-action print" onclick="doPrint()">🖨?打印</button>
+    </div>
+  </div>
+</div>
+
+<!-- 批量导入工序弹窗 -->
+<div class="modal-overlay" id="bulkModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeBulkImport()">?/button>
+    <h2>📥 批量导入工序</h2>
+    <p style="font-size:13px;color:#666;margin-bottom:10px;line-height:1.8">
+      攌?Excel 复制粘贴（制表分隔）或直接输入。每行一条：<br>
+      ?<b>工序?单价</b> ?导入到当前分类（<span id="bulkTypeLabel" style="color:#e94560;font-weight:700"></span>?br>
+      ?<b>分类,工序?单价</b> ?如：平车,上,1.5（自动归类到对应分类?br>
+      分类名称：平?/ 扎车 / 坎车
+    </p>
+    <textarea id="bulkText" style="width:100%;height:220px;border:1px solid #ddd;border-radius:8px;padding:12px;font-family:inherit;font-size:14px;outline:none;resize:vertical" placeholder="示例?
+上,1.5
+上,2.0
+锁边,0.8
+平车,上腰,1.2
+扎车,绷缝,0.6" autocomplete="off"></textarea>
+    <div style="margin-top:16px;display:flex;gap:10px;justify-content:flex-end">
+      <button class="btn-action" style="background:#f0f0f0;color:#333" onclick="closeBulkImport()">取消</button>
+      <button class="btn-action save" data-role-block="" onclick="doBulkImport()">📥 导入</button>
+    </div>
+  </div>
+</div>
+
+<!-- 款式详情弹窗 -->
+<!-- 俔密码弹窗 -->
+<!-- 忟新增工序弹?-->
+<div class="modal-overlay" id="quickAddProcessModal">
+  <div class="modal" style="max-width:440px">
+    <h2 style="font-size:18px;margin-bottom:4px">?忟新增工?/h2>
+    <p style="font-size:12px;color:#999;margin-bottom:16px">新后自动出现在工序选择区，攌忍勾?/p>
+    <div style="margin-bottom:16px">
+      <div style="font-size:13px;font-weight:600;margin-bottom:8px;color:#333">工序类型</div>
+      <div style="display:flex;gap:8px">
+        <label class="machine-btn selected" data-m="pingche" onclick="selectMachineType(this)">🚲 平车</label>
+        <label class="machine-btn" data-m="zache" onclick="selectMachineType(this)">?扎车</label>
+        <label class="machine-btn" data-m="kanche" onclick="selectMachineType(this)">🔪 坎车</label>
+      </div>
+    </div>
+    <div class="field-group">
+      <div class="field-label">工序名称</div>
+      <input class="field-input" type="text" id="quickProcName" placeholder="输入工序名称，：上拉链、合侧缝" autocomplete="off">
+    </div>
+    <div class="field-group">
+      <div class="field-label">单价（元/件）</div>
+      <input class="field-input" type="number" id="quickProcPrice" placeholder="输入单价，?.5" min="0" step="0.01" autocomplete="off">
+    </div>
+    <div id="quickProcMsg" class="modal-msg" style="min-height:18px;margin-bottom:10px;font-size:13px"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px">
+      <button class="btn-action" style="background:#f0f0f0;color:#333" onclick="closeQuickAddProcess()">取消</button>
+      <button class="btn-action save" data-role-block="" onclick="doQuickAddProcess()">?添加</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="changePwdModal">
+  <div class="modal">
+    <h2 style="font-size:18px;margin-bottom:4px">🔑 俔登录密码</h2>
+    <p id="changePwdMsg" class="modal-msg" style="min-height:18px;margin-bottom:14px;font-size:13px"></p>
+    <div class="field-group">
+      <div class="field-label">旧密?/div>
+      <input class="field-input" type="password" id="oldPwdInput" placeholder="输入当前密码" autocomplete="current-password">
+    </div>
+    <div class="field-group">
+      <div class="field-label">新密?<span style="color:#999;font-size:12px">（至?位）</span></div>
+      <input class="field-input" type="password" id="newPwdInput" placeholder="输入新密码（至少4位）" autocomplete="new-password">
+    </div>
+    <div class="field-group">
+      <div class="field-label">新密?/div>
+      <input class="field-input" type="password" id="newPwd2Input" placeholder="再输次新密码" autocomplete="new-password">
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px">
+      <button class="btn-action" style="background:#f0f0f0;color:#333" onclick="closeChangePwd()">取消</button>
+      <button class="btn-action save" onclick="doChangePwd()">?俔</button>
+    </div>
+  </div>
+</div>
+
+<!-- 图片全屏预 -->
+<div class="modal-overlay" id="imgLightbox" style="display:none;background:rgba(0,0,0,0.95);z-index:100000;cursor:zoom-out" onclick="closeLightbox(event)">
+  <img id="lightboxImg" src="" style="max-width:95vw;max-height:95vh;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(1);transform-origin:center center;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.6);cursor:zoom-in;transition:transform 0.15s ease-out" onclick="event.stopPropagation();lbToggleZoom()">
+  <div style="position:fixed;top:20px;right:20px;color:#fff;font-size:28px;cursor:pointer;opacity:0.7;z-index:2" onclick="closeLightbox(event)">?/div>
+  <div id="lightboxCounter" style="position:fixed;top:20px;left:20px;color:#fff;font-size:14px;opacity:0.7;user-select:none;z-index:2"></div>
+  <div style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%);display:flex;gap:16px;align-items:center;z-index:2">
+    <button onclick="event.stopPropagation();lbZoom(-0.25)" style="width:44px;height:44px;border-radius:50%;border:none;background:rgba(255,255,255,0.2);color:#fff;font-size:20px;cursor:pointer">?/button>
+    <span id="lbScaleText" style="color:#fff;font-size:14px;min-width:48px;text-align:center;user-select:none">100%</span>
+    <button onclick="event.stopPropagation();lbZoom(0.25)" style="width:44px;height:44px;border-radius:50%;border:none;background:rgba(255,255,255,0.2);color:#fff;font-size:20px;cursor:pointer">?/button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="detailModal" onclick="if(event.target===this)closeDetail()">
+  <div class="modal" style="max-width:700px;max-height:90vh;padding-bottom:16px;overflow-y:auto">
+    <button class="modal-close" onclick="closeDetail()">?/button>
+    <h2>👔 款式详情</h2>
+    <div id="detailContent"></div>
+    <div style="margin-top:16px;padding-top:14px;border-top:1px solid #eee;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn-action save" data-role-block="" onclick="saveDetailChanges()">💾 保存俔</button>
+        <button class="btn-action" id="approveBtn" data-role-block="" onclick="toggleApprove()">?通过审批</button>
+        <button class="btn-action save" data-role-block="" onclick="loadFromHistory()">📝 加载到款式</button>
+        <button class="btn-action clear" data-role-block="" onclick="deleteCurrentHistory()">🗑?删除</button>
+        <button class="btn-action" style="background:#27ae60;color:#fff" data-role-block="" onclick="exportStyleXlsx()">📥 导出工序?/button>
+        <button class="btn-action" style="background:#8e44ad;color:#fff" data-role-block="" onclick="showExportRecords(currentHistoryId)">📋 导出记录</button>
+      </div>
+      <button class="btn-action" style="background:#f0f0f0;color:#333;padding:10px 24px;font-size:15px;border-radius:10px" onclick="closeDetail()">?关闭</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!--  欢迎弹窗  -->
+<div id="welcomeModal" style="display:none;position:fixed;inset:0;z-index:99999;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);font-family:inherit">
+  <div style="background:#fff;border-radius:20px;padding:32px 28px;max-width:380px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.18);animation:wbSlideIn .3s ease">
+    <div style="font-size:48px;margin-bottom:8px" id="wbEmoji">👋</div>
+    <div style="font-size:22px;font-weight:700;color:#1a1a2e;margin-bottom:4px">欢迎回来?span id="wbName"></span>?/div>
+    <div style="font-size:14px;color:#888;margin-bottom:20px" id="wbTime"></div>
+    <div id="wbRoleBadge" style="display:inline-block;font-size:12px;padding:3px 14px;border-radius:20px;margin-bottom:20px"></div>
+    <div style="background:#f8f9ff;border-radius:12px;padding:14px;margin-bottom:20px;text-align:left">
+      <div style="font-size:13px;color:#555;margin-bottom:6px;font-weight:600">📌 忍操作</div>
+      <div style="font-size:13px;color:#666;line-height:1.8">
+        <span id="wbTip1"></span>
+      </div>
+    </div>
+    <button onclick="closeWelcome()" style="width:100%;height:48px;background:linear-gradient(135deg,#e94560,#c2324f);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer">始使??/button>
+  </div>
+</div>
+<style>
+@keyframes wbSlideIn{from{opacity:0;transform:translateY(-20px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+</style>
+
+<script src="default-data.js"></script>
+<script src="app.js?v=1.5.7"></script>
+
+<!-- 通知弹窗 -->
+<div class="modal-overlay" id="notifModal">
+  <div class="modal" style="max-width:500px;max-height:80vh;display:flex;flex-direction:column">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-shrink:0">
+      <h3 style="margin:0">🔔 我的通知 <span id="notifUnread" style="color:#e94560;font-size:14px"></span></h3>
+      <button class="modal-close" onclick="closeNotifyModal()">?/button>
+    </div>
+    <div id="notifList" style="overflow-y:auto;flex:1;min-height:0"></div>
+  </div>
+</div>
+
+<!--  欢迎弹窗  -->
+<div id="welcomeModal" style="display:none;position:fixed;inset:0;z-index:99999;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);font-family:inherit">
+  <div style="background:#fff;border-radius:20px;padding:32px 28px;max-width:380px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.18);animation:wbSlideIn .3s ease">
+    <div style="font-size:48px;margin-bottom:8px" id="wbEmoji">👋</div>
+    <div style="font-size:22px;font-weight:700;color:#1a1a2e;margin-bottom:4px">欢迎回来?span id="wbName"></span>?/div>
+    <div style="font-size:13px;color:#888;margin-bottom:20px" id="wbTime"></div>
+    <div id="wbRoleBadge" style="display:inline-block;font-size:12px;padding:3px 14px;border-radius:20px;margin-bottom:20px"></div>
+    <div style="background:#f8f9ff;border-radius:12px;padding:14px;margin-bottom:20px;text-align:left">
+      <div style="font-size:13px;color:#555;margin-bottom:6px;font-weight:600">📌 忍操作</div>
+      <div style="font-size:13px;color:#666;line-height:1.8" id="wbTip1"></div>
+    </div>
+    <button onclick="closeWelcome()" style="width:100%;height:48px;background:linear-gradient(135deg,#e94560,#c2324f);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer">始使??/button>
+  </div>
+</div>
+
+
+
+
+</body></html>
