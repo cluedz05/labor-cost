@@ -2,7 +2,7 @@
 
 // ===== 应用版本号（每次更新递增）=====
 
-const APP_VERSION = '1.5.9';
+const APP_VERSION = '1.6.0';
 
 const VERSION_KEY = 'app_version';
 
@@ -7656,33 +7656,53 @@ function importLibrary(event) {
 
 
 function searchByImage(event) {
-
   var file = event.target.files[0];
-
   if (!file) return;
 
   var reader = new FileReader();
-
   reader.onload = function(e) {
-
-    var keyword = prompt('请输入款式关键词进行搜索（如：短袖、圆领、连衣裙等）：');
-
-    if (keyword) {
-
-      var searchInput = document.getElementById('librarySearch');
-
-      if (searchInput) { searchInput.value = keyword; renderLibrary(); }
-
-    }
-
-    toast('💡 以图搜索功能正在开发中，目前支持关键词搜索');
-
+    var imageData = e.target.result;
+    
+    // 创建图片预览和搜索弹窗
+    var modal = document.createElement('div');
+    modal.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px';
+    modal.innerHTML = '<div style="background:#fff;border-radius:16px;padding:24px;max-width:500px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3)">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">' +
+        '<h3 style="margin:0;font-size:18px;color:#1a1a2e">🖼️ 以图搜款</h3>' +
+        '<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#999;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%">✕</button>' +
+      '</div>' +
+      '<img src="' + imageData + '" style="width:100%;max-height:250px;object-fit:contain;border-radius:12px;background:#f5f5f5;margin-bottom:16px">' +
+      '<div style="margin-bottom:12px"><label style="font-size:14px;color:#555;font-weight:600;display:block;margin-bottom:8px">输入关键词搜索：</label>' +
+        '<input type="text" id="imageSearchKeyword" placeholder="如：短袖、圆领、连衣裙、针织..." style="width:100%;padding:12px;border:2px solid #e5e7eb;border-radius:10px;font-size:14px;box-sizing:border-box;outline:none" onfocus="this.style.borderColor=\'#8b5cf6\'" onblur="this.style.borderColor=\'#e5e7eb\'">' +
+      '</div>' +
+      '<div style="margin-bottom:16px"><label style="font-size:14px;color:#555;font-weight:600;display:block;margin-bottom:8px">快速选择：</label>' +
+        '<div style="display:flex;flex-wrap:wrap;gap:8px">' +
+          '<button onclick="document.getElementById(\'imageSearchKeyword\').value=\'短袖\'" style="padding:6px 14px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:20px;font-size:13px;cursor:pointer;color:#374151">短袖</button>' +
+          '<button onclick="document.getElementById(\'imageSearchKeyword\').value=\'长袖\'" style="padding:6px 14px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:20px;font-size:13px;cursor:pointer;color:#374151">长袖</button>' +
+          '<button onclick="document.getElementById(\'imageSearchKeyword\').value=\'连衣裙\'" style="padding:6px 14px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:20px;font-size:13px;cursor:pointer;color:#374151">连衣裙</button>' +
+          '<button onclick="document.getElementById(\'imageSearchKeyword\').value=\'套装\'" style="padding:6px 14px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:20px;font-size:13px;cursor:pointer;color:#374151">套装</button>' +
+          '<button onclick="document.getElementById(\'imageSearchKeyword\').value=\'针织\'" style="padding:6px 14px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:20px;font-size:13px;cursor:pointer;color:#374151">针织</button>' +
+          '<button onclick="document.getElementById(\'imageSearchKeyword\').value=\'牛仔\'" style="padding:6px 14px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:20px;font-size:13px;cursor:pointer;color:#374151">牛仔</button>' +
+          '<button onclick="document.getElementById(\'imageSearchKeyword\').value=\'外套\'" style="padding:6px 14px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:20px;font-size:13px;cursor:pointer;color:#374151">外套</button>' +
+          '<button onclick="document.getElementById(\'imageSearchKeyword\').value=\'哈衣\'" style="padding:6px 14px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:20px;font-size:13px;cursor:pointer;color:#374151">哈衣</button>' +
+        '</div>' +
+      '</div>' +
+      '<div style="display:flex;gap:10px">' +
+        '<button onclick="var kw=document.getElementById(\'imageSearchKeyword\').value;if(kw){var si=document.getElementById(\'librarySearch\');if(si){si.value=kw;renderLibrary();}this.closest(\'div[style*=fixed]\').remove();toast(\'🔍 已搜索：\'+kw);}else{toast(\'⚠️ 请输入关键词\');}" style="flex:1;padding:12px;background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer">🔍 开始搜索</button>' +
+        '<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="padding:12px 20px;background:#f3f4f6;color:#374151;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer">取消</button>' +
+      '</div>' +
+      '<div style="margin-top:16px;padding:12px;background:#fef3c7;border-radius:10px;font-size:12px;color:#92400e;line-height:1.6">💡 提示：纯前端应用暂不支持AI图像识别，您可以根据图片特征输入关键词搜索相似款式。建议在添加款式时填写详细的标签和分类，提高搜索准确率。</div>' +
+    '</div>';
+    document.body.appendChild(modal);
+    
+    // 聚焦输入框
+    setTimeout(function() {
+      var input = document.getElementById('imageSearchKeyword');
+      if (input) input.focus();
+    }, 100);
   };
-
   reader.readAsDataURL(file);
-
   event.target.value = '';
-
 }
 
 
@@ -7743,7 +7763,7 @@ function syncToLibrary(styleId) {
   var existingIdx = library.findIndex(function(item) { return item.name === style.name; });
   
   // 转换工序数据
-  var processes = (style.processes || []).map(function(p) {
+  var processes = (style.selections || style.processes || []).map(function(p) {
     return {
       type: p.type || 'pingche',
       name: p.name || '',
@@ -7810,7 +7830,7 @@ function syncAllApprovedToLibrary() {
   approvedStyles.forEach(function(style) {
     var existingIdx = library.findIndex(function(item) { return item.name === style.name; });
     
-    var processes = (style.processes || []).map(function(p) {
+    var processes = (style.selections || style.processes || []).map(function(p) {
       return {
         type: p.type || 'pingche',
         name: p.name || '',
