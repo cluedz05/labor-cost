@@ -1868,7 +1868,7 @@ function autoBackup() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `王炸大魔王工序数据备份_${new Date().toISOString().slice(0,10)}.json`;
+  a.download = `多绮爱服饰工序数据备份_${new Date().toISOString().slice(0,10)}.json`;
   a.click();
   URL.revokeObjectURL(url);
   toast('⚠️ 已自动下载备份文件，请保存好');
@@ -2080,7 +2080,7 @@ function openPrint() {
       🚲 平车：¥${subPingche.toFixed(2)} · ⚡ 扎车：¥${subZache.toFixed(2)} · 🔪 坎车：¥${subKanche.toFixed(2)}<br>
       工序成本合计：¥${total.toFixed(2)} 元
     </div>
-    <div class="print-footer">王炸大魔王工序成本工具 · ${new Date().toLocaleDateString('zh-CN')}</div>
+    <div class="print-footer">多绮爱服饰工序成本工具 · ${new Date().toLocaleDateString('zh-CN')}</div>
   `;
   document.getElementById('printModal').classList.add('show');
 }
@@ -2100,7 +2100,7 @@ function exportData() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `王炸大魔王工序数据_${new Date().toISOString().slice(0,10)}.json`;
+  a.download = `多绮爱服饰工序数据_${new Date().toISOString().slice(0,10)}.json`;
   a.click();
   URL.revokeObjectURL(url);
   toast('✅ 数据已导出');
