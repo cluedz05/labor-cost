@@ -547,10 +547,34 @@ function showExportRecords(styleId) {
 // ===== 自动备份功能 =====
 const BACKUP_KEY = 'app_auto_backups';
 const MAX_BACKUPS = 20; // 最多保留20个备份
+const BACKUP_EXPIRE_DAYS = 30; // 备份保留天数（超过一个月自动删除）
+const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+
+// 清理过期备份（超过一个月自动删除）
+function cleanExpiredBackups(backups) {
+  if (!backups || backups.length === 0) return [];
+  var now = Date.now();
+  var expireTime = BACKUP_EXPIRE_DAYS * ONE_DAY_MS;
+  var before = backups.length;
+  var valid = backups.filter(function(b) {
+    return b.timestamp && (now - b.timestamp) < expireTime;
+  });
+  var removed = before - valid.length;
+  if (removed > 0) {
+    console.log('🧹 自动清理了 ' + removed + ' 个超过' + BACKUP_EXPIRE_DAYS + '天的过期备份');
+  }
+  return valid;
+}
 
 function getBackups() {
   try {
-    return JSON.parse(localStorage.getItem(BACKUP_KEY) || '[]');
+    var backups = JSON.parse(localStorage.getItem(BACKUP_KEY) || '[]');
+    // 自动清理过期备份
+    var cleaned = cleanExpiredBackups(backups);
+    if (cleaned.length !== backups.length) {
+      saveBackups(cleaned);
+    }
+    return cleaned;
   } catch(e) {
     return [];
   }
@@ -574,7 +598,7 @@ function createAutoBackup(reason) {
     // 最多保留MAX_BACKUPS个备份
     if (backups.length > MAX_BACKUPS) backups = backups.slice(0, MAX_BACKUPS);
     saveBackups(backups);
-    console.log('💾 自动备份已创建: ' + reason + ' (共' + backups.length + '个备份)');
+    console.log('💾 自动备份已创建: ' + reason + ' (共' + backups.length + '个备份, 超过' + BACKUP_EXPIRE_DAYS + '天自动删除)');
     return backup;
   } catch(e) {
     console.warn('自动备份失败:', e);
@@ -611,10 +635,11 @@ function showBackupManager() {
     html += '<div style="font-size:48px;margin-bottom:12px">💾</div>';
     html += '<p>暂无备份记录</p>';
     html += '<p style="font-size:12px;margin-top:8px">数据修改时会自动创建备份</p>';
+    html += '<p style="font-size:11px;margin-top:4px;color:#bbb">最多保留' + MAX_BACKUPS + '个备份，超过' + BACKUP_EXPIRE_DAYS + '天自动删除</p>';
     html += '</div>';
   } else {
     html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">';
-    html += '<span style="font-size:13px;color:#666">共 ' + backups.length + ' 个备份（最多保留' + MAX_BACKUPS + '个）</span>';
+    html += '<span style="font-size:13px;color:#666">共 ' + backups.length + ' 个备份（最多' + MAX_BACKUPS + '个，超过' + BACKUP_EXPIRE_DAYS + '天自动删除）</span>';
     html += '<button onclick="createAutoBackup(\'手动备份\');showBackupManager();" style="padding:6px 14px;background:#10b981;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px">➕ 立即备份</button>';
     html += '</div>';
     
