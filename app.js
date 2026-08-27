@@ -833,16 +833,25 @@ function idbLoad() {
 }
 
 function saveDB() {
+  // 始终先保存到 localStorage（确保数据不丢失）
+  try {
+    const str = JSON.stringify(DB);
+    try { localStorage.setItem('gf_cost_db', str); } catch(e) {
+      console.warn('localStorage保存失败', e);
+    }
+    idbSave(DB);
+  } catch(e) {
+    console.error('数据序列化失败', e);
+    toast('⚠️ 数据保存失败，请检查数据量');
+  }
+  
+  // 如果有后端API，同时保存到服务器
   if (useAPI) {
     fetch('/api/save', { method: 'POST', headers: apiHeaders(), body: JSON.stringify(DB) })
       .then(r => r.json())
       .then(d => { if (d && d.updatedAt) { DB._updatedAt = d.updatedAt; } })
-      .catch(e => console.warn('保存到服务器失败', e));
-    return;
+      .catch(e => console.warn('保存到服务器失败（本地已保存）', e));
   }
-  const str = JSON.stringify(DB);
-  try { localStorage.setItem('gf_cost_db', str); } catch(e) {}
-  idbSave(DB);
 }
 
 async function loadDB() {
