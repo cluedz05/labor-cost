@@ -2,7 +2,7 @@
 
 // ===== 应用版本号（每次更新递增）=====
 
-const APP_VERSION = '1.7.1';
+const APP_VERSION = '1.8.0';
 
 const VERSION_KEY = 'app_version';
 
@@ -7754,11 +7754,14 @@ function searchByImage(event) {
           '<button onclick="document.getElementById(\'imageSearchKeyword\').value=\'哈衣\'" style="padding:6px 14px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:20px;font-size:13px;cursor:pointer;color:#374151">哈衣</button>' +
         '</div>' +
       '</div>' +
+      '<div style="display:flex;gap:10px;margin-bottom:10px">' +
+        '<button onclick="doAIColorSearch(this)" style="flex:1;padding:12px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer">🤖 AI图像识别搜款</button>' +
+      '</div>' +
       '<div style="display:flex;gap:10px">' +
-        '<button onclick="var kw=document.getElementById(\'imageSearchKeyword\').value;if(kw){var si=document.getElementById(\'librarySearch\');if(si){si.value=kw;renderLibrary();}this.closest(\'div[style*=fixed]\').remove();toast(\'🔍 已搜索：\'+kw);}else{toast(\'⚠️ 请输入关键词\');}" style="flex:1;padding:12px;background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer">🔍 开始搜索</button>' +
+        '<button onclick="var kw=document.getElementById(\'imageSearchKeyword\').value;if(kw){var si=document.getElementById(\'librarySearch\');if(si){si.value=kw;renderLibrary();}this.closest(\'div[style*=fixed]\').remove();toast(\'🔍 已搜索：\'+kw);}else{toast(\'⚠️ 请输入关键词\');}" style="flex:1;padding:12px;background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer">🔍 关键词搜索</button>' +
         '<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="padding:12px 20px;background:#f3f4f6;color:#374151;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer">取消</button>' +
       '</div>' +
-      '<div style="margin-top:16px;padding:12px;background:#fef3c7;border-radius:10px;font-size:12px;color:#92400e;line-height:1.6">💡 提示：纯前端应用暂不支持AI图像识别，您可以根据图片特征输入关键词搜索相似款式。建议在添加款式时填写详细的标签和分类，提高搜索准确率。</div>' +
+      '<div style="margin-top:16px;padding:12px;background:#dbeafe;border-radius:10px;font-size:12px;color:#1e40af;line-height:1.6">🤖 <b>AI图像识别</b>：使用MobileNet深度学习模型提取图片特征，自动搜索款式库中视觉相似的款式。首次使用需下载AI模型（约10MB），请耐心等待。</div>' +
     '</div>';
     document.body.appendChild(modal);
     
@@ -7935,4 +7938,244 @@ function syncAllApprovedToLibrary() {
   saveLibrary(library);
   renderLibrary();
   toast('✅ 同步完成：新增 ' + added + ' 款，更新 ' + updated + ' 款');
+}
+
+
+// ===== AI图像识别搜款（TensorFlow.js + MobileNet）=====
+let mobilenetModel = null;
+let modelLoading = false;
+let libraryFeatures = {}; // 缓存款式库图片的特征向量
+
+// 加载MobileNet模型
+async function loadMobileNetModel() {
+  if (mobilenetModel) return mobilenetModel;
+  if (modelLoading) {
+    // 等待模型加载完成
+    return new Promise(resolve => {
+      const check = setInterval(() => {
+        if (mobilenetModel) {
+          clearInterval(check);
+          resolve(mobilenetModel);
+        }
+      }, 100);
+    });
+  }
+  
+  modelLoading = true;
+  try {
+    if (typeof tf === 'undefined') {
+      console.error('TensorFlow.js未加载');
+      return null;
+    }
+    
+    // 加载MobileNet模型
+    mobilenetModel = await tf.loadLayersModel('https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/model.json');
+    console.log('MobileNet模型加载成功');
+    return mobilenetModel;
+  } catch (e) {
+    console.error('MobileNet模型加载失败:', e);
+    return null;
+  } finally {
+    modelLoading = false;
+  }
+}
+
+// 图像预处理
+function preprocessImage(imgElement) {
+  return tf.tidy(() => {
+    // 调整图片大小到224x224
+    const tensor = tf.browser.fromPixels(imgElement)
+      .resizeNearestNeighbor([224, 224])
+      .toFloat()
+      .div(tf.scalar(127.5))
+      .sub(tf.scalar(1));
+    
+    // 增加batch维度
+    return tensor.expandDims(0);
+  });
+}
+
+// 提取图像特征向量
+async function extractImageFeatures(imageSrc) {
+  const model = await loadMobileNetModel();
+  if (!model) return null;
+  
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = function() {
+      try {
+        const tensor = preprocessImage(img);
+        // 使用MobileNet的倒数第二层输出作为特征向量
+        const features = model.predict(tensor, { verbose: false });
+        // 将特征向量展平并归一化
+        const flattened = features.reshape([-1]);
+        const normalized = flattened.div(flattened.norm());
+        const array = normalized.arraySync();
+        
+        // 清理tensor
+        tensor.dispose();
+        features.dispose();
+        flattened.dispose();
+        normalized.dispose();
+        
+        resolve(array);
+      } catch (e) {
+        console.error('特征提取失败:', e);
+        resolve(null);
+      }
+    };
+    img.onerror = function() {
+      resolve(null);
+    };
+    img.src = imageSrc;
+  });
+}
+
+// 计算两个特征向量的余弦相似度
+function cosineSimilarity(vec1, vec2) {
+  if (!vec1 || !vec2 || vec1.length !== vec2.length) return 0;
+  let dotProduct = 0;
+  for (let i = 0; i < vec1.length; i++) {
+    dotProduct += vec1[i] * vec2[i];
+  }
+  return dotProduct; // 已经归一化，所以点积就是余弦相似度
+}
+
+// AI图像搜款
+async function aiImageSearch(imageDataUrl, callback) {
+  // 显示加载状态
+  const resultDiv = document.getElementById('aiSearchResult');
+  if (resultDiv) {
+    resultDiv.innerHTML = '<div style="text-align:center;padding:30px;color:#6b7280"><div style="font-size:32px;margin-bottom:10px">🤖</div>正在加载AI模型并分析图片...</div>';
+  }
+  
+  // 提取上传图片的特征
+  const targetFeatures = await extractImageFeatures(imageDataUrl);
+  if (!targetFeatures) {
+    if (resultDiv) {
+      resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:#ef4444">❌ 图片分析失败，请尝试其他图片</div>';
+    }
+    callback([]);
+    return;
+  }
+  
+  const library = getLibrary();
+  const results = [];
+  let processed = 0;
+  const total = library.filter(item => item.image).length;
+  
+  if (total === 0) {
+    if (resultDiv) {
+      resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:#9ca3af">📭 款式库中没有带图片的款式</div>';
+    }
+    callback([]);
+    return;
+  }
+  
+  // 遍历款式库，提取特征并计算相似度
+  for (let i = 0; i < library.length; i++) {
+    const item = library[i];
+    if (!item.image) continue;
+    
+    // 检查是否有缓存的特征
+    let features = libraryFeatures[item.id];
+    if (!features) {
+      features = await extractImageFeatures(item.image);
+      if (features) {
+        libraryFeatures[item.id] = features;
+      }
+    }
+    
+    processed++;
+    
+    if (features) {
+      const similarity = cosineSimilarity(targetFeatures, features);
+      results.push({
+        idx: i,
+        item: item,
+        similarity: similarity
+      });
+    }
+    
+    // 更新进度
+    if (resultDiv) {
+      resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:#6b7280"><div style="font-size:24px;margin-bottom:8px">🔍</div>正在分析图片... (' + processed + '/' + total + ')</div>';
+    }
+  }
+  
+  // 按相似度排序
+  results.sort((a, b) => b.similarity - a.similarity);
+  
+  // 显示结果
+  if (resultDiv) {
+    if (results.length === 0) {
+      resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:#9ca3af">未找到相似款式</div>';
+    } else {
+      let html = '<div style="font-size:14px;font-weight:600;color:#1a1a2e;margin-bottom:10px">🎯 AI找到 ' + results.length + ' 个相似款式（按相似度排序）</div>';
+      html += '<div style="max-height:350px;overflow-y:auto">';
+      
+      results.slice(0, 10).forEach((r, idx) => {
+        const simPercent = (r.similarity * 100).toFixed(1);
+        const simColor = simPercent >= 70 ? '#10b981' : simPercent >= 50 ? '#f59e0b' : '#ef4444';
+        
+        html += '<div style="display:flex;align-items:center;gap:12px;padding:12px;border-bottom:1px solid #e5e7eb;cursor:pointer;border-radius:8px" onmouseover="this.style.background=\'#f9fafb\'" onmouseout="this.style.background=\'transparent\'" onclick="viewLibraryDetail(' + r.idx + ')">';
+        
+        if (r.item.image) {
+          html += '<img src="' + r.item.image + '" style="width:60px;height:60px;object-fit:cover;border-radius:8px">';
+        } else {
+          html += '<div style="width:60px;height:60px;background:#e5e7eb;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:28px">👔</div>';
+        }
+        
+        html += '<div style="flex:1;min-width:0">';
+        html += '<div style="font-weight:600;font-size:14px;color:#1a1a2e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + escHtml(r.item.name || '未命名') + '</div>';
+        html += '<div style="font-size:12px;color:#6b7280;margin-top:2px">分类：' + escHtml(r.item.category || '未分类') + ' | 工序：' + (r.item.processes || []).length + '道</div>';
+        html += '</div>';
+        
+        html += '<div style="text-align:right;flex-shrink:0">';
+        html += '<div style="font-size:20px;font-weight:700;color:' + simColor + '">' + simPercent + '%</div>';
+        html += '<div style="font-size:10px;color:#9ca3af">相似度</div>';
+        html += '</div>';
+        
+        html += '</div>';
+      });
+      
+      html += '</div>';
+      resultDiv.innerHTML = html;
+    }
+  }
+  
+  callback(results);
+}
+
+// 执行AI颜色搜款（改进版，使用AI图像识别）
+function doAIColorSearch(btn) {
+  var modal = btn.closest('div[style*=fixed]');
+  if (!modal) return;
+  
+  var img = modal.querySelector('img');
+  if (!img || !img.src) {
+    toast('⚠️ 没有找到图片');
+    return;
+  }
+  
+  var imgData = img.src;
+  
+  // 创建结果容器
+  var resultDiv = document.createElement('div');
+  resultDiv.id = 'aiSearchResult';
+  resultDiv.style.cssText = 'margin-top:16px;padding:16px;background:#f9fafb;border-radius:10px;min-height:100px';
+  
+  // 移除之前的结果
+  var oldResult = modal.querySelector('#aiSearchResult');
+  if (oldResult) oldResult.remove();
+  
+  // 插入到按钮区域前面
+  var btnArea = btn.parentElement;
+  btnArea.parentElement.insertBefore(resultDiv, btnArea);
+  
+  // 执行AI图像搜索
+  aiImageSearch(imgData, function(results) {
+    console.log('AI搜索完成，找到', results.length, '个相似款式');
+  });
 }
