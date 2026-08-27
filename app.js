@@ -2712,20 +2712,46 @@ function importData(e, mode) {
         });
         DB.styles = mergeStyles(DB.styles, data.styles || []);
         saveDB();
+        // 验证是否保存成功
+        var saved = verifyDataSaved();
         renderManageList(); renderProcessSelect(); renderHistory();
-        toast('✅ 已合并同事数据');
+        if (saved) {
+          toast('✅ 已合并同事数据（' + DB.styles.length + '款，已保存到本地）');
+        } else {
+          toast('⚠️ 数据合并成功，但保存到本地失败，请检查浏览器存储空间');
+        }
         clientLog('merge', '合并同事数据（源文件：' + file.name + '）');
       } else {
         DB = data;
         saveDB();
+        // 验证是否保存成功
+        var saved2 = verifyDataSaved();
         renderManageList(); renderProcessSelect(); renderHistory();
-        toast('✅ 备份已恢复');
+        if (saved2) {
+          toast('✅ 备份已恢复（' + DB.styles.length + '款，已保存到本地，刷新不会丢失）');
+        } else {
+          toast('⚠️ 数据恢复成功，但保存到本地失败，请检查浏览器存储空间');
+        }
         clientLog('import', '导入备份恢复（文件：' + file.name + '）');
       }
     } catch(err) { toast('⚠️ 文件解析失败'); }
     e.target.value = '';
   };
   reader.readAsText(file);
+}
+
+// 验证数据是否保存到 localStorage
+function verifyDataSaved() {
+  try {
+    var raw = localStorage.getItem('gf_cost_db');
+    if (!raw) return false;
+    var parsed = JSON.parse(raw);
+    if (!parsed.styles || !parsed.processes) return false;
+    // 验证款式数量是否一致
+    return parsed.styles.length === DB.styles.length;
+  } catch(e) {
+    return false;
+  }
 }
 function mergeProcess(a, b) {
   const map = {};
