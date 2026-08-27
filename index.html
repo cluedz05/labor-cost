@@ -31,9 +31,8 @@
   <button class="btn-top" id="adminBtn" onclick="alert('克隆版本不包含管理后台功能')" style="background: rgba(233, 69, 96, 0.2); border: 1px solid rgba(233, 69, 96, 0.4); color: rgb(255, 138, 154);">👑 管理后台</button>
   <div class="topbar-right">
     <button class="btn-top" id="notifBell" onclick="showNotifyModal()" style="display: inline-flex; position: relative;">🔔 <span id="notifBadge" style="display:none;position:absolute;top:-6px;right:-6px;background:#e94560;color:#fff;border-radius:50%;width:18px;height:18px;font-size:11px;line-height:18px;text-align:center;font-weight:700">0</span></button>
-        <span id="userBadge" style="font-size: 12px; color: rgba(255, 255, 255, 0.5);">👤 管理员</span>
-    <button class="btn-top" id="switchRoleBtn" onclick="showRoleSelect()" style="background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); font-size:12px">🔄 切换模式</button>
-    <button class="btn-top" id="logoutBtn" onclick="alert('这是本地克隆版本，无需登录')" style="">🚪 退出</button>
+        <span id="userBadge" style="font-size: 12px; color: rgba(255, 255, 255, 0.5);">👤 未登录</span>
+    <button class="btn-top" id="logoutBtn" onclick="doLogout()" style="">🚪 退出登录</button>
     <button class="btn-top" id="changePwdBtn" onclick="openChangePwd()" style="background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.2);">🔑 修改密码</button>
     <button class="btn-top" data-role-block="" onclick="exportData()">💾 导出数据</button>
     <button class="btn-top" data-role-block="" onclick="importMode='replace';document.getElementById('importFile').click()">📂 导入备份</button>
@@ -53,24 +52,47 @@
   <a href="/" style="background:#e94560;color:#fff;padding:14px 36px;border-radius:12px;font-size:16px;font-weight:700;text-decoration:none;box-shadow:0 6px 20px rgba(233,69,96,0.4)">去登录 / 注册</a>
 </div>
 
-<!-- 角色选择弹窗 -->
-<div id="roleSelectOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99999;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;padding:40px">
-  <div style="font-size:56px;margin-bottom:16px">👔</div>
-  <h2 style="font-size:24px;margin-bottom:8px">多绮爱服饰工序成本工具</h2>
-  <p style="color:rgba(255,255,255,0.6);font-size:14px;margin-bottom:32px">请选择使用模式</p>
-  <div style="display:flex;gap:20px;flex-wrap:wrap;justify-content:center;max-width:600px">
-    <div onclick="selectRole('admin')" style="background:rgba(233,69,96,0.15);border:2px solid rgba(233,69,96,0.4);border-radius:16px;padding:24px;cursor:pointer;transition:all 0.2s;min-width:200px" onmouseover="this.style.background='rgba(233,69,96,0.25)';this.style.borderColor='rgba(233,69,96,0.7)'" onmouseout="this.style.background='rgba(233,69,96,0.15)';this.style.borderColor='rgba(233,69,96,0.4)'">
-      <div style="font-size:40px;margin-bottom:12px">👑</div>
-      <div style="font-size:18px;font-weight:700;margin-bottom:8px">管理员模式</div>
-      <div style="font-size:12px;color:rgba(255,255,255,0.6);line-height:1.6">全部功能<br>工序管理 · 操作日志<br>数据导入导出</div>
+<!-- 登录/注册弹窗 -->
+<div id="loginOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99999;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;padding:40px">
+  <div style="background:#fff;border-radius:20px;padding:36px 32px;max-width:400px;width:90%;color:#333;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
+    <div style="font-size:48px;margin-bottom:8px">👔</div>
+    <h2 style="font-size:22px;font-weight:700;color:#1a1a2e;margin-bottom:4px">多绮爱服饰工序成本工具</h2>
+    <p style="font-size:13px;color:#888;margin-bottom:24px" id="loginSubtitle">请登录后使用</p>
+    
+    <!-- 登录表单 -->
+    <div id="loginForm">
+      <div class="field-group" style="margin-bottom:14px;text-align:left">
+        <div class="field-label" style="font-size:13px;font-weight:600;margin-bottom:6px;color:#555">👤 用户名</div>
+        <input class="field-input" type="text" id="loginUsername" placeholder="请输入用户名" autocomplete="username" style="width:100%;padding:12px;border:1.5px solid #ddd;border-radius:10px;font-size:14px;box-sizing:border-box;outline:none">
+      </div>
+      <div class="field-group" style="margin-bottom:8px;text-align:left">
+        <div class="field-label" style="font-size:13px;font-weight:600;margin-bottom:6px;color:#555">🔑 密码</div>
+        <input class="field-input" type="password" id="loginPassword" placeholder="请输入密码" autocomplete="current-password" style="width:100%;padding:12px;border:1.5px solid #ddd;border-radius:10px;font-size:14px;box-sizing:border-box;outline:none" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <p id="loginMsg" style="font-size:13px;color:#e94560;margin:8px 0;min-height:18px"></p>
+      <button onclick="doLogin()" style="width:100%;height:46px;background:linear-gradient(135deg,#e94560,#c2324f);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;margin-bottom:12px">🔓 登录</button>
+      <p style="font-size:13px;color:#888;margin:0">还没有账号？<a href="javascript:void(0)" onclick="showRegister()" style="color:#e94560;font-weight:600;text-decoration:none">立即注册</a></p>
     </div>
-    <div onclick="selectRole('user')" style="background:rgba(59,130,246,0.15);border:2px solid rgba(59,130,246,0.4);border-radius:16px;padding:24px;cursor:pointer;transition:all 0.2s;min-width:200px" onmouseover="this.style.background='rgba(59,130,246,0.25)';this.style.borderColor='rgba(59,130,246,0.7)'" onmouseout="this.style.background='rgba(59,130,246,0.15)';this.style.borderColor='rgba(59,130,246,0.4)'">
-      <div style="font-size:40px;margin-bottom:12px">👤</div>
-      <div style="font-size:18px;font-weight:700;margin-bottom:8px">普通用户模式</div>
-      <div style="font-size:12px;color:rgba(255,255,255,0.6);line-height:1.6">精简功能<br>新款开发 · 历史款式<br>简洁易用</div>
+    
+    <!-- 注册表单 -->
+    <div id="registerForm" style="display:none">
+      <div class="field-group" style="margin-bottom:14px;text-align:left">
+        <div class="field-label" style="font-size:13px;font-weight:600;margin-bottom:6px;color:#555">👤 用户名</div>
+        <input class="field-input" type="text" id="regUsername" placeholder="请输入用户名（3-20位）" autocomplete="username" style="width:100%;padding:12px;border:1.5px solid #ddd;border-radius:10px;font-size:14px;box-sizing:border-box;outline:none">
+      </div>
+      <div class="field-group" style="margin-bottom:14px;text-align:left">
+        <div class="field-label" style="font-size:13px;font-weight:600;margin-bottom:6px;color:#555">🔑 密码</div>
+        <input class="field-input" type="password" id="regPassword" placeholder="请输入密码（至少4位）" autocomplete="new-password" style="width:100%;padding:12px;border:1.5px solid #ddd;border-radius:10px;font-size:14px;box-sizing:border-box;outline:none">
+      </div>
+      <div class="field-group" style="margin-bottom:8px;text-align:left">
+        <div class="field-label" style="font-size:13px;font-weight:600;margin-bottom:6px;color:#555">🔑 确认密码</div>
+        <input class="field-input" type="password" id="regPassword2" placeholder="请再次输入密码" autocomplete="new-password" style="width:100%;padding:12px;border:1.5px solid #ddd;border-radius:10px;font-size:14px;box-sizing:border-box;outline:none" onkeydown="if(event.key==='Enter')doRegister()">
+      </div>
+      <p id="regMsg" style="font-size:13px;color:#e94560;margin:8px 0;min-height:18px"></p>
+      <button onclick="doRegister()" style="width:100%;height:46px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;margin-bottom:12px">📝 注册</button>
+      <p style="font-size:13px;color:#888;margin:0">已有账号？<a href="javascript:void(0)" onclick="showLogin()" style="color:#10b981;font-weight:600;text-decoration:none">返回登录</a></p>
     </div>
   </div>
-  <p style="color:rgba(255,255,255,0.4);font-size:12px;margin-top:32px">选择后可在右上角随时切换</p>
 </div>
 
 <!-- 待审批遮罩 -->

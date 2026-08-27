@@ -188,21 +188,9 @@ async function init() {
     } catch(e) {
       // API不可用 → 降级为纯前端本地模式
       useAPI = false;
-      currentUser = { username: '本地用户', role: 'admin', isAdmin: true, uid: 'local' };
-      // 隐藏未登录遮罩层
+      // 隐藏未登录遮罩层（使用我们自己的登录系统）
       var overlay = document.getElementById('unloginOverlay');
       if (overlay) overlay.style.display = 'none';
-      // 显示用户信息和管理员功能
-      var badge = document.getElementById('userBadge');
-      if (badge) { badge.textContent = '👤 本地用户'; badge.style.display = ''; }
-      var adminBtn = document.getElementById('adminBtn');
-      if (adminBtn) adminBtn.style.display = '';
-      var logsTabBtn = document.getElementById('logsTabBtn');
-      if (logsTabBtn) logsTabBtn.style.display = '';
-      var mnavLogs = document.getElementById('mnavLogs');
-      if (mnavLogs) mnavLogs.style.display = '';
-      var changePwdBtn = document.getElementById('changePwdBtn');
-      if (changePwdBtn) changePwdBtn.style.display = 'none';
     }
   }
   await loadDB();
@@ -226,14 +214,10 @@ async function init() {
     }
   }
   
-  // ── 角色选择（纯前端模式）──
+  // ── 纯前端模式：检查登录状态 ──
   if (!useAPI) {
-    var savedRole = localStorage.getItem('app_role');
-    if (savedRole) {
-      selectRole(savedRole, true);
-    } else {
-      showRoleSelect();
-    }
+    initUsers();
+    checkLogin();
   }
 }
 
@@ -243,67 +227,243 @@ let currentUser = null;
 const IDB_NAME = 'gf_cost_db_idb';
 const IDB_STORE = 'kv';
 
-// ===== 角色选择（纯前端模式）=====
-function selectRole(role, silent) {
-  if (!role) role = 'admin';
-  localStorage.setItem('app_role', role);
+// ===== 用户系统（纯前端模式）=====
+const USERS_KEY = 'app_users';
+const CURRENT_USER_KEY = 'app_current_user';
+
+// 简单的密码哈希（Base64编码，仅用于本地演示，非安全加密）
+function hashPassword(pwd) {
+  try {
+    return btoa(unescape(encodeURIComponent(pwd + '_dqas_salt')));
+  } catch(e) {
+    return pwd;
+  }
+}
+
+// 初始化用户系统，预设主账号
+function initUsers() {
+  var users = localStorage.getItem(USERS_KEY);
+  if (!users) {
+    // 预设主账号（管理员）
+    var defaultUsers = {
+      'admin': {
+        username: 'admin',
+        password: hashPassword('admin123'),
+        role: 'admin',
+        isAdmin: true,
+        createdAt: Date.now(),
+        uid: 'admin_001'
+      }
+    };
+    localStorage.setItem(USERS_KEY, JSON.stringify(defaultUsers));
+    console.log('已初始化用户系统，主账号: admin / admin123');
+  }
+}
+
+// 获取所有用户
+function getUsers() {
+  try {
+    return JSON.parse(localStorage.getItem(USERS_KEY) || '{}');
+  } catch(e) {
+    return {};
+  }
+}
+
+// 保存用户
+function saveUsers(users) {
+  localStorage.setItem(USERS_KEY, JSON.stringify(users));
+}
+
+// 检查登录状态
+function checkLogin() {
+  var savedUser = sessionStorage.getItem(CURRENT_USER_KEY);
+  if (savedUser) {
+    try {
+      currentUser = JSON.parse(savedUser);
+      updateUserUI();
+      hideLoginOverlay();
+      return true;
+    } catch(e) {}
+  }
+  // 未登录，显示登录弹窗
+  showLoginOverlay();
+  return false;
+}
+
+// 显示登录弹窗
+function showLoginOverlay() {
+  var overlay = document.getElementById('loginOverlay');
+  if (overlay) overlay.style.display = 'flex';
+  showLogin();
+}
+
+// 隐藏登录弹窗
+function hideLoginOverlay() {
+  var overlay = document.getElementById('loginOverlay');
+  if (overlay) overlay.style.display = 'none';
+}
+
+// 显示登录表单
+function showLogin() {
+  document.getElementById('loginForm').style.display = 'block';
+  document.getElementById('registerForm').style.display = 'none';
+  document.getElementById('loginSubtitle').textContent = '请登录后使用';
+  document.getElementById('loginMsg').textContent = '';
+  document.getElementById('regMsg').textContent = '';
+}
+
+// 显示注册表单
+function showRegister() {
+  document.getElementById('loginForm').style.display = 'none';
+  document.getElementById('registerForm').style.display = 'block';
+  document.getElementById('loginSubtitle').textContent = '创建新账号';
+  document.getElementById('loginMsg').textContent = '';
+  document.getElementById('regMsg').textContent = '';
+}
+
+// 登录
+function doLogin() {
+  var username = document.getElementById('loginUsername').value.trim();
+  var password = document.getElementById('loginPassword').value;
+  var msgEl = document.getElementById('loginMsg');
   
-  var isAdmin = role === 'admin';
+  if (!username) {
+    msgEl.textContent = '请输入用户名';
+    return;
+  }
+  if (!password) {
+    msgEl.textContent = '请输入密码';
+    return;
+  }
+  
+  var users = getUsers();
+  var user = users[username];
+  
+  if (!user) {
+    msgEl.textContent = '用户不存在，请先注册';
+    return;
+  }
+  
+  if (user.password !== hashPassword(password)) {
+    msgEl.textContent = '密码错误';
+    return;
+  }
+  
+  // 登录成功
+  currentUser = {
+    username: user.username,
+    role: user.role,
+    isAdmin: user.isAdmin,
+    uid: user.uid
+  };
+  sessionStorage.setItem(CURRENT_USER_KEY, JSON.stringify(currentUser));
+  updateUserUI();
+  hideLoginOverlay();
+  toast('✅ 登录成功，欢迎 ' + user.username);
+}
+
+// 注册
+function doRegister() {
+  var username = document.getElementById('regUsername').value.trim();
+  var password = document.getElementById('regPassword').value;
+  var password2 = document.getElementById('regPassword2').value;
+  var msgEl = document.getElementById('regMsg');
+  
+  if (!username) {
+    msgEl.textContent = '请输入用户名';
+    return;
+  }
+  if (username.length < 3 || username.length > 20) {
+    msgEl.textContent = '用户名长度需为3-20位';
+    return;
+  }
+  if (!password) {
+    msgEl.textContent = '请输入密码';
+    return;
+  }
+  if (password.length < 4) {
+    msgEl.textContent = '密码至少4位';
+    return;
+  }
+  if (password !== password2) {
+    msgEl.textContent = '两次密码输入不一致';
+    return;
+  }
+  
+  var users = getUsers();
+  if (users[username]) {
+    msgEl.textContent = '用户名已存在';
+    return;
+  }
+  
+  // 创建新用户（普通用户角色）
+  var newUser = {
+    username: username,
+    password: hashPassword(password),
+    role: 'user',
+    isAdmin: false,
+    createdAt: Date.now(),
+    uid: 'user_' + Date.now()
+  };
+  users[username] = newUser;
+  saveUsers(users);
+  
+  // 自动登录
+  currentUser = {
+    username: newUser.username,
+    role: newUser.role,
+    isAdmin: newUser.isAdmin,
+    uid: newUser.uid
+  };
+  sessionStorage.setItem(CURRENT_USER_KEY, JSON.stringify(currentUser));
+  updateUserUI();
+  hideLoginOverlay();
+  toast('✅ 注册成功，欢迎 ' + username);
+}
+
+// 退出登录
+function doLogout() {
+  if (!confirm('确定要退出登录吗？')) return;
+  currentUser = null;
+  sessionStorage.removeItem(CURRENT_USER_KEY);
+  document.getElementById('loginUsername').value = '';
+  document.getElementById('loginPassword').value = '';
+  showLoginOverlay();
+  toast('👋 已退出登录');
+}
+
+// 更新用户界面
+function updateUserUI() {
   var badge = document.getElementById('userBadge');
   var adminBtn = document.getElementById('adminBtn');
   var logsTabBtn = document.getElementById('logsTabBtn');
   var mnavLogs = document.getElementById('mnavLogs');
   var changePwdBtn = document.getElementById('changePwdBtn');
-  var switchRoleBtn = document.getElementById('switchRoleBtn');
+  
+  if (!currentUser) {
+    if (badge) badge.textContent = '👤 未登录';
+    if (adminBtn) adminBtn.style.display = 'none';
+    if (logsTabBtn) logsTabBtn.style.display = 'none';
+    if (mnavLogs) mnavLogs.style.display = 'none';
+    if (changePwdBtn) changePwdBtn.style.display = 'none';
+    return;
+  }
   
   // 更新用户徽章
   if (badge) {
-    badge.textContent = isAdmin ? '👑 管理员' : '👤 普通用户';
-  }
-  
-  // 管理员功能显示/隐藏
-  if (adminBtn) adminBtn.style.display = isAdmin ? '' : 'none';
-  if (logsTabBtn) logsTabBtn.style.display = isAdmin ? '' : 'none';
-  if (mnavLogs) mnavLogs.style.display = isAdmin ? '' : 'none';
-  if (changePwdBtn) changePwdBtn.style.display = 'none'; // 纯前端模式都不需要修改密码
-  if (switchRoleBtn) switchRoleBtn.style.display = '';
-  
-  // 隐藏/显示导出导入按钮（普通用户只保留核心功能）
-  var topbarRight = document.querySelector('.topbar-right');
-  if (topbarRight) {
-    var btns = topbarRight.querySelectorAll('.btn-top');
-    btns.forEach(function(btn) {
-      var text = btn.textContent || '';
-      if (text.indexOf('导出数据') >= 0 || text.indexOf('导入备份') >= 0 || text.indexOf('合并同事') >= 0) {
-        btn.style.display = isAdmin ? '' : 'none';
-      }
-    });
-  }
-  
-  // 如果当前在操作日志标签且切换为普通用户，自动切回新款开发
-  if (!isAdmin) {
-    var activeTab = document.querySelector('.tab-btn.active');
-    if (activeTab && activeTab.dataset.tab === 'logs') {
-      document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
-      document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
-      var devBtn = document.querySelector('[data-tab="dev"]');
-      if (devBtn) devBtn.classList.add('active');
-      document.getElementById('tab-dev').classList.add('active');
+    if (currentUser.isAdmin || currentUser.role === 'admin') {
+      badge.textContent = '👑 ' + currentUser.username + '（管理员）';
+    } else {
+      badge.textContent = '👤 ' + currentUser.username;
     }
   }
   
-  // 隐藏角色选择弹窗
-  var overlay = document.getElementById('roleSelectOverlay');
-  if (overlay) overlay.style.display = 'none';
-  
-  if (!silent) {
-    toast(isAdmin ? '👑 已切换到管理员模式' : '👤 已切换到普通用户模式');
-  }
-}
-
-function showRoleSelect() {
-  var overlay = document.getElementById('roleSelectOverlay');
-  if (overlay) overlay.style.display = 'flex';
+  // 管理员功能显示/隐藏
+  var isAdmin = currentUser.isAdmin || currentUser.role === 'admin';
+  if (adminBtn) adminBtn.style.display = isAdmin ? '' : 'none';
+  if (logsTabBtn) logsTabBtn.style.display = isAdmin ? '' : 'none';
+  if (mnavLogs) mnavLogs.style.display = isAdmin ? '' : 'none';
+  if (changePwdBtn) changePwdBtn.style.display = 'none'; // 纯前端模式不需要修改密码
 }
 
 function idbOpen() {
