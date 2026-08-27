@@ -1,6 +1,6 @@
 
 // ===== 应用版本号（每次更新递增）=====
-const APP_VERSION = '1.3.6';
+const APP_VERSION = '1.3.7';
 const VERSION_KEY = 'app_version';
 
 // ===== 版本检测与数据保护 =====
@@ -891,6 +891,16 @@ function restoreBackup(backupId) {
   return true;
 }
 
+// 删除备份
+function deleteBackup(backupId) {
+  if (!confirm('确定要删除这个备份吗？此操作不可恢复！')) return;
+  var backups = getBackups();
+  backups = backups.filter(function(b) { return b.id !== backupId; });
+  saveBackups(backups);
+  toast('✅ 已删除备份');
+  showBackupManager(); // 刷新备份列表
+}
+
 // 手动备份
 function doManualBackup() {
   try {
@@ -951,7 +961,10 @@ function showBackupManager() {
       html += '<div style="font-size:12px;color:#888;margin-bottom:4px">🕐 ' + dateStr + ' · 👤 ' + escHtml(backup.createdBy) + '</div>';
       html += '<div style="font-size:11px;color:#aaa">📦 款式 ' + styleCount + ' 个 · 🔧 工序 ' + procCount + ' 项</div>';
       html += '</div>';
+      html += '<div style="display:flex;flex-direction:column;gap:6px">';
       html += '<button onclick="restoreBackup(' + backup.id + ')" style="padding:6px 14px;background:#4361ee;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px;white-space:nowrap">恢复</button>';
+      html += '<button onclick="deleteBackup(' + backup.id + ')" style="padding:6px 14px;background:#ef4444;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px;white-space:nowrap">删除</button>';
+      html += '</div>';
       html += '</div>';
       html += '</div>';
     });
