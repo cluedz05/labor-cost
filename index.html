@@ -161,6 +161,22 @@
 
     <div id="registerForm" style="display:none">
 
+      <div class="field-group" style="margin-bottom:14px;text-align:center">
+
+        <div class="field-label" style="font-size:13px;font-weight:600;margin-bottom:6px;color:#555">🖼️ 头像（可选）</div>
+
+        <div style="display:flex;align-items:center;justify-content:center;gap:12px">
+
+          <div id="regAvatarPreview" style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:600;border:2px solid #e0e0e0;overflow:hidden">👤</div>
+
+          <input type="file" id="regAvatar" accept="image/*" style="display:none" onchange="previewRegAvatar(this)">
+
+          <button type="button" onclick="document.getElementById('regAvatar').click()" style="padding:8px 16px;background:#f0f0f0;color:#333;border:1px solid #ddd;border-radius:8px;cursor:pointer;font-size:13px">选择头像</button>
+
+        </div>
+
+      </div>
+
       <div class="field-group" style="margin-bottom:14px;text-align:left">
 
         <div class="field-label" style="font-size:13px;font-weight:600;margin-bottom:6px;color:#555">👤 用户名</div>

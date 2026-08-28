@@ -752,6 +752,40 @@ function initUsers() {
 
     console.log('已初始化用户系统，主账号: admin / admin123');
 
+  } else {
+
+    // 确保主账号admin始终存在
+
+    try {
+
+      var userData = JSON.parse(users);
+
+      if (!userData['admin']) {
+
+        userData['admin'] = {
+
+          username: 'admin',
+
+          password: hashPassword('admin123'),
+
+          role: 'admin',
+
+          isAdmin: true,
+
+          createdAt: Date.now(),
+
+          uid: 'admin_001'
+
+        };
+
+        localStorage.setItem(USERS_KEY, JSON.stringify(userData));
+
+        console.log('已添加主账号admin');
+
+      }
+
+    } catch(e) {}
+
   }
 
 }
@@ -876,6 +910,30 @@ function showRegister() {
 
   document.getElementById('regMsg').textContent = '';
 
+  // 重置头像预览
+  var avatarPreview = document.getElementById('regAvatarPreview');
+  if (avatarPreview) {
+    avatarPreview.innerHTML = '👤';
+    avatarPreview.style.background = 'linear-gradient(135deg,#667eea,#764ba2)';
+  }
+  window._tempRegAvatar = null;
+
+}
+
+// 预览注册头像
+function previewRegAvatar(input) {
+  if (input.files && input.files[0]) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      window._tempRegAvatar = e.target.result;
+      var avatarPreview = document.getElementById('regAvatarPreview');
+      if (avatarPreview) {
+        avatarPreview.innerHTML = '<img src="' + e.target.result + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%">';
+        avatarPreview.style.background = 'transparent';
+      }
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
 }
 
 
@@ -1047,6 +1105,12 @@ function doRegister() {
     uid: 'user_' + Date.now()
 
   };
+
+  // 保存头像
+  if (window._tempRegAvatar) {
+    newUser.avatar = window._tempRegAvatar;
+    window._tempRegAvatar = null;
+  }
 
   users[username] = newUser;
 
