@@ -7314,64 +7314,114 @@ function renderLibrary() {
 
   }
 
-  var html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px">';
+  var html = '<div style="display:flex;flex-direction:column;gap:20px">';
 
   filtered.forEach(function(item, idx) {
 
     var total = 0;
+    var pingcheTotal = 0;
+    var zacheTotal = 0;
+    var kancheTotal = 0;
 
-    (item.processes || []).forEach(function(p) { total += (p.price || 0) * (p.qty || 1); });
+    (item.processes || []).forEach(function(p) { 
+      var subtotal = (p.price || 0) * (p.qty || 1);
+      total += subtotal;
+      if (p.type === 'pingche') pingcheTotal += subtotal;
+      else if (p.type === 'zache') zacheTotal += subtotal;
+      else if (p.type === 'kanche') kancheTotal += subtotal;
+    });
 
     var imgHtml = item.image 
+      ? '<img src="' + item.image + '" style="width:120px;height:160px;object-fit:cover;border:1px solid #ddd;cursor:pointer" onclick="viewLibraryImage(' + idx + ')">'
+      : '<div style="width:120px;height:160px;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;color:#fff;font-size:36px;border:1px solid #ddd">👔</div>';
 
-      ? '<img src="' + item.image + '" style="width:100%;height:160px;object-fit:cover;border-radius:8px 8px 0 0;cursor:pointer" onclick="viewLibraryImage(' + idx + ')">'
-
-      : '<div style="width:100%;height:160px;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;color:#fff;font-size:48px;border-radius:8px 8px 0 0">👔</div>';
-
-    var tagsHtml = (item.tags || []).map(function(t) { return '<span style="display:inline-block;background:#e0e7ff;color:#4338ca;padding:2px 8px;border-radius:10px;font-size:11px;margin:2px">' + escHtml(t) + '</span>'; }).join('');
-
-    html += '<div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.06)">';
-
-    html += imgHtml;
-
-    html += '<div style="padding:12px">';
-
-    html += '<div style="font-weight:600;font-size:15px;color:#1a1a2e;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + escHtml(item.name || '未命名') + '</div>';
-
-    // 工序详情（显示前3道）
-    var procPreview = '';
-    if (item.processes && item.processes.length > 0) {
-      var showProcs = item.processes.slice(0, 3);
-      procPreview = '<div style="margin-bottom:8px;padding:8px;background:#f9fafb;border-radius:6px;font-size:11px;color:#4b5563;line-height:1.6">';
-      showProcs.forEach(function(p) {
-        var typeName = {pingche:'平车', zache:'扎车', kanche:'坎车'}[p.type] || p.type;
-        procPreview += '<div style="display:flex;justify-content:space-between"><span>🔧 ' + escHtml(p.name || '未命名') + ' (' + typeName + ')</span><span style="color:#e94560;font-weight:600">¥' + ((p.price||0)*(p.qty||1)).toFixed(2) + '</span></div>';
-      });
-      if (item.processes.length > 3) {
-        procPreview += '<div style="text-align:center;color:#6b7280;margin-top:4px">...还有' + (item.processes.length - 3) + '道工序</div>';
+    // 表格形式，像Excel一样
+    html += '<div style="background:#fff;border:2px solid #333;border-radius:4px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1)">';
+    
+    // 款号标题行
+    html += '<div style="background:#fbbf24;padding:8px 12px;font-weight:700;font-size:16px;color:#1a1a2e;border-bottom:2px solid #333;display:flex;justify-content:space-between;align-items:center">';
+    html += '<span>款号' + escHtml(item.name || '未命名') + '</span>';
+    html += '<span style="font-size:13px;font-weight:400;color:#666">分类：' + escHtml(item.category || '未分类') + ' | 工序：' + (item.processes || []).length + '道</span>';
+    html += '</div>';
+    
+    // 内容区域：图片在左，工序表格在右
+    html += '<div style="display:flex;padding:10px;gap:10px">';
+    
+    // 图片区域
+    html += '<div style="flex-shrink:0">' + imgHtml + '</div>';
+    
+    // 工序表格区域
+    html += '<div style="flex:1;min-width:0">';
+    html += '<table style="width:100%;border-collapse:collapse;font-size:13px">';
+    
+    // 表头
+    html += '<thead>';
+    html += '<tr style="background:#f3f4f6">';
+    html += '<th style="border:1px solid #ccc;padding:6px 8px;text-align:left;width:50%">步骤</th>';
+    html += '<th style="border:1px solid #ccc;padding:6px 8px;text-align:center;width:20%">单价</th>';
+    html += '<th style="border:1px solid #ccc;padding:6px 8px;text-align:center;width:30%">小计</th>';
+    html += '</tr>';
+    html += '</thead>';
+    
+    // 表体
+    html += '<tbody>';
+    var currentType = '';
+    (item.processes || []).forEach(function(p, pIdx) {
+      var typeName = {pingche:'平车', zache:'扎车', kanche:'坎车'}[p.type] || p.type;
+      var subtotal = (p.price || 0) * (p.qty || 1);
+      
+      // 如果工序类型变化，显示小计行
+      if (currentType && p.type !== currentType) {
+        var typeTotal = 0;
+        (item.processes || []).slice(0, pIdx).forEach(function(pp) {
+          if (pp.type === currentType) typeTotal += (pp.price || 0) * (pp.qty || 1);
+        });
+        html += '<tr style="background:#fef3c7;font-weight:600">';
+        html += '<td colspan="2" style="border:1px solid #ccc;padding:6px 8px;text-align:right;color:#92400e">' + ({pingche:'平车', zache:'扎车', kanche:'坎车'}[currentType] || currentType) + '小计</td>';
+        html += '<td style="border:1px solid #ccc;padding:6px 8px;text-align:center;color:#92400e">¥' + typeTotal.toFixed(2) + '</td>';
+        html += '</tr>';
       }
-      procPreview += '</div>';
+      currentType = p.type;
+      
+      html += '<tr>';
+      html += '<td style="border:1px solid #ccc;padding:5px 8px">' + escHtml(p.name || '未命名') + '</td>';
+      html += '<td style="border:1px solid #ccc;padding:5px 8px;text-align:center">¥' + (p.price || 0).toFixed(2) + '</td>';
+      html += '<td style="border:1px solid #ccc;padding:5px 8px;text-align:center;color:#e94560;font-weight:600">¥' + subtotal.toFixed(2) + '</td>';
+      html += '</tr>';
+    });
+    
+    // 最后一个类型的小计
+    if (currentType) {
+      var typeTotal = 0;
+      (item.processes || []).forEach(function(pp) {
+        if (pp.type === currentType) typeTotal += (pp.price || 0) * (pp.qty || 1);
+      });
+      html += '<tr style="background:#fef3c7;font-weight:600">';
+      html += '<td colspan="2" style="border:1px solid #ccc;padding:6px 8px;text-align:right;color:#92400e">' + ({pingche:'平车', zache:'扎车', kanche:'坎车'}[currentType] || currentType) + '小计</td>';
+      html += '<td style="border:1px solid #ccc;padding:6px 8px;text-align:center;color:#92400e">¥' + typeTotal.toFixed(2) + '</td>';
+      html += '</tr>';
     }
-
-    html += '<div style="font-size:12px;color:#6b7280;margin-bottom:8px">分类：' + escHtml(item.category || '未分类') + ' | 工序：' + (item.processes || []).length + '道</div>';
-
-    html += '<div style="font-size:18px;font-weight:700;color:#e94560;margin-bottom:8px">¥' + total.toFixed(2) + '</div>';
-
-    html += procPreview;
-
-    html += '<div style="margin-bottom:10px;min-height:24px">' + tagsHtml + '</div>';
-
-    html += '<div style="display:flex;gap:6px">';
-
-    html += '<button onclick="loadLibraryStyle(' + idx + ')" style="flex:1;padding:6px;background:#4361ee;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px">📋 加载使用</button>';
-
-    html += '<button onclick="viewLibraryDetail(' + idx + ')" style="padding:6px 10px;background:#8b5cf6;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px" title="查看详情">👁️</button>';
-
-    html += '<button onclick="editLibraryStyle(' + idx + ')" style="padding:6px 10px;background:#f59e0b;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px">✏️</button>';
-
-    html += '<button onclick="deleteLibraryStyle(' + idx + ')" style="padding:6px 10px;background:#ef4444;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px">🗑️</button>';
-
-    html += '</div></div></div>';
+    
+    // 合计行
+    html += '<tr style="background:#fecaca;font-weight:700">';
+    html += '<td colspan="2" style="border:1px solid #ccc;padding:8px;text-align:right;color:#991b1b;font-size:14px">合计</td>';
+    html += '<td style="border:1px solid #ccc;padding:8px;text-align:center;color:#991b1b;font-size:16px">¥' + total.toFixed(2) + '</td>';
+    html += '</tr>';
+    
+    html += '</tbody>';
+    html += '</table>';
+    html += '</div>';
+    html += '</div>';
+    
+    // 操作按钮行
+    html += '<div style="padding:8px 12px;background:#f9fafb;border-top:1px solid #ddd;display:flex;gap:6px;justify-content:flex-end">';
+    html += '<button onclick="loadLibraryStyle(' + idx + ')" style="padding:6px 14px;background:#4361ee;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:12px">📋 加载使用</button>';
+    html += '<button onclick="viewLibraryDetail(' + idx + ')" style="padding:6px 10px;background:#8b5cf6;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:12px">👁️ 详情</button>';
+    html += '<button onclick="editLibraryStyle(' + idx + ')" style="padding:6px 10px;background:#f59e0b;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:12px">✏️ 编辑</button>';
+    html += '<button onclick="deleteLibraryStyle(' + idx + ')" style="padding:6px 10px;background:#ef4444;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:12px">🗑️ 删除</button>';
+    html += '</div>';
+    
+    html += '</div>';
 
   });
 
