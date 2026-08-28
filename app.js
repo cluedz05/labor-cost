@@ -7365,42 +7365,39 @@ function renderLibrary() {
     
     // 表体
     html += '<tbody>';
-    var currentType = '';
+    
+    // 先计算每个类型的小计
+    var typeTotals = {};
+    (item.processes || []).forEach(function(p) {
+      var subtotal = (p.price || 0) * (p.qty || 1);
+      if (!typeTotals[p.type]) typeTotals[p.type] = 0;
+      typeTotals[p.type] += subtotal;
+    });
+    
+    // 记录每个类型是否已经显示过小计
+    var typeShown = {};
+    
     (item.processes || []).forEach(function(p, pIdx) {
       var typeName = {pingche:'平车', zache:'扎车', kanche:'坎车'}[p.type] || p.type;
       var subtotal = (p.price || 0) * (p.qty || 1);
       
-      // 如果工序类型变化，显示小计行
-      if (currentType && p.type !== currentType) {
-        var typeTotal = 0;
-        (item.processes || []).slice(0, pIdx).forEach(function(pp) {
-          if (pp.type === currentType) typeTotal += (pp.price || 0) * (pp.qty || 1);
-        });
-        html += '<tr style="background:#fef3c7;font-weight:600">';
-        html += '<td colspan="2" style="border:1px solid #ccc;padding:6px 8px;text-align:right;color:#92400e">' + ({pingche:'平车', zache:'扎车', kanche:'坎车'}[currentType] || currentType) + '小计</td>';
-        html += '<td style="border:1px solid #ccc;padding:6px 8px;text-align:center;color:#92400e">¥' + typeTotal.toFixed(2) + '</td>';
-        html += '</tr>';
-      }
-      currentType = p.type;
+      // 判断是否是该类型的第一道工序
+      var isFirstOfType = !typeShown[p.type];
+      if (isFirstOfType) typeShown[p.type] = true;
       
       html += '<tr>';
       html += '<td style="border:1px solid #ccc;padding:5px 8px">' + escHtml(p.name || '未命名') + '</td>';
       html += '<td style="border:1px solid #ccc;padding:5px 8px;text-align:center">¥' + (p.price || 0).toFixed(2) + '</td>';
-      html += '<td style="border:1px solid #ccc;padding:5px 8px;text-align:center;color:#e94560;font-weight:600">¥' + subtotal.toFixed(2) + '</td>';
+      
+      // 如果是该类型的第一道工序，显示类型小计；否则显示工序小计
+      if (isFirstOfType && typeTotals[p.type] > 0) {
+        html += '<td style="border:1px solid #ccc;padding:5px 8px;text-align:center;color:#92400e;font-weight:600;background:#fef3c7">' + typeName + ' ¥' + typeTotals[p.type].toFixed(2) + '</td>';
+      } else {
+        html += '<td style="border:1px solid #ccc;padding:5px 8px;text-align:center;color:#e94560">¥' + subtotal.toFixed(2) + '</td>';
+      }
+      
       html += '</tr>';
     });
-    
-    // 最后一个类型的小计
-    if (currentType) {
-      var typeTotal = 0;
-      (item.processes || []).forEach(function(pp) {
-        if (pp.type === currentType) typeTotal += (pp.price || 0) * (pp.qty || 1);
-      });
-      html += '<tr style="background:#fef3c7;font-weight:600">';
-      html += '<td colspan="2" style="border:1px solid #ccc;padding:6px 8px;text-align:right;color:#92400e">' + ({pingche:'平车', zache:'扎车', kanche:'坎车'}[currentType] || currentType) + '小计</td>';
-      html += '<td style="border:1px solid #ccc;padding:6px 8px;text-align:center;color:#92400e">¥' + typeTotal.toFixed(2) + '</td>';
-      html += '</tr>';
-    }
     
     // 合计行
     html += '<tr style="background:#fecaca;font-weight:700">';
