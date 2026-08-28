@@ -7814,7 +7814,7 @@ function searchHistoryByImage(event) {
         '<button onclick="var kw=document.getElementById(\'historyImageSearchKeyword\').value;if(kw){var si=document.getElementById(\'searchInput\');if(si){si.value=kw;renderHistory();}this.closest(\'div[style*=fixed]\').remove();toast(\'🔍 已搜索：\'+kw);}else{toast(\'⚠️ 请输入关键词\');}" style="flex:1;padding:12px;background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer">🔍 关键词搜索</button>' +
         '<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="padding:12px 20px;background:#f3f4f6;color:#374151;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer">取消</button>' +
       '</div>' +
-      '<div style="margin-top:16px;padding:12px;background:#dbeafe;border-radius:10px;font-size:12px;color:#1e40af;line-height:1.6">🤖 <b>AI图像识别</b>：使用MobileNet深度学习模型提取图片特征，自动搜索历史款式中视觉相似的款式。首次使用需下载AI模型（约10MB），请耐心等待。</div>' +
+      '<div style="margin-top:16px;padding:12px;background:#dbeafe;border-radius:10px;font-size:12px;color:#1e40af;line-height:1.6">🤖 <b>AI图像识别</b>：使用颜色直方图算法提取图片特征，自动搜索历史款式中视觉相似的款式。分析速度快，无需下载模型。</div>' +
     '</div>';
     document.body.appendChild(modal);
     
@@ -7863,25 +7863,9 @@ function initLibraryButtons() {
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', function() {
     initLibraryButtons();
-    // 预加载AI模型（后台静默加载）
-    setTimeout(function() {
-      if (typeof loadMobileNetModel === 'function') {
-        loadMobileNetModel().then(function(model) {
-          if (model) console.log('AI模型预加载完成');
-        });
-      }
-    }, 2000);
   });
 } else {
   initLibraryButtons();
-  // 预加载AI模型
-  setTimeout(function() {
-    if (typeof loadMobileNetModel === 'function') {
-      loadMobileNetModel().then(function(model) {
-        if (model) console.log('AI模型预加载完成');
-      });
-    }
-  }, 2000);
 }
 
 
@@ -8013,88 +7997,45 @@ function syncAllApprovedToLibrary() {
 
 
 // ===== AI图像识别搜款（TensorFlow.js + MobileNet）=====
-let mobilenetModel = null;
-let modelLoading = false;
-let libraryFeatures = {}; // 缓存款式库图片的特征向量
+// 颜色直方图图像相似度搜索（不依赖外部模型，快速稳定）
+let historyImageFeatures = {}; // 缓存历史款式图片的特征向量
 
-// 加载MobileNet模型
-async function loadMobileNetModel() {
-  if (mobilenetModel) return mobilenetModel;
-  if (modelLoading) {
-    // 等待模型加载完成
-    return new Promise(resolve => {
-      const check = setInterval(() => {
-        if (mobilenetModel) {
-          clearInterval(check);
-          resolve(mobilenetModel);
-        }
-      }, 100);
-    });
-  }
-  
-  modelLoading = true;
-  try {
-    if (typeof tf === 'undefined') {
-      console.error('TensorFlow.js未加载');
-      return null;
-    }
-    
-    // 加载MobileNet模型
-    mobilenetModel = await tf.loadLayersModel('https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/model.json');
-    console.log('MobileNet模型加载成功');
-    return mobilenetModel;
-  } catch (e) {
-    console.error('MobileNet模型加载失败:', e);
-    return null;
-  } finally {
-    modelLoading = false;
-  }
-}
-
-// 图像预处理
-function preprocessImage(imgElement) {
-  return tf.tidy(() => {
-    // 调整图片大小到224x224
-    const tensor = tf.browser.fromPixels(imgElement)
-      .resizeNearestNeighbor([224, 224])
-      .toFloat()
-      .div(tf.scalar(127.5))
-      .sub(tf.scalar(1));
-    
-    // 增加batch维度
-    return tensor.expandDims(0);
-  });
-}
-
-// 提取图像特征向量（优化版：使用更小尺寸，更快速度）
-async function extractImageFeatures(imageSrc) {
-  const model = await loadMobileNetModel();
-  if (!model) return null;
-  
+// 提取图像颜色直方图特征
+function extractColorHistogram(imageSrc) {
   return new Promise((resolve) => {
     const img = new Image();
     img.crossOrigin = 'anonymous';
     img.onload = function() {
       try {
-        // 使用tf.tidy自动清理内存
-        const array = tf.tidy(() => {
-          // 调整图片大小到128x128（更小尺寸，更快速度）
-          const tensor = tf.browser.fromPixels(img)
-            .resizeNearestNeighbor([128, 128])
-            .toFloat()
-            .div(tf.scalar(127.5))
-            .sub(tf.scalar(1))
-            .expandDims(0);
-          
-          // 使用模型预测
-          const features = model.predict(tensor, { verbose: false });
-          // 展平并归一化
-          const flattened = features.reshape([-1]);
-          const normalized = flattened.div(flattened.norm());
-          return normalized.arraySync();
-        });
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        // 缩放到64x64，提高速度
+        canvas.width = 64;
+        canvas.height = 64;
+        ctx.drawImage(img, 0, 0, 64, 64);
         
-        resolve(array);
+        const imageData = ctx.getImageData(0, 0, 64, 64);
+        const data = imageData.data;
+        
+        // 颜色直方图：每个通道4个区间，共64个bin
+        const bins = 64;
+        const histogram = new Array(bins).fill(0);
+        
+        for (let i = 0; i < data.length; i += 4) {
+          const r = Math.floor(data[i] / 64);     // 0-3
+          const g = Math.floor(data[i + 1] / 64); // 0-3
+          const b = Math.floor(data[i + 2] / 64); // 0-3
+          const idx = r * 16 + g * 4 + b;
+          histogram[idx]++;
+        }
+        
+        // 归一化
+        const total = 64 * 64;
+        for (let i = 0; i < bins; i++) {
+          histogram[i] /= total;
+        }
+        
+        resolve(histogram);
       } catch (e) {
         console.error('特征提取失败:', e);
         resolve(null);
@@ -8107,25 +8048,25 @@ async function extractImageFeatures(imageSrc) {
   });
 }
 
-// 计算两个特征向量的余弦相似度
-function cosineSimilarity(vec1, vec2) {
-  if (!vec1 || !vec2 || vec1.length !== vec2.length) return 0;
-  let dotProduct = 0;
-  for (let i = 0; i < vec1.length; i++) {
-    dotProduct += vec1[i] * vec2[i];
+// 计算两个直方图的相似度（直方图交集）
+function histogramSimilarity(hist1, hist2) {
+  if (!hist1 || !hist2 || hist1.length !== hist2.length) return 0;
+  let intersection = 0;
+  for (let i = 0; i < hist1.length; i++) {
+    intersection += Math.min(hist1[i], hist2[i]);
   }
-  return dotProduct; // 已经归一化，所以点积就是余弦相似度
+  return intersection;
 }
 
-// AI图像搜款（优化版：并行处理，更快速度）
+// AI图像搜款（使用颜色直方图，搜索历史款式）
 async function aiImageSearch(imageDataUrl, callback) {
   const resultDiv = document.getElementById('aiSearchResult');
   if (resultDiv) {
-    resultDiv.innerHTML = '<div style="text-align:center;padding:30px;color:#6b7280"><div style="font-size:32px;margin-bottom:10px">🤖</div>正在加载AI模型并分析图片...</div>';
+    resultDiv.innerHTML = '<div style="text-align:center;padding:30px;color:#6b7280"><div style="font-size:32px;margin-bottom:10px">🤖</div>正在分析图片...</div>';
   }
   
   // 提取上传图片的特征
-  const targetFeatures = await extractImageFeatures(imageDataUrl);
+  const targetFeatures = await extractColorHistogram(imageDataUrl);
   if (!targetFeatures) {
     if (resultDiv) {
       resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:#ef4444">❌ 图片分析失败，请尝试其他图片</div>';
@@ -8134,13 +8075,14 @@ async function aiImageSearch(imageDataUrl, callback) {
     return;
   }
   
-  const library = getLibrary();
-  const itemsWithImage = library.filter(item => item.image);
+  // 搜索历史款式
+  const styles = DB.styles || [];
+  const itemsWithImage = styles.filter(item => item.imgs && item.imgs[0]);
   const total = itemsWithImage.length;
   
   if (total === 0) {
     if (resultDiv) {
-      resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:#9ca3af">📭 款式库中没有带图片的款式</div>';
+      resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:#9ca3af">📭 历史款式中没有带图片的款式</div>';
     }
     callback([]);
     return;
@@ -8149,36 +8091,27 @@ async function aiImageSearch(imageDataUrl, callback) {
   const results = [];
   let processed = 0;
   
-  // 并行处理（每次处理3张图片，提高速度）
-  const batchSize = 3;
-  for (let batchStart = 0; batchStart < itemsWithImage.length; batchStart += batchSize) {
-    const batch = itemsWithImage.slice(batchStart, batchStart + batchSize);
-    
-    // 并行提取当前批次的特征
-    const batchPromises = batch.map(async (item) => {
-      const idx = library.indexOf(item);
-      let features = libraryFeatures[item.id];
-      if (!features) {
-        features = await extractImageFeatures(item.image);
-        if (features) {
-          libraryFeatures[item.id] = features;
-        }
-      }
-      return { idx, item, features };
-    });
-    
-    const batchResults = await Promise.all(batchPromises);
-    
-    batchResults.forEach(({ idx, item, features }) => {
-      processed++;
+  // 逐个处理（颜色直方图很快，不需要并行）
+  for (let i = 0; i < itemsWithImage.length; i++) {
+    const item = itemsWithImage[i];
+    const idx = styles.indexOf(item);
+    let features = historyImageFeatures[item.id];
+    if (!features) {
+      features = await extractColorHistogram(item.imgs[0]);
       if (features) {
-        const similarity = cosineSimilarity(targetFeatures, features);
-        results.push({ idx, item, similarity });
+        historyImageFeatures[item.id] = features;
       }
-    });
+    }
     
-    // 更新进度
-    if (resultDiv) {
+    if (features) {
+      const similarity = histogramSimilarity(targetFeatures, features);
+      results.push({ idx, item, similarity });
+    }
+    
+    processed++;
+    
+    // 更新进度（每处理5个更新一次）
+    if (resultDiv && (processed % 5 === 0 || processed === total)) {
       const percent = Math.round((processed / total) * 100);
       resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:#6b7280">' +
         '<div style="font-size:24px;margin-bottom:8px">🔍</div>' +
@@ -8197,24 +8130,24 @@ async function aiImageSearch(imageDataUrl, callback) {
     if (results.length === 0) {
       resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:#9ca3af">未找到相似款式</div>';
     } else {
-      let html = '<div style="font-size:14px;font-weight:600;color:#1a1a2e;margin-bottom:10px">🎯 AI找到 ' + results.length + ' 个相似款式（按相似度排序）</div>';
+      let html = '<div style="font-size:14px;font-weight:600;color:#1a1a2e;margin-bottom:10px">🎯 找到 ' + results.length + ' 个相似款式（按相似度排序）</div>';
       html += '<div style="max-height:350px;overflow-y:auto">';
       
       results.slice(0, 10).forEach((r, idx) => {
         const simPercent = (r.similarity * 100).toFixed(1);
         const simColor = simPercent >= 70 ? '#10b981' : simPercent >= 50 ? '#f59e0b' : '#ef4444';
         
-        html += '<div style="display:flex;align-items:center;gap:12px;padding:12px;border-bottom:1px solid #e5e7eb;cursor:pointer;border-radius:8px" onmouseover="this.style.background=\'#f9fafb\'" onmouseout="this.style.background=\'transparent\'" onclick="viewLibraryDetail(' + r.idx + ')">';
+        html += '<div style="display:flex;align-items:center;gap:12px;padding:12px;border-bottom:1px solid #e5e7eb;cursor:pointer;border-radius:8px" onmouseover="this.style.background=\'#f9fafb\'" onmouseout="this.style.background=\'transparent\'" onclick="showDetail(\'' + r.item.id + '\')">';
         
-        if (r.item.image) {
-          html += '<img src="' + r.item.image + '" style="width:60px;height:60px;object-fit:cover;border-radius:8px">';
+        if (r.item.imgs && r.item.imgs[0]) {
+          html += '<img src="' + r.item.imgs[0] + '" style="width:60px;height:60px;object-fit:cover;border-radius:8px">';
         } else {
           html += '<div style="width:60px;height:60px;background:#e5e7eb;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:28px">👔</div>';
         }
         
         html += '<div style="flex:1;min-width:0">';
         html += '<div style="font-weight:600;font-size:14px;color:#1a1a2e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + escHtml(r.item.name || '未命名') + '</div>';
-        html += '<div style="font-size:12px;color:#6b7280;margin-top:2px">分类：' + escHtml(r.item.category || '未分类') + ' | 工序：' + (r.item.processes || []).length + '道</div>';
+        html += '<div style="font-size:12px;color:#6b7280;margin-top:2px">日期：' + (r.item.date || '未知') + ' | 工序：' + ((r.item.selections || r.item.processes || []).length) + '道</div>';
         html += '</div>';
         
         html += '<div style="text-align:right;flex-shrink:0">';
