@@ -55,8 +55,6 @@
 
   <button class="tab-btn" data-tab="manage">⚙️ 工序管理</button>
 
-  <button class="tab-btn" data-tab="library">📚 款式库</button>
-
   <button class="tab-btn" data-tab="history">📁 历史款式</button>
 
   <button class="tab-btn" data-tab="recycle">🗑️ 回收站 <span id="recycleCount" style="display:none;background:#e94560;color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;margin-left:4px">0</span></button>
@@ -593,6 +591,10 @@
       <div class="search-bar">
 
         <input type="text" id="searchInput" placeholder="🔍 搜索款号/款名…" oninput="renderHistory()" autocomplete="off" name="_x4xottvsu_searchInput">
+
+        <button class="btn-add" data-role-block="" onclick="document.getElementById('historyImageSearch').click()" style="margin:0;padding:10px 16px;background:#8b5cf6">🖼️ 以图搜款</button>
+
+        <input type="file" id="historyImageSearch" accept="image/*" style="display:none" onchange="searchHistoryByImage(event)">
 
         <button class="btn-add" data-role-block="" onclick="clearHistorySearch()" style="margin:0;padding:10px 16px;background:#6b7280">🔍 清除筛选</button>
 

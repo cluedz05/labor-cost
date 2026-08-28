@@ -7775,6 +7775,60 @@ function searchByImage(event) {
   event.target.value = '';
 }
 
+// 历史款式以图搜款
+function searchHistoryByImage(event) {
+  var file = event.target.files[0];
+  if (!file) return;
+
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var imageData = e.target.result;
+    
+    // 创建图片预览和搜索弹窗
+    var modal = document.createElement('div');
+    modal.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px';
+    modal.innerHTML = '<div style="background:#fff;border-radius:16px;padding:24px;max-width:500px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3)">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">' +
+        '<h3 style="margin:0;font-size:18px;color:#1a1a2e">🖼️ 历史款式以图搜款</h3>' +
+        '<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#999;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%">✕</button>' +
+      '</div>' +
+      '<img src="' + imageData + '" style="width:100%;max-height:250px;object-fit:contain;border-radius:12px;background:#f5f5f5;margin-bottom:16px">' +
+      '<div style="margin-bottom:12px"><label style="font-size:14px;color:#555;font-weight:600;display:block;margin-bottom:8px">输入关键词搜索：</label>' +
+        '<input type="text" id="historyImageSearchKeyword" placeholder="如：短袖、圆领、连衣裙、针织..." style="width:100%;padding:12px;border:2px solid #e5e7eb;border-radius:10px;font-size:14px;box-sizing:border-box;outline:none" onfocus="this.style.borderColor=\'#8b5cf6\'" onblur="this.style.borderColor=\'#e5e7eb\'">' +
+      '</div>' +
+      '<div style="margin-bottom:16px"><label style="font-size:14px;color:#555;font-weight:600;display:block;margin-bottom:8px">快速选择：</label>' +
+        '<div style="display:flex;flex-wrap:wrap;gap:8px">' +
+          '<button onclick="document.getElementById(\'historyImageSearchKeyword\').value=\'短袖\'" style="padding:6px 14px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:20px;font-size:13px;cursor:pointer;color:#374151">短袖</button>' +
+          '<button onclick="document.getElementById(\'historyImageSearchKeyword\').value=\'长袖\'" style="padding:6px 14px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:20px;font-size:13px;cursor:pointer;color:#374151">长袖</button>' +
+          '<button onclick="document.getElementById(\'historyImageSearchKeyword\').value=\'连衣裙\'" style="padding:6px 14px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:20px;font-size:13px;cursor:pointer;color:#374151">连衣裙</button>' +
+          '<button onclick="document.getElementById(\'historyImageSearchKeyword\').value=\'套装\'" style="padding:6px 14px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:20px;font-size:13px;cursor:pointer;color:#374151">套装</button>' +
+          '<button onclick="document.getElementById(\'historyImageSearchKeyword\').value=\'针织\'" style="padding:6px 14px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:20px;font-size:13px;cursor:pointer;color:#374151">针织</button>' +
+          '<button onclick="document.getElementById(\'historyImageSearchKeyword\').value=\'牛仔\'" style="padding:6px 14px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:20px;font-size:13px;cursor:pointer;color:#374151">牛仔</button>' +
+          '<button onclick="document.getElementById(\'historyImageSearchKeyword\').value=\'外套\'" style="padding:6px 14px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:20px;font-size:13px;cursor:pointer;color:#374151">外套</button>' +
+          '<button onclick="document.getElementById(\'historyImageSearchKeyword\').value=\'哈衣\'" style="padding:6px 14px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:20px;font-size:13px;cursor:pointer;color:#374151">哈衣</button>' +
+        '</div>' +
+      '</div>' +
+      '<div style="display:flex;gap:10px;margin-bottom:10px">' +
+        '<button onclick="doAIColorSearch(this)" style="flex:1;padding:12px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer">🤖 AI图像识别搜款</button>' +
+      '</div>' +
+      '<div style="display:flex;gap:10px">' +
+        '<button onclick="var kw=document.getElementById(\'historyImageSearchKeyword\').value;if(kw){var si=document.getElementById(\'searchInput\');if(si){si.value=kw;renderHistory();}this.closest(\'div[style*=fixed]\').remove();toast(\'🔍 已搜索：\'+kw);}else{toast(\'⚠️ 请输入关键词\');}" style="flex:1;padding:12px;background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer">🔍 关键词搜索</button>' +
+        '<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="padding:12px 20px;background:#f3f4f6;color:#374151;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer">取消</button>' +
+      '</div>' +
+      '<div style="margin-top:16px;padding:12px;background:#dbeafe;border-radius:10px;font-size:12px;color:#1e40af;line-height:1.6">🤖 <b>AI图像识别</b>：使用MobileNet深度学习模型提取图片特征，自动搜索历史款式中视觉相似的款式。首次使用需下载AI模型（约10MB），请耐心等待。</div>' +
+    '</div>';
+    document.body.appendChild(modal);
+    
+    // 聚焦输入框
+    setTimeout(function() {
+      var input = document.getElementById('historyImageSearchKeyword');
+      if (input) input.focus();
+    }, 100);
+  };
+  reader.readAsDataURL(file);
+  event.target.value = '';
+}
+
 
 
 // 动态创建款式库按钮（确保文字显示）
