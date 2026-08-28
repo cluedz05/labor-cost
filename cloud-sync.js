@@ -438,16 +438,21 @@
         if (isConfigured()) {
             // 延迟同步，避免影响页面加载
             setTimeout(() => {
-                // 检查是否需要从云端恢复（本地数据为空时）
-                const localLibrary = localStorage.getItem('style_library');
-                if (!localLibrary || localLibrary === '[]') {
-                    addSyncLog('本地数据为空，尝试从云端恢复...', 'info');
-                    syncFromCloud();
-                }
+                // 总是从云端拉取最新数据（在线更新）
+                addSyncLog('正在从云端获取最新数据...', 'info');
+                syncFromCloud();
+                
+                // 设置定期自动同步，每隔1分钟从云端拉取数据
+                setInterval(() => {
+                    if (!isSyncing) {
+                        addSyncLog('定期同步：正在从云端获取最新数据...', 'info');
+                        syncFromCloud();
+                    }
+                }, 60000); // 60秒
             }, 3000);
         }
 
-        console.log('☁️ 云端同步模块已加载');
+        console.log('☁️ 云端同步模块已加载（自动在线更新已启用）');
     }
 
     // 暴露全局函数
