@@ -1,0 +1,7720 @@
+[
+  {
+    "id": "excel_1",
+    "name": "JJ25#",
+    "category": "2025婴套装",
+    "tags": [
+      "2025婴套装"
+    ],
+    "processes": [
+      {
+        "type": "pingche",
+        "name": "定唛",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "剪.定肩带",
+        "price": 0.9,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "反头带.做.定头带蝴蝶结",
+        "price": 0.9,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "做.定裤子蝴蝶结",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "裤子定唛",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎车.扎头带",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上衣拼侧骨落唛",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎上胸围",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上下脚橡筋",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋浪底",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼侧骨落唛",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎腰橡筋",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "脚口密扎",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚衫脚",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚裤头",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "拉边",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上衣定唛",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "后领口定小橡筋.倒针.修止口",
+        "price": 0.35,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "缩袖山",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "衫脚倒针",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车袖口橡筋",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "反头带.做.定头带蝴蝶结",
+        "price": 0.9,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车定蝴蝶结",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎车.扎头带",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩.上袖.埋夹落唛",
+        "price": 0.55,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋浪底",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼侧骨落唛",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎腰橡筋",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "密扎",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拉领.拉水滴",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拉浪底",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚裤头",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚脚口",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上衣定唛倒领口针",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "缩定小飞袖",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "下脚倒针",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车定腰蝴蝶结",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "裤子定唛",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "反头带.做.定头带蝴蝶结",
+        "price": 0.9,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎车.扎头带",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩.上袖.埋夹落唛",
+        "price": 0.55,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪",
+        "price": 0.2,
+        "qty": 1
+      }
+    ],
+    "image": "",
+    "note": "从Excel表格导入，工作表：2025婴套装",
+    "totalPrice": 13.55,
+    "createdAt": "2026-08-28"
+  },
+  {
+    "id": "excel_2",
+    "name": "JJ06#",
+    "category": "2025婴套装",
+    "tags": [
+      "2025婴套装"
+    ],
+    "processes": [
+      {
+        "type": "pingche",
+        "name": "上衣定唛",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "荷叶飞袖车压花边",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "缩定飞袖",
+        "price": 0.45,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车定蝴蝶结",
+        "price": 1.0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "反头带.做.定头带蝴蝶结",
+        "price": 0.9,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "裤子定唛",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "裤脚倒针",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎车.扎头带",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "飞袖扎散口",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩上袖埋夹落唛",
+        "price": 0.6,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上领.上袖口.上下脚",
+        "price": 0.8,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋浪底",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼侧骨落唛",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎腰橡筋",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "缩拼脚口",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "脚口密扎",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚腰头",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上衣定唛倒领口针",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "缩定前幅木耳边",
+        "price": 0.7,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车定小蝴蝶结*2",
+        "price": 1.0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "裤子定唛车花苞腰定腰侧",
+        "price": 0.8,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "反头带.做.定头带蝴蝶结",
+        "price": 0.9,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎车.扎头带",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩上袖埋夹落唛",
+        "price": 0.6,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋浪底",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼侧骨落唛",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎腰散口",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上裤脚",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "密扎",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拉领",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拉浪底",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚袖口",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上衣定唛",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "后领口定小橡筋.倒针.修止口",
+        "price": 0.35,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "缩定小飞袖",
+        "price": 0.45,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车定腰蝴蝶结",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "裤子定唛",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "反头带.做.定头带蝴蝶结",
+        "price": 0.9,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎车.扎头带",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩上袖埋夹落唛",
+        "price": 0.6,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋浪底",
+        "price": 0.2,
+        "qty": 1
+      }
+    ],
+    "image": "",
+    "note": "从Excel表格导入，工作表：2025婴套装",
+    "totalPrice": 16.75,
+    "createdAt": "2026-08-28"
+  },
+  {
+    "id": "excel_3",
+    "name": "XK26#",
+    "category": "2025婴套装",
+    "tags": [
+      "2025婴套装"
+    ],
+    "processes": [
+      {
+        "type": "pingche",
+        "name": "包袖口",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包门边车领嘴",
+        "price": 0.7,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包袋口装袋",
+        "price": 0.35,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "做装袋盖",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定唛",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "做领上领",
+        "price": 1.0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包衫脚",
+        "price": 0.35,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "袋口压线装袋",
+        "price": 0.8,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "前中压线",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压后浪双线",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压前中.及拉链牌线",
+        "price": 0.45,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上腰头定唛定腰侧",
+        "price": 0.7,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩.上袖.埋夹落唛",
+        "price": 0.55,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上衣拼前",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎链牌散口",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼裤",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋浪底",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼侧骨落唛",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎腰橡筋",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "做领开胸落唛",
+        "price": 1.8,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上领压线",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上腰定唛.定侧",
+        "price": 0.7,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压假袋双线",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压前中.及拉链牌线",
+        "price": 0.45,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压后浪双线",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包脚口",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎胸贴.拉链贴散口",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前幅",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩.上袖.埋夹落唛",
+        "price": 0.6,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼假袋",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋浪底",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼侧骨落唛",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎腰散口",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚袖口",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚下脚",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车门边做领上领落唛",
+        "price": 1.7,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包衫脚",
+        "price": 0.35,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包袖口",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包脚口",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上腰头定唛定腰侧",
+        "price": 0.7,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩.上袖.埋夹落唛",
+        "price": 0.6,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪",
+        "price": 0.2,
+        "qty": 1
+      }
+    ],
+    "image": "",
+    "note": "从Excel表格导入，工作表：2025婴套装",
+    "totalPrice": 18.1,
+    "createdAt": "2026-08-28"
+  },
+  {
+    "id": "excel_4",
+    "name": "2207#",
+    "category": "2025婴套装",
+    "tags": [
+      "2025婴套装"
+    ],
+    "processes": [
+      {
+        "type": "pingche",
+        "name": "定唛倒领口针",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "假袋口压线",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上腰头定唛定腰侧",
+        "price": 0.7,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包脚口",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后幅",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩.上袖.埋夹落唛",
+        "price": 0.55,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎裤子",
+        "price": 0.9,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拉领",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚袖口",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚下脚",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "做领开胸落唛",
+        "price": 1.8,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上领压线",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上腰定唛.定侧",
+        "price": 0.7,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车.装袋盖.车袋口.装袋",
+        "price": 2.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包脚口",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎车.拼上衣前幅",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎胸贴散口",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩.上袖.埋夹落唛",
+        "price": 0.55,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪.埋浪底",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼侧骨落唛",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎腰散口",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚袖口",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚下脚",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定唛倒领口针",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "夹底倒针",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "划位装袋",
+        "price": 0.35,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "裤子定唛",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎上衣",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎裤子",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "拉边",
+        "price": 0.45,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚下脚",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚裤脚",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚裤头",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚袋口",
+        "price": 0.05,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定唛倒领口针",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "夹底倒针",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "贴胸贴",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车章标",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "裤子定双唛",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎上衣",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎裤子",
+        "price": 0.5,
+        "qty": 1
+      }
+    ],
+    "image": "",
+    "note": "从Excel表格导入，工作表：2025婴套装",
+    "totalPrice": 16.35,
+    "createdAt": "2026-08-28"
+  },
+  {
+    "id": "excel_5",
+    "name": "XLB07#",
+    "category": "2025婴套装",
+    "tags": [
+      "2025婴套装"
+    ],
+    "processes": [
+      {
+        "type": "pingche",
+        "name": "定唛倒领口针",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "裤子定唛",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车章仔",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩.上袖.埋夹落唛",
+        "price": 0.55,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪.埋浪底",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼侧骨落唛",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎腰橡筋",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "拉边",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚袖口",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚下脚",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚裤脚",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚裤头",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定唛倒领口针",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩.上袖.埋夹落唛",
+        "price": 0.55,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拉领",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚袖口",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚下脚",
+        "price": 0.2,
+        "qty": 1
+      }
+    ],
+    "image": "",
+    "note": "从Excel表格导入，工作表：2025婴套装",
+    "totalPrice": 4.1000000000000005,
+    "createdAt": "2026-08-28"
+  },
+  {
+    "id": "excel_6",
+    "name": "Zr05#",
+    "category": "2025婴套装",
+    "tags": [
+      "2025婴套装"
+    ],
+    "processes": [
+      {
+        "type": "pingche",
+        "name": "车蝴蝶结",
+        "price": 0.6,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "做上下领开胸落唛衣整套",
+        "price": 2.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车袋口.及三角",
+        "price": 0.6,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "袖叉倒针",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车袖英",
+        "price": 1.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "衫脚倒针",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车裤袋",
+        "price": 0.8,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压腰线",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压后浪.前浪车暗线.压明线",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包脚口",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上腰定唛一整套",
+        "price": 0.7,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎胸贴散口",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩.上袖.埋夹落唛",
+        "price": 0.55,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋浪底",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼侧骨落唛",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎腰散口",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拉袖叉",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拉浪底",
+        "price": 0.3,
+        "qty": 1
+      }
+    ],
+    "image": "",
+    "note": "从Excel表格导入，工作表：2025婴套装",
+    "totalPrice": 9.7,
+    "createdAt": "2026-08-28"
+  },
+  {
+    "id": "excel_7",
+    "name": "LL07#",
+    "category": "2025婴套装",
+    "tags": [
+      "2025婴套装"
+    ],
+    "processes": [
+      {
+        "type": "pingche",
+        "name": "定唛倒领口针",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车前方琴",
+        "price": 0.35,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "缩车前幅荷叶",
+        "price": 0.7,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车袖口橡筋",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "驳.包衫脚橡筋",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "裤子定唛车花苞腰定腰侧",
+        "price": 0.8,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车定腰蝴蝶结",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包脚口",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车反头带.封口",
+        "price": 0.6,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩.上袖.埋夹落唛",
+        "price": 0.55,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎衫脚散口",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "密袖口.密荷叶",
+        "price": 0.6,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪.埋浪底",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼侧骨落唛",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎腰散口",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拉领",
+        "price": 0.15,
+        "qty": 1
+      }
+    ],
+    "image": "",
+    "note": "从Excel表格导入，工作表：2025婴套装",
+    "totalPrice": 6.55,
+    "createdAt": "2026-08-28"
+  },
+  {
+    "id": "excel_8",
+    "name": "AL05#",
+    "category": "2025婴套装",
+    "tags": [
+      "2025婴套装"
+    ],
+    "processes": [
+      {
+        "type": "pingche",
+        "name": "做领上领车后门筒",
+        "price": 2.0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拉夹",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车衫脚",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定花*5",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上裤头定唛腰定侧",
+        "price": 0.7,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包裤脚口",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定丝带蝴蝶结*3",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎上衣",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎裤子整件",
+        "price": 0.75,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "缩前后领窝",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼领肩",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼领圈落小橡筋上领压线1.6",
+        "price": 1.6,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压下领线",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拉后水滴.拉夹",
+        "price": 0.35,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车1公分衫脚",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上裤头定唛腰定侧",
+        "price": 0.7,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包裤脚口",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎领散口",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋夹落唛",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后.埋浪底",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼侧骨落唛",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎腰散口",
+        "price": 0.2,
+        "qty": 1
+      }
+    ],
+    "image": "",
+    "note": "从Excel表格导入，工作表：2025婴套装",
+    "totalPrice": 10.85,
+    "createdAt": "2026-08-28"
+  },
+  {
+    "id": "excel_9",
+    "name": "LL98#婴#",
+    "category": "2025婴套装",
+    "tags": [
+      "2025婴套装"
+    ],
+    "processes": [
+      {
+        "type": "pingche",
+        "name": "车定头带蝴蝶结",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定唛",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拉吊带",
+        "price": 0.45,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "夹底倒针",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "剪.折.定拉边蝴蝶结",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "缩定腰中荷叶",
+        "price": 0.55,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定唛车花苞腰（不定腰侧）",
+        "price": 0.7,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包裤脚",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车定腰蝴蝶结",
+        "price": 0.9,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎上衣侧骨落唛",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼荷叶",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "密扎",
+        "price": 0.6,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪.埋浪底",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼侧骨落唛",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎腰散口",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚裤脚",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼肩压内线走边线",
+        "price": 0.6,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定唛压前后领横线",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "卷边飞袖.缩飞袖",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压夹圈线",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车蝴蝶章",
+        "price": 0.6,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包衫脚",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包裤脚",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "裤子定褶",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上裤头定唛腰定侧",
+        "price": 0.7,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎上衣整件",
+        "price": 0.9,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎裤子整件",
+        "price": 0.75,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上衣",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车花",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压假袋线",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上腰定唛定腰侧",
+        "price": 0.7,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包裤脚口",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车假链牌",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩上袖埋夹落唛",
+        "price": 0.65,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上领.袖口.衫脚",
+        "price": 0.8,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎裤子",
+        "price": 1.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包袋口装袋",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车门边做领上领落唛",
+        "price": 1.8,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包衫脚",
+        "price": 0.35,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "做袖口一 整套",
+        "price": 1.8,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压前中.及拉链牌线",
+        "price": 0.45,
+        "qty": 1
+      }
+    ],
+    "image": "",
+    "note": "从Excel表格导入，工作表：2025婴套装",
+    "totalPrice": 21.2,
+    "createdAt": "2026-08-28"
+  },
+  {
+    "id": "excel_10",
+    "name": "LL279#婴装#",
+    "category": "2026婴童装",
+    "tags": [
+      "2026婴童装"
+    ],
+    "processes": [
+      {
+        "type": "pingche",
+        "name": "车定前领假飘带",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "木耳边卷边+缩褶",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上木耳边+压线",
+        "price": 0.6,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "做上下领定唛压门边线",
+        "price": 2.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "缩里布+面布袖山",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼面布里布袖测",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "缩拼袖口",
+        "price": 0.6,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车袖口橡筋",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "套袖山",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "衫脚卷边",
+        "price": 0.35,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "缩裤脚",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上裤头套返裤子",
+        "price": 1.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "裤侧定蝴蝶",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩埋夹落唛上圆袖",
+        "price": 0.65,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎前拼散口",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎裤子+里布",
+        "price": 1.05,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定唛",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上撞色领边",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "走缩领木耳边",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "折领边上木耳边",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "折压后门筒定叠位压领线",
+        "price": 0.45,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "走缩飞袖",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "腰褶走线",
+        "price": 0.6,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拉.剪蝴蝶结",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "蝴蝶尾倒针",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "打蝴蝶.定蝴蝶",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车定腰蝴蝶结",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车中腰橡筋",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩上飞袖埋夹",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼裙测落唛",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎领散口",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上中腰",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "密扎",
+        "price": 0.8,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "做门边.做领上领定唛",
+        "price": 1.7,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车领花边",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拉夹圈",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压夹圈线",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "夹底倒针",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "裙摆卷边",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车中腰橡筋",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩.埋夹",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼裙测落唛",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "缩拼中腰",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎领散口",
+        "price": 0.1,
+        "qty": 1
+      }
+    ],
+    "image": "",
+    "note": "从Excel表格导入，工作表：2026婴童装",
+    "totalPrice": 19.75,
+    "createdAt": "2026-08-28"
+  },
+  {
+    "id": "excel_11",
+    "name": "XLG051#婴装#",
+    "category": "2026婴童装",
+    "tags": [
+      "2026婴童装"
+    ],
+    "processes": [
+      {
+        "type": "pingche",
+        "name": "上衣.裤子定唛",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩上袖埋夹落唛",
+        "price": 0.6,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上领",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪埋浪",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼侧骨落唛",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上腰头橡筋",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚袖口",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚衫脚",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚裤头",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚裤脚",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上衣.裤子定双唛",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩上袖埋夹落唛",
+        "price": 0.6,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上领",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪埋浪",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上腰头橡筋",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚袖口.冚衫脚",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚裤头.冚裤脚",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定唛.领口倒针",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车弯袋",
+        "price": 0.8,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包裤脚",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上腰头定唛定腰测",
+        "price": 0.7,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "贴假拉链牌",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩上袖埋夹落唛",
+        "price": 0.6,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋浪底",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼侧骨落唛",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎腰.链牌散口.弯袋散口",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拉领",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚下脚",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定唛",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车订章仔.定恐龙",
+        "price": 1.0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车袋口.装袋",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压前后.及拉链牌线",
+        "price": 0.65,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压裤假袋线",
+        "price": 0.35,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上腰头定唛定腰测",
+        "price": 0.7,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包裤脚",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩上袖埋夹落唛",
+        "price": 0.65,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上衫脚.上袖口",
+        "price": 0.55,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上领",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后埋浪底",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼裤侧落唛",
+        "price": 0.3,
+        "qty": 1
+      }
+    ],
+    "image": "",
+    "note": "从Excel表格导入，工作表：2026婴童装",
+    "totalPrice": 14.9,
+    "createdAt": "2026-08-28"
+  },
+  {
+    "id": "excel_12",
+    "name": "AL439#婴装#",
+    "category": "2026婴童装",
+    "tags": [
+      "2026婴童装"
+    ],
+    "processes": [
+      {
+        "type": "pingche",
+        "name": "装袋",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "开胸上领",
+        "price": 1.05,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压裤前线",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "裤定唛",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩上袖埋夹落唛",
+        "price": 0.6,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼袋口",
+        "price": 0.07,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎领.胸贴散口",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎裤子",
+        "price": 0.7,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚袖子",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚下脚",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚裤腰",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚裤脚",
+        "price": 0.2,
+        "qty": 1
+      }
+    ],
+    "image": "",
+    "note": "从Excel表格导入，工作表：2026婴童装",
+    "totalPrice": 4.0200000000000005,
+    "createdAt": "2026-08-28"
+  },
+  {
+    "id": "excel_13",
+    "name": "XLY030#婴装#",
+    "category": "2026婴童装",
+    "tags": [
+      "2026婴童装"
+    ],
+    "processes": [
+      {
+        "type": "pingche",
+        "name": "定唛",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩上袖埋夹落唛",
+        "price": 0.6,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上领",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚袖子",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚下脚",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定唛",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩上袖埋夹落唛",
+        "price": 0.6,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上领",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚袖子",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚下脚",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定领唛",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "领口.夹底倒针",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "运返耳仔.定耳仔",
+        "price": 0.6,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "裤要定双唛",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定侧线",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前幅",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩埋夹落唛",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋浪底",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎裤侧散口",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上腰头",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拉剪领夹边",
+        "price": 0.45,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拉裤剪边",
+        "price": 0.35,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚裤头",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚衫脚",
+        "price": 0.2,
+        "qty": 1
+      }
+    ],
+    "image": "",
+    "note": "从Excel表格导入，工作表：2026婴童装",
+    "totalPrice": 6.55,
+    "createdAt": "2026-08-28"
+  },
+  {
+    "id": "excel_14",
+    "name": "XLB054#婴装#",
+    "category": "2026婴童装",
+    "tags": [
+      "2026婴童装"
+    ],
+    "processes": [
+      {
+        "type": "pingche",
+        "name": "做门边.做领上领定唛",
+        "price": 1.7,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包袖口",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "衫脚卷边",
+        "price": 0.35,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上腰头订唛定腰测",
+        "price": 0.7,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包裤脚",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩上袖埋夹落唛",
+        "price": 0.6,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪埋浪",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼测骨落唛",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎腰散口",
+        "price": 0.2,
+        "qty": 1
+      }
+    ],
+    "image": "",
+    "note": "从Excel表格导入，工作表：2026婴童装",
+    "totalPrice": 5.05,
+    "createdAt": "2026-08-28"
+  },
+  {
+    "id": "excel_15",
+    "name": "LL274小童#",
+    "category": "哈衣",
+    "tags": [
+      "哈衣"
+    ],
+    "processes": [
+      {
+        "type": "pingche",
+        "name": "定唛",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前幅几字位.打刀口",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼门边压线",
+        "price": 1.0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "缩.定木耳边",
+        "price": 1.0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "缩袖顶",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车袖口.脚口橡筋",
+        "price": 0.8,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定花仔",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "倒领口针",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎前拼散口",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎门边散口",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩上袖埋夹落唛（短裤）",
+        "price": 0.65,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼后浪",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "整件密扎",
+        "price": 1.1,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚后浪",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拉领",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "做帽",
+        "price": 2.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定唛.领口.夹底倒针",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车袋口装袋*2",
+        "price": 0.9,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车门边定叠位",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包裤脚",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "拉边",
+        "price": 0.45,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎车",
+        "price": 0.6,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定唛.夹底倒针",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋夹落唛",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎浪贴.拼浪底",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拉吊带",
+        "price": 0.45,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚裤脚",
+        "price": 0.2,
+        "qty": 1
+      }
+    ],
+    "image": "",
+    "note": "从Excel表格导入，工作表：哈衣",
+    "totalPrice": 13.8,
+    "createdAt": "2026-08-28"
+  },
+  {
+    "id": "excel_16",
+    "name": "XLB462#",
+    "category": "哈衣",
+    "tags": [
+      "哈衣"
+    ],
+    "processes": [
+      {
+        "type": "pingche",
+        "name": "开胸上领落唛压线",
+        "price": 1.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "袖口倒针",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "裤脚倒针修止口",
+        "price": 0.45,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩上袖埋夹落唛（短裤）",
+        "price": 0.65,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎领.胸贴散口",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼袖口螺纹",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼后浪",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "拉边",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚裤脚",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定唛.定肩",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "袖口倒针",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压前浪线",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "裤脚倒针",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车章仔",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩.埋夹落唛（短裤）",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼后浪",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "上前浪贴.扎散口",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "拉边",
+        "price": 0.6,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚裤脚",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定唛.",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车肩带",
+        "price": 0.7,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "运内贴落肩带",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压夹圈.横头线",
+        "price": 0.45,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "运返耳仔",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定耳仔",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压前幅线.前后浪",
+        "price": 0.55,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包裤脚",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定狗头",
+        "price": 0.45,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎贴散口.夹弯散口",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前幅.后浪",
+        "price": 0.55,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼裤侧落唛",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定唛.",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车袋口.装袋*2",
+        "price": 0.8,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "做肩带",
+        "price": 0.55,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "运前后内贴落肩带",
+        "price": 0.45,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压夹圈.横头线",
+        "price": 0.45,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包裤脚",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎内贴散口",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎夹圈散口",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼测骨落唛",
+        "price": 0.35,
+        "qty": 1
+      }
+    ],
+    "image": "",
+    "note": "从Excel表格导入，工作表：哈衣",
+    "totalPrice": 15.15,
+    "createdAt": "2026-08-28"
+  },
+  {
+    "id": "excel_17",
+    "name": "AL449#婴装#",
+    "category": "哈衣",
+    "tags": [
+      "哈衣"
+    ],
+    "processes": [
+      {
+        "type": "pingche",
+        "name": "开胸上定唛压领线",
+        "price": 1.15,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "袖口倒针",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "缩定腰身",
+        "price": 0.6,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "下身拉边倒针",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车中腰橡筋",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩上袖埋夹",
+        "price": 0.55,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上袖口螺纹",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎领.胸贴散口",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼裙测",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼裤侧落唛",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上中腰",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚裙脚",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拉浪底",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上衣包后领定横唛+小唛",
+        "price": 0.8,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车小熊",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包袋口装圆袋要双线",
+        "price": 0.55,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "内对折定肩带横头",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "对折压肩带边线",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "贴前后领落肩带",
+        "price": 0.45,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压夹圈.横头线",
+        "price": 0.45,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压前后横领宽线",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包裤脚",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压前后浪双线",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定唛",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上袖埋夹落唛",
+        "price": 0.7,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上领",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼测骨落唛",
+        "price": 0.35,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋浪",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎贴.夹圈散口",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚袖口",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚衫脚",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包后领+订唛",
+        "price": 0.8,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车熊仔.订鼻子",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "内对折定肩带横头",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "对折压肩带边线",
+        "price": 0.35,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼内贴落肩带",
+        "price": 0.45,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压夹圈前后横定夹",
+        "price": 0.6,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "运返.打折定耳仔.",
+        "price": 0.7,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包裤脚",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩上袖埋夹落唛",
+        "price": 0.65,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上领.上衫脚.上袖口",
+        "price": 0.8,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪埋浪拼测骨落唛",
+        "price": 0.7,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "拼内贴扎散口",
+        "price": 0.3,
+        "qty": 1
+      }
+    ],
+    "image": "",
+    "note": "从Excel表格导入，工作表：哈衣",
+    "totalPrice": 17.35,
+    "createdAt": "2026-08-28"
+  },
+  {
+    "id": "excel_18",
+    "name": "5862小童#",
+    "category": "牛仔裤",
+    "tags": [
+      "牛仔裤"
+    ],
+    "processes": [
+      {
+        "type": "pingche",
+        "name": "车弯袋压双线",
+        "price": 0.9,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压前后.及拉链牌线",
+        "price": 0.65,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压飞机头双线",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上腰定横唛定腰测",
+        "price": 0.9,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包裤脚口",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼后飞机头",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪.埋浪",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼侧骨落唛",
+        "price": 0.45,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎腰.弯袋散口",
+        "price": 0.35,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压前后.及拉链牌线",
+        "price": 0.65,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压飞机头双线",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上腰定横唛定腰测",
+        "price": 0.9,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包裤脚口",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定织带车嘴巴",
+        "price": 0.9,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压前幅拼接线",
+        "price": 0.6,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼后飞机头",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼内侧",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前侧",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪.埋浪",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼侧骨落唛",
+        "price": 0.45,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎腰.弯袋.链牌散口",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎嘴巴贴布散口",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车弯袋压双线",
+        "price": 0.9,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压前后.及拉链牌线",
+        "price": 0.65,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压飞机头双线",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上腰定横唛定腰测",
+        "price": 0.9,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包裤脚口",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼后飞机头",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪.埋浪",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼侧骨落唛",
+        "price": 0.45,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎腰.弯袋.链牌散口",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车弯袋压双线",
+        "price": 0.9,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压前后.及拉链牌线",
+        "price": 0.65,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压飞机头双线",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包袋口.装后袋*2",
+        "price": 1.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "明线车三角贴布",
+        "price": 0.8,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上腰定横唛定腰测",
+        "price": 0.9,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包裤脚口",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼后飞机头",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪.埋浪",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼侧骨落唛",
+        "price": 0.25,
+        "qty": 1
+      }
+    ],
+    "image": "",
+    "note": "从Excel表格导入，工作表：牛仔裤",
+    "totalPrice": 21.900000000000002,
+    "createdAt": "2026-08-28"
+  },
+  {
+    "id": "excel_19",
+    "name": "5862大童#",
+    "category": "牛仔裤",
+    "tags": [
+      "牛仔裤"
+    ],
+    "processes": [
+      {
+        "type": "pingche",
+        "name": "车弯袋压双线",
+        "price": 0.9,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压前后.及拉链牌线",
+        "price": 0.65,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压飞机头双线",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上腰定横唛定腰测",
+        "price": 0.9,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包裤脚口",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼后飞机头",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪.埋浪",
+        "price": 0.55,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼侧骨落唛",
+        "price": 0.55,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎腰.弯袋散口",
+        "price": 0.35,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压前后.及拉链牌线",
+        "price": 0.65,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压飞机头双线",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上腰定横唛定腰测",
+        "price": 0.9,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包裤脚口",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定织带车嘴巴",
+        "price": 0.9,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压前幅拼接线",
+        "price": 0.75,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼后飞机头",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼内侧",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前侧",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪.埋浪",
+        "price": 0.55,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼侧骨落唛",
+        "price": 0.55,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎腰.弯袋.链牌散口",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎嘴巴贴布散口",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车弯袋压双线",
+        "price": 0.9,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压前后.及拉链牌线",
+        "price": 0.65,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压飞机头双线",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上腰定横唛定腰测",
+        "price": 0.9,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包裤脚口",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼后飞机头",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪.埋浪",
+        "price": 0.55,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼侧骨落唛",
+        "price": 0.55,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎腰.弯袋.链牌散口",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车弯袋压双线",
+        "price": 0.9,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压前后.及拉链牌线",
+        "price": 0.65,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压飞机头双线",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包袋口.装后袋*2",
+        "price": 1.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "明线车三角贴布",
+        "price": 0.8,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上腰定横唛定腰测",
+        "price": 0.9,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包裤脚口",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼后飞机头",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪.埋浪",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼侧骨落唛",
+        "price": 0.35,
+        "qty": 1
+      }
+    ],
+    "image": "",
+    "note": "从Excel表格导入，工作表：牛仔裤",
+    "totalPrice": 22.75,
+    "createdAt": "2026-08-28"
+  },
+  {
+    "id": "excel_20",
+    "name": "5902小童#",
+    "category": "牛仔裤",
+    "tags": [
+      "牛仔裤"
+    ],
+    "processes": [
+      {
+        "type": "pingche",
+        "name": "车弯袋",
+        "price": 0.8,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "空拉挤边条",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "落.拼侧骨挤边条*4边",
+        "price": 1.6,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "卷荷叶边",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "缩.上荷叶边",
+        "price": 0.7,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上腰定横唛定腰测",
+        "price": 0.9,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪.埋浪",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎侧骨散口落唛*4",
+        "price": 0.55,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼荷叶",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎腰.弯袋散口",
+        "price": 0.35,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚裤脚",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车章仔",
+        "price": 0.35,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车压双线",
+        "price": 0.9,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压前后.及拉链牌线",
+        "price": 0.65,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压飞机头双线",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车花苞腰.定唛",
+        "price": 1.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "量剪定腰耳仔",
+        "price": 0.7,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "卷定裤脚脚测骨",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车腰带",
+        "price": 0.6,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼后飞机头",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪.埋浪",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼侧骨落唛",
+        "price": 0.45,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎腰.弯袋.链牌散口",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎裤脚散口",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拉耳仔",
+        "price": 0.05,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车弯袋压双线",
+        "price": 0.8,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "双针车压前后.及拉链牌线",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "双针车压飞机头",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上腰定横唛+小唛",
+        "price": 0.9,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "剪定腰耳仔*3",
+        "price": 0.65,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定蝴蝶结*2",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包袋口.双针车装后袋*2",
+        "price": 0.8,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包裤脚口",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼后飞机头",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪.埋浪",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼侧骨落唛",
+        "price": 0.45,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎腰.弯袋.链牌散口",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚车拉腰耳仔",
+        "price": 0.05,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车袋口.装圆袋*2",
+        "price": 0.8,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "双针车压前后.及拉链牌线",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "双针车压飞机头",
+        "price": 0.25,
+        "qty": 1
+      }
+    ],
+    "image": "",
+    "note": "从Excel表格导入，工作表：牛仔裤",
+    "totalPrice": 21.3,
+    "createdAt": "2026-08-28"
+  },
+  {
+    "id": "excel_21",
+    "name": "5902大童#",
+    "category": "牛仔裤",
+    "tags": [
+      "牛仔裤"
+    ],
+    "processes": [
+      {
+        "type": "pingche",
+        "name": "车弯袋",
+        "price": 0.8,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "空拉挤边条",
+        "price": 0.45,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "落.拼侧骨挤边条*4边",
+        "price": 2.0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "卷荷叶边",
+        "price": 0.45,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "缩.上荷叶边",
+        "price": 0.8,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上腰定横唛定腰测",
+        "price": 0.9,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪.埋浪",
+        "price": 0.55,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎侧骨散口落唛*4",
+        "price": 0.65,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼荷叶",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎腰.弯袋散口",
+        "price": 0.35,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚裤脚",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车章仔",
+        "price": 0.35,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车压双线",
+        "price": 0.9,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压前后.及拉链牌线",
+        "price": 0.65,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压飞机头双线",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车花苞腰.定唛",
+        "price": 1.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "量剪定腰耳仔",
+        "price": 0.7,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "卷定裤脚脚测骨",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车腰带",
+        "price": 0.6,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼后飞机头",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪.埋浪",
+        "price": 0.55,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼侧骨落唛",
+        "price": 0.55,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎腰.弯袋.链牌散口",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎裤脚散口",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拉耳仔",
+        "price": 0.05,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车弯袋压双线",
+        "price": 0.8,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "双针车压前后.及拉链牌线",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "双针车压飞机头",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上腰定横唛+小唛",
+        "price": 0.9,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "剪定腰耳仔*3",
+        "price": 0.65,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定蝴蝶结*2",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包袋口.双针车装后袋*2",
+        "price": 0.8,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包裤脚口",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼后飞机头",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪.埋浪",
+        "price": 0.55,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼侧骨落唛",
+        "price": 0.55,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎腰.弯袋.链牌散口",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚车拉腰耳仔",
+        "price": 0.05,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车袋口.装圆袋*2",
+        "price": 0.8,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "双针车压前后.及拉链牌线",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "双针车压飞机头",
+        "price": 0.25,
+        "qty": 1
+      }
+    ],
+    "image": "",
+    "note": "从Excel表格导入，工作表：牛仔裤",
+    "totalPrice": 22.35,
+    "createdAt": "2026-08-28"
+  },
+  {
+    "id": "excel_22",
+    "name": "XLM118#小童#",
+    "category": "小童连衣裙",
+    "tags": [
+      "小童连衣裙"
+    ],
+    "processes": [
+      {
+        "type": "pingche",
+        "name": "定唛",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "运返颈肩带",
+        "price": 0.6,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包领口.定两边位",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定后肩带",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定后橡筋.连前幅压线",
+        "price": 0.55,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "卷下摆",
+        "price": 0.45,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼裙测落唛",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼下裙摆",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "缩拼下摆",
+        "price": 0.35,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎整件散口",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "缩荷叶",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上荷叶压线",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定肩带连带收口压线",
+        "price": 0.6,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "夹底倒针",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "裤子定唛",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定后腰两侧橡筋",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包后腰橡筋",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包裤脚橡筋",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车前腰橡筋",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "轧车扎后上橡筋",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋夹",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎后腰散口",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪埋浪",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼测骨落唛",
+        "price": 0.45,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎裤脚散口",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前腰",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎肩带头散口",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "密扎",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚后上",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拉剪夹.领横",
+        "price": 0.25,
+        "qty": 1
+      }
+    ],
+    "image": "",
+    "note": "从Excel表格导入，工作表：小童连衣裙",
+    "totalPrice": 8.7,
+    "createdAt": "2026-08-28"
+  },
+  {
+    "id": "excel_23",
+    "name": "XLM140#小童#",
+    "category": "小童连衣裙",
+    "tags": [
+      "小童连衣裙"
+    ],
+    "processes": [
+      {
+        "type": "pingche",
+        "name": "定唛",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "缩前后领横",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拉吊带",
+        "price": 0.55,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "夹底倒针",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼裙测落唛",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼下裙摆",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "缩拼下摆",
+        "price": 0.35,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "密扎",
+        "price": 0.35,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "缩木耳边.上木耳边",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "运返领.上领",
+        "price": 0.55,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包领.+修止口",
+        "price": 0.7,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "折压门边线.",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车横唛+小唛",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "订门边叠位",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "缩袖顶",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包袖口橡筋",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包裙脚",
+        "price": 0.45,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车横唛+小唛",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩上袖埋夹",
+        "price": 0.6,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼裙测落唛",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "缩拼中腰",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车领花边.运返领.定领脚",
+        "price": 1.0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上领",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压领线",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车横唛+小唛",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车前剪中3条花边",
+        "price": 0.8,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车裙摆花边",
+        "price": 0.8,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "裙脚卷边",
+        "price": 0.45,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车袖口橡筋",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "缩袖顶",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车隐形拉链.定拉链贴",
+        "price": 1.1,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎拉链贴",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "缩拼中腰(分开）",
+        "price": 0.35,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩上袖埋夹落唛",
+        "price": 0.85,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼上拼",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "密袖口",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎领散口",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "拼后中一段.扎散口",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "缩.上木耳边领",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压领线",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车横唛+小唛",
+        "price": 0.3,
+        "qty": 1
+      }
+    ],
+    "image": "",
+    "note": "从Excel表格导入，工作表：小童连衣裙",
+    "totalPrice": 15.85,
+    "createdAt": "2026-08-28"
+  },
+  {
+    "id": "excel_24",
+    "name": "LQ10#",
+    "category": "小童连衣裙",
+    "tags": [
+      "小童连衣裙"
+    ],
+    "processes": [
+      {
+        "type": "pingche",
+        "name": "做领上领车门边",
+        "price": 2.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车袋口装袋",
+        "price": 0.45,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "衫脚卷边",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包裤脚",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车弯袋",
+        "price": 0.8,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上腰定唛定腰测",
+        "price": 0.9,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩上袖埋夹落唛",
+        "price": 0.9,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪埋浪拼骨落唛",
+        "price": 1.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上腰头散口",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎弯散口",
+        "price": 0.2,
+        "qty": 1
+      }
+    ],
+    "image": "",
+    "note": "从Excel表格导入，工作表：小童连衣裙",
+    "totalPrice": 7.95,
+    "createdAt": "2026-08-28"
+  },
+  {
+    "id": "excel_25",
+    "name": "LL311#",
+    "category": "小童套装+单件",
+    "tags": [
+      "小童套装+单件"
+    ],
+    "processes": [
+      {
+        "type": "pingche",
+        "name": "车袋口装袋",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车门边.做领上领落唛",
+        "price": 1.7,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包袖口",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "卷衫脚边",
+        "price": 0.35,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼腰上橡筋定唛定腰侧",
+        "price": 0.8,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩上袖埋夹落唛",
+        "price": 0.65,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪埋浪底",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼裤侧落唛",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎裤腰散口",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "做领带",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车门边.做上下级领上领落唛",
+        "price": 2.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "运返袋盖.点位装袋盖",
+        "price": 1.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "运返马甲定位",
+        "price": 1.0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包袖口",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "衫脚卷边",
+        "price": 0.35,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压假裤袋口",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上裤头定唛定腰测",
+        "price": 0.7,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包裤脚口",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩上袖埋夹落唛",
+        "price": 0.65,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼假袋",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪埋浪底",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼裤侧落唛",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎裤腰散口",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车定袋盖",
+        "price": 1.0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车章标",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压前幅线",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车门边做领上落横唛（衬衫）",
+        "price": 1.9,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包袖口.下脚卷边",
+        "price": 0.85,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "裤子车横唛",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包裤脚口",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎上衣",
+        "price": 0.85,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎裤子",
+        "price": 0.75,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚裤头",
+        "price": 0.2,
+        "qty": 1
+      }
+    ],
+    "image": "",
+    "note": "从Excel表格导入，工作表：小童套装+单件",
+    "totalPrice": 20.1,
+    "createdAt": "2026-08-28"
+  },
+  {
+    "id": "excel_26",
+    "name": "LL306#",
+    "category": "小童套装+单件",
+    "tags": [
+      "小童套装+单件"
+    ],
+    "processes": [
+      {
+        "type": "pingche",
+        "name": "上衣定唛",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拉领拉水滴",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拉夹圈",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "剪定橡筋耳仔",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "后领口倒针修止口",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "夹底倒针",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "圈定蝴蝶结",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车下摆橡筋",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "裤腰定唛",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包裤脚",
+        "price": 0.6,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎车埋肩",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋夹落唛",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼下摆测缝",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上下摆",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "密扎",
+        "price": 0.6,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎裤子",
+        "price": 0.95,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上腰头橡筋",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚裤头",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定唛",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼领压线",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "运返.压线.定袋盖",
+        "price": 0.8,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压前幅线",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压后幅线",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压后袖线.开叉线",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定袖口褶",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "运返上袖英压线",
+        "price": 1.0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定拉链盖",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上拉链压线",
+        "price": 0.8,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "运返门筒.压线",
+        "price": 0.45,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上门筒压线",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "裙子.定褶",
+        "price": 0.7,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上腰头橡筋定唛定腰测",
+        "price": 0.8,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "卷裙脚边",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎车.拼前上后上",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼后袖.开叉",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩上袖埋夹落唛",
+        "price": 0.7,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上领.上衫脚",
+        "price": 0.35,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎裙子",
+        "price": 0.45,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定唛",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "夹底倒针",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "点位.定蝴蝶结",
+        "price": 0.35,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "裙子.定褶",
+        "price": 1.0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "卷裙脚边",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "裙脚倒针",
+        "price": 0.1,
+        "qty": 1
+      }
+    ],
+    "image": "",
+    "note": "从Excel表格导入，工作表：小童套装+单件",
+    "totalPrice": 16.25,
+    "createdAt": "2026-08-28"
+  },
+  {
+    "id": "excel_27",
+    "name": "XK233#",
+    "category": "小童套装+单件",
+    "tags": [
+      "小童套装+单件"
+    ],
+    "processes": [
+      {
+        "type": "pingche",
+        "name": "车领口打刀口",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "做领上领落唛",
+        "price": 1.0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车门边",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "点位.装袋",
+        "price": 0.35,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "裤子定唛",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎上衣",
+        "price": 0.8,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎裤子",
+        "price": 0.75,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚袖.衫脚.裤脚",
+        "price": 0.6,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定唛*2",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼领.压内线",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定内贴",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包拉链头",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上领",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "开拉链胸.套内贴.压线",
+        "price": 1.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压领线",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "套夹内贴.打剪口",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压夹线.",
+        "price": 0.45,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "套夹圈",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压衫脚风琴",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车弯袋",
+        "price": 0.8,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包裤脚",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎领，门边贴散口",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩埋夹落唛",
+        "price": 0.45,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼衫脚两侧",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上下拼衫脚",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎小肩上袖埋夹.扎散口",
+        "price": 0.7,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "拼内贴扎散口",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎弯袋散口",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪埋浪.拼测骨落唛",
+        "price": 0.55,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上腰橡筋",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚裤头",
+        "price": 0.2,
+        "qty": 1
+      }
+    ],
+    "image": "",
+    "note": "从Excel表格导入，工作表：小童套装+单件",
+    "totalPrice": 13.6,
+    "createdAt": "2026-08-28"
+  },
+  {
+    "id": "excel_28",
+    "name": "XK288#小童#",
+    "category": "小童套装+单件",
+    "tags": [
+      "小童套装+单件"
+    ],
+    "processes": [
+      {
+        "type": "pingche",
+        "name": "车横唛+小唛",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车订袋盖",
+        "price": 0.9,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压前幅.后幅线",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车订门筒",
+        "price": 0.7,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼领横",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上领.里外",
+        "price": 0.45,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上衫脚",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "订拉链盖上拉链",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "套里布",
+        "price": 0.9,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "边条定夹",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼袖压线套里布开袖叉",
+        "price": 1.0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "袖口折定褶",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车袖英",
+        "price": 1.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压领.门边线一圈线",
+        "price": 0.55,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎车拼前后幅",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎面布",
+        "price": 0.65,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎里布落唛",
+        "price": 0.7,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎面布后袖散口",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎里布后袖",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包后领压领线车横唛+小唛",
+        "price": 0.8,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车订帽子触角",
+        "price": 0.8,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车订后幅翅膀",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车订拉连盖上拉链压线",
+        "price": 1.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼帽.上帽",
+        "price": 0.45,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩上袖埋落唛",
+        "price": 0.7,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上袖口.衫脚",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎拉链盖散口",
+        "price": 0.05,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚帽口",
+        "price": 0.15,
+        "qty": 1
+      }
+    ],
+    "image": "",
+    "note": "从Excel表格导入，工作表：小童套装+单件",
+    "totalPrice": 15.15,
+    "createdAt": "2026-08-28"
+  },
+  {
+    "id": "excel_29",
+    "name": "LL261#小童#",
+    "category": "小童套装+单件",
+    "tags": [
+      "小童套装+单件"
+    ],
+    "processes": [
+      {
+        "type": "pingche",
+        "name": "拼领压线",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "订唛",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车订袋盖",
+        "price": 0.9,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压前幅.后幅线",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼袖压线开袖叉",
+        "price": 0.6,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "袖口折定褶",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车袖英",
+        "price": 1.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "订拉链盖上拉链压线",
+        "price": 1.0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车订门筒",
+        "price": 0.7,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车褶*7+走横头线",
+        "price": 0.85,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "卷裙摆",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上腰定腰侧定唛",
+        "price": 0.8,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎车拼前后幅",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上领",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎后袖散口",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩上袖埋落唛",
+        "price": 0.7,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上衫脚",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎裙子",
+        "price": 0.45,
+        "qty": 1
+      }
+    ],
+    "image": "",
+    "note": "从Excel表格导入，工作表：小童套装+单件",
+    "totalPrice": 9.45,
+    "createdAt": "2026-08-28"
+  },
+  {
+    "id": "excel_30",
+    "name": "XLC095#",
+    "category": "希音",
+    "tags": [
+      "希音"
+    ],
+    "processes": [
+      {
+        "type": "pingche",
+        "name": "定唛",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "缩肩.车织带",
+        "price": 0.45,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "缩侧骨.车织带",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "夹底倒针",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "裤子定唛",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "裙测缩侧骨.车织带",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎上衣",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上领橡筋",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎裙测落",
+        "price": 0.45,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上腰橡筋",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拉夹边.",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚衫脚",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚领子",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚裙脚",
+        "price": 0.2,
+        "qty": 1
+      }
+    ],
+    "image": "",
+    "note": "从Excel表格导入，工作表：希音",
+    "totalPrice": 4.05,
+    "createdAt": "2026-08-28"
+  },
+  {
+    "id": "excel_31",
+    "name": "XLC056#大童#",
+    "category": "希音",
+    "tags": [
+      "希音"
+    ],
+    "processes": [
+      {
+        "type": "pingche",
+        "name": "反蝴蝶带.封口连打结定针",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定唛",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "领口.夹底倒针",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "夹圈.分开缩褶",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "缩腰测*4",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "剪落丝带",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车中腰橡筋",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎蝴蝶带",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩.埋夹上领橡筋",
+        "price": 0.55,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼裙测落唛*3",
+        "price": 0.65,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "缩拼中腰",
+        "price": 0.35,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拉夹圈",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚裙脚.冚领",
+        "price": 0.6,
+        "qty": 1
+      }
+    ],
+    "image": "",
+    "note": "从Excel表格导入，工作表：希音",
+    "totalPrice": 5.0,
+    "createdAt": "2026-08-28"
+  },
+  {
+    "id": "excel_32",
+    "name": "XLC038大童#",
+    "category": "希音",
+    "tags": [
+      "希音"
+    ],
+    "processes": [
+      {
+        "type": "pingche",
+        "name": "车定肩部蝴蝶带*2",
+        "price": 1.0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定唛",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拉领",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拉夹圈",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "夹底倒针",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "裙片打褶*20",
+        "price": 2.0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "裙摆卷",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车后叉上拉链定贴",
+        "price": 1.0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后公主线*4",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼下侧*4",
+        "price": 0.8,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋夹落唛",
+        "price": 0.55,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎后中散口",
+        "price": 0.45,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎拉链贴",
+        "price": 0.3,
+        "qty": 1
+      }
+    ],
+    "image": "",
+    "note": "从Excel表格导入，工作表：希音",
+    "totalPrice": 8.0,
+    "createdAt": "2026-08-28"
+  },
+  {
+    "id": "excel_33",
+    "name": "XLC039大童#",
+    "category": "希音",
+    "tags": [
+      "希音"
+    ],
+    "processes": [
+      {
+        "type": "pingche",
+        "name": "做领上领定唛压线",
+        "price": 1.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "飞袖双层缩褶",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼下层网纱*2",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "双层缩下摆",
+        "price": 0.55,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定网纱",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼后中",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定耳仔",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "夹底倒针",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压叉线",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上袖",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋夹落唛",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼下层里布侧骨",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎下摆拼接散口",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎后中散口",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "里布裙摆",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎领散口",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "做领上领定唛压线",
+        "price": 1.6,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拉夹圈",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "夹底倒针",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "合拉链位上拉链定贴",
+        "price": 1.0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "下脚卷边",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎领散口",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋夹落唛",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎后中散口",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎拉链贴",
+        "price": 0.25,
+        "qty": 1
+      }
+    ],
+    "image": "",
+    "note": "从Excel表格导入，工作表：希音",
+    "totalPrice": 9.5,
+    "createdAt": "2026-08-28"
+  },
+  {
+    "id": "excel_34",
+    "name": "XLC126大童#",
+    "category": "希音",
+    "tags": [
+      "希音"
+    ],
+    "processes": [
+      {
+        "type": "pingche",
+        "name": "做门边.做领上领定唛",
+        "price": 1.8,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "运返袋盖.压线.装袋盖",
+        "price": 1.0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "间线.*4压前幅线*6",
+        "price": 1.0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "走夹圈.衫脚单线",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "连衣裙 侧下开叉*1",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定唛",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定耳仔",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "走缩侧骨+织带固定",
+        "price": 0.75,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上胸围橡筋",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼测骨落唛（开叉）",
+        "price": 0.55,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前幅埋肩埋夹落唛",
+        "price": 0.6,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚裙摆",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚胸围",
+        "price": 0.2,
+        "qty": 1
+      }
+    ],
+    "image": "",
+    "note": "从Excel表格导入，工作表：希音",
+    "totalPrice": 7.7,
+    "createdAt": "2026-08-28"
+  },
+  {
+    "id": "excel_35",
+    "name": "XLC117大童#",
+    "category": "希音",
+    "tags": [
+      "希音"
+    ],
+    "processes": [
+      {
+        "type": "pingche",
+        "name": "定唛",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎里布上",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "里布前后浪埋浪",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼里布侧骨落唛",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上里腰",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼面布下侧骨2*2",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎面布前后浪埋浪",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎面布上侧骨",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "3合一上裙中裤腰",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "2合一上橡筋",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚腰头",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚裤脚2*2",
+        "price": 0.8,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚弧线裙摆",
+        "price": 0.5,
+        "qty": 1
+      }
+    ],
+    "image": "",
+    "note": "从Excel表格导入，工作表：希音",
+    "totalPrice": 3.65,
+    "createdAt": "2026-08-28"
+  },
+  {
+    "id": "excel_36",
+    "name": "XLC140#",
+    "category": "希音",
+    "tags": [
+      "希音"
+    ],
+    "processes": [
+      {
+        "type": "pingche",
+        "name": "上衣定唛",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压前后.及拉链牌线",
+        "price": 0.65,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上腰定唛定腰测",
+        "price": 0.9,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包裤脚口",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "点位",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车袋口.定袋角.装袋",
+        "price": 1.6,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车袋盖.装  袋盖",
+        "price": 1.2,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎上衣+上领",
+        "price": 1.0,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎裤子整件",
+        "price": 0.8,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚衫脚",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚袖口",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "做领开胸上领一整套",
+        "price": 2.0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "袖口倒针.衫脚",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "蝴蝶结尾倒针",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "量剪.打蝴蝶结",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定蝴蝶结",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "裤子定唛",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎胸贴散口",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩上袖埋夹落唛",
+        "price": 0.75,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪埋浪拼骨落唛",
+        "price": 1.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上裤头",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚腰头",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚裤脚",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拉袖子.下脚",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拉蝴蝶带",
+        "price": 0.05,
+        "qty": 1
+      }
+    ],
+    "image": "",
+    "note": "从Excel表格导入，工作表：希音",
+    "totalPrice": 13.15,
+    "createdAt": "2026-08-28"
+  },
+  {
+    "id": "excel_37",
+    "name": "XLC227#",
+    "category": "希音",
+    "tags": [
+      "希音"
+    ],
+    "processes": [
+      {
+        "type": "pingche",
+        "name": "上衣定唛",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "侧前后骨缩褶*4+固定条",
+        "price": 0.6,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "裤子定唛",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩.上袖.埋夹落唛",
+        "price": 0.65,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼领条.上领",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪埋浪拼骨落唛",
+        "price": 1.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上裤头",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚腰头.冚裤脚",
+        "price": 0.45,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚袖.衫脚",
+        "price": 0.4,
+        "qty": 1
+      }
+    ],
+    "image": "",
+    "note": "从Excel表格导入，工作表：希音",
+    "totalPrice": 3.85,
+    "createdAt": "2026-08-28"
+  },
+  {
+    "id": "excel_38",
+    "name": "XLC053大童#",
+    "category": "希音",
+    "tags": [
+      "希音"
+    ],
+    "processes": [
+      {
+        "type": "pingche",
+        "name": "定唛",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "前腰面层贴朴烫朴",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "前腰面层侧骨定褶*6",
+        "price": 0.6,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "前腰面层中烫",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "前外搭贴朴烫朴",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "运反前外搭",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "前外搭中烫",
+        "price": 0.05,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "前外搭定褶*2",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "前左面层贴朴烫朴",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "前左面层定褶*2",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前右侧",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前内里",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前肩*2",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "运返前上",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定外搭贴",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼腰底",
+        "price": 0.12,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定前腰面层侧",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "前腰面层定针位*4",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定前腰身褶*3",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拉后领",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "缩袖山",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "缩袖口",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "拉链围拉边",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼后裙.车隐形拉链",
+        "price": 1.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "裙摆卷边",
+        "price": 0.6,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎前腰面层散口",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前腰",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼后腰",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋夹",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼袖测",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上袖",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上袖口",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎后中散口",
+        "price": 0.5,
+        "qty": 1
+      }
+    ],
+    "image": "",
+    "note": "从Excel表格导入，工作表：希音",
+    "totalPrice": 8.32,
+    "createdAt": "2026-08-28"
+  },
+  {
+    "id": "excel_39",
+    "name": "XLC043大童#",
+    "category": "希音",
+    "tags": [
+      "希音"
+    ],
+    "processes": [
+      {
+        "type": "pingche",
+        "name": "定唛",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拉领.压领线",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "车前幅假袋",
+        "price": 0.8,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "运返前幅里布埋肩走边线",
+        "price": 1.0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拉夹圈压线",
+        "price": 0.7,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "夹底倒针",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "压衫脚线",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上腰头定唛",
+        "price": 0.8,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "包裤脚",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼后幅*3",
+        "price": 0.45,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前幅",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼测骨落唛",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎衫脚散口",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪.埋浪",
+        "price": 0.55,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼侧骨落唛",
+        "price": 0.55,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎腰散口",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "步骤",
+        "price": 0,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上衣定唛",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "夹底倒针",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "裤子定唛",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "量剪.打蝴蝶结",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "蝴蝶结尾倒针",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "定蝴蝶结",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩埋夹落唛",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上领橡筋",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪埋浪拼骨落唛",
+        "price": 0.55,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上腰橡筋",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚领子",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拉剪夹圈",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚下脚",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚裤脚",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚腰头",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "空拉蝴蝶",
+        "price": 0.05,
+        "qty": 1
+      }
+    ],
+    "image": "",
+    "note": "从Excel表格导入，工作表：希音",
+    "totalPrice": 10.25,
+    "createdAt": "2026-08-28"
+  },
+  {
+    "id": "excel_40",
+    "name": "XLB536#小童#",
+    "category": "外套",
+    "tags": [
+      "外套"
+    ],
+    "processes": [
+      {
+        "type": "pingche",
+        "name": "拼衫身.门襟于螺纹脚",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上帽",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "套门边",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "订唛",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "门边连着领压线",
+        "price": 0.55,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "订肩",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼腰上裤头两侧倒针订唛头）",
+        "price": 0.7,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼帽",
+        "price": 0.15,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "埋肩上袖埋夹落唛",
+        "price": 0.65,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎领散口",
+        "price": 0.1,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎门边散口",
+        "price": 0.25,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "上袖口扎衫脚螺纹",
+        "price": 0.5,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼前后浪埋浪",
+        "price": 0.4,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "拼侧骨*4落唛",
+        "price": 0.55,
+        "qty": 1
+      },
+      {
+        "type": "pingche",
+        "name": "上裤脚螺纹",
+        "price": 0.3,
+        "qty": 1
+      },
+      {
+        "type": "zache",
+        "name": "扎腰散口",
+        "price": 0.2,
+        "qty": 1
+      },
+      {
+        "type": "kanche",
+        "name": "冚帽边",
+        "price": 0.15,
+        "qty": 1
+      }
+    ],
+    "image": "",
+    "note": "从Excel表格导入，工作表：外套",
+    "totalPrice": 5.8,
+    "createdAt": "2026-08-28"
+  }
+]
