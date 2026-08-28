@@ -28,15 +28,24 @@
     let isSyncing = false;
     let syncTimer = null;
 
+    // 默认配置（硬编码，所有浏览器自动配置）
+    const DEFAULT_CONFIG = {
+        url: 'https://izzcqlydjnfumbzfepcx.supabase.co',
+        anonKey: 'sb_publishable_Vo_zxOAcU3j4y216VCx3qw_XygxDytX',
+        table: 'app_data'
+    };
+
     // ============================================
     // 配置管理
     // ============================================
 
     function getConfig() {
         try {
-            return JSON.parse(localStorage.getItem(CONFIG_KEY) || '{}');
+            const userConfig = JSON.parse(localStorage.getItem(CONFIG_KEY) || '{}');
+            // 合并默认配置和用户配置
+            return Object.assign({}, DEFAULT_CONFIG, userConfig);
         } catch(e) {
-            return {};
+            return DEFAULT_CONFIG;
         }
     }
 
