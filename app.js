@@ -4930,7 +4930,7 @@ function renderHistory() {
 
         </div>
 
-        <div style="position:absolute;top:8px;right:8px;display:flex;gap:4px">
+        <div style="position:absolute;top:8px;right:48px;display:flex;gap:4px">
           ${s.status === 'approved' ? `<button class="del-history" data-role-block onclick="event.stopPropagation(); syncToLibrary('${s.id}')" title="同步到款式库" style="background:#10b981;color:#fff">📚</button>` : ''}
           <button class="del-history" data-role-block onclick="event.stopPropagation(); deleteHistory('${s.id}')" title="删除">✕</button>
         </div>
