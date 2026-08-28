@@ -15,8 +15,8 @@
         'style_library',      // 款式库
         'styles',             // 历史款式
         'currentStyle',       // 当前款式
-        'users',              // 用户列表
-        'currentUser',        // 当前用户
+        'app_users',          // 用户列表
+        'app_current_user',   // 当前用户
         'backups',            // 备份记录
         'exportRecords',      // 导出记录
         'approvals',          // 审批记录
