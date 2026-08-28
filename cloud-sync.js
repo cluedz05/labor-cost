@@ -179,10 +179,12 @@
     }
 
     // 从云端同步所有数据
-    async function syncFromCloud() {
+    async function syncFromCloud(silent = false) {
         if (isSyncing || !isConfigured()) return;
         isSyncing = true;
-        addSyncLog('开始从云端同步...', 'info');
+        if (!silent) {
+            addSyncLog('开始从云端同步...', 'info');
+        }
 
         let successCount = 0;
         for (const key of DATA_KEYS) {
@@ -195,11 +197,15 @@
 
         localStorage.setItem(LAST_SYNC_KEY, new Date().toISOString());
         isSyncing = false;
-        addSyncLog(`同步完成，成功下载 ${successCount}/${DATA_KEYS.length} 项数据`, 'success');
-        showToast(`☁️ 云端数据已恢复 (${successCount}项)`);
-        
-        // 刷新页面以应用新数据
-        setTimeout(() => location.reload(), 1000);
+        if (!silent) {
+            addSyncLog(`同步完成，成功下载 ${successCount}/${DATA_KEYS.length} 项数据`, 'success');
+            showToast(`☁️ 云端数据已恢复 (${successCount}项)`);
+            
+            // 刷新页面以应用新数据（仅手动同步时刷新）
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            addSyncLog(`定期同步完成，更新 ${successCount}/${DATA_KEYS.length} 项数据`, 'success');
+        }
     }
 
     // 自动同步（延迟执行，避免频繁同步）
@@ -438,15 +444,15 @@
         if (isConfigured()) {
             // 延迟同步，避免影响页面加载
             setTimeout(() => {
-                // 总是从云端拉取最新数据（在线更新）
+                // 页面加载时使用静默同步（不刷新页面）
                 addSyncLog('正在从云端获取最新数据...', 'info');
-                syncFromCloud();
+                syncFromCloud(true);
                 
-                // 设置定期自动同步，每隔1分钟从云端拉取数据
+                // 设置定期自动同步，每隔1分钟从云端拉取数据（静默同步，不刷新页面）
                 setInterval(() => {
                     if (!isSyncing) {
                         addSyncLog('定期同步：正在从云端获取最新数据...', 'info');
-                        syncFromCloud();
+                        syncFromCloud(true);
                     }
                 }, 60000); // 60秒
             }, 3000);
