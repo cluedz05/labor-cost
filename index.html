@@ -39,7 +39,24 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="cloud-sync.js"></script>
 
-<link rel="stylesheet" href="style.css"><link rel="stylesheet" href="style-extra.css"></head>
+<link rel="stylesheet" href="style.css"><link rel="stylesheet" href="style-extra.css">
+<style>
+/* 全局表格表头文字颜色修复 */
+table th {
+    color: #333333 !important;
+    font-weight: 600 !important;
+}
+/* 表格中的按钮文字颜色修复 */
+table button {
+    color: #333333 !important;
+}
+/* 白色背景上的白色文字修复 */
+.selected-table th,
+.selected-table thead th {
+    color: #333333 !important;
+    background-color: #f5f5f5 !important;
+}
+</style></head>
 
 <body>
 
