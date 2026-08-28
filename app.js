@@ -7391,9 +7391,9 @@ function renderLibrary() {
       
       // 如果是该类型的第一道工序，显示类型小计；否则显示工序小计
       if (isFirstOfType && typeTotals[p.type] > 0) {
-        html += '<td style="border:1px solid #ccc;padding:5px 8px;text-align:center;color:#92400e;font-weight:600;background:#fef3c7">' + typeName + ' ¥' + typeTotals[p.type].toFixed(2) + '</td>';
+        html += '<td style="border:1px solid #ccc;padding:5px 8px;text-align:center;color:#333;font-weight:600;background:#fef3c7">' + typeName + ' ¥' + typeTotals[p.type].toFixed(2) + '</td>';
       } else {
-        html += '<td style="border:1px solid #ccc;padding:5px 8px;text-align:center;color:#e94560">¥' + subtotal.toFixed(2) + '</td>';
+        html += '<td style="border:1px solid #ccc;padding:5px 8px;text-align:center;color:#333">¥' + subtotal.toFixed(2) + '</td>';
       }
       
       html += '</tr>';
@@ -7401,8 +7401,8 @@ function renderLibrary() {
     
     // 合计行
     html += '<tr style="background:#fecaca;font-weight:700">';
-    html += '<td colspan="2" style="border:1px solid #ccc;padding:8px;text-align:right;color:#991b1b;font-size:14px">合计</td>';
-    html += '<td style="border:1px solid #ccc;padding:8px;text-align:center;color:#991b1b;font-size:16px">¥' + total.toFixed(2) + '</td>';
+    html += '<td colspan="2" style="border:1px solid #ccc;padding:8px;text-align:right;color:#333;font-size:14px">合计</td>';
+    html += '<td style="border:1px solid #ccc;padding:8px;text-align:center;color:#333;font-size:16px">¥' + total.toFixed(2) + '</td>';
     html += '</tr>';
     
     html += '</tbody>';
