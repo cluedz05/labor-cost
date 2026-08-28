@@ -8000,7 +8000,7 @@ function syncAllApprovedToLibrary() {
 // 颜色直方图图像相似度搜索（不依赖外部模型，快速稳定）
 let historyImageFeatures = {}; // 缓存历史款式图片的特征向量
 
-// 提取图像颜色直方图特征
+// 提取图像颜色直方图特征（优化版：32x32，更快速度）
 function extractColorHistogram(imageSrc) {
   return new Promise((resolve) => {
     const img = new Image();
@@ -8009,12 +8009,12 @@ function extractColorHistogram(imageSrc) {
       try {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-        // 缩放到64x64，提高速度
-        canvas.width = 64;
-        canvas.height = 64;
-        ctx.drawImage(img, 0, 0, 64, 64);
+        // 缩放到32x32，更快速度
+        canvas.width = 32;
+        canvas.height = 32;
+        ctx.drawImage(img, 0, 0, 32, 32);
         
-        const imageData = ctx.getImageData(0, 0, 64, 64);
+        const imageData = ctx.getImageData(0, 0, 32, 32);
         const data = imageData.data;
         
         // 颜色直方图：每个通道4个区间，共64个bin
@@ -8022,15 +8022,15 @@ function extractColorHistogram(imageSrc) {
         const histogram = new Array(bins).fill(0);
         
         for (let i = 0; i < data.length; i += 4) {
-          const r = Math.floor(data[i] / 64);     // 0-3
-          const g = Math.floor(data[i + 1] / 64); // 0-3
-          const b = Math.floor(data[i + 2] / 64); // 0-3
-          const idx = r * 16 + g * 4 + b;
+          const r = data[i] >> 6;     // 0-3 (除以64)
+          const g = data[i + 1] >> 6; // 0-3
+          const b = data[i + 2] >> 6; // 0-3
+          const idx = (r << 4) | (g << 2) | b;
           histogram[idx]++;
         }
         
         // 归一化
-        const total = 64 * 64;
+        const total = 32 * 32;
         for (let i = 0; i < bins; i++) {
           histogram[i] /= total;
         }
@@ -8091,27 +8091,36 @@ async function aiImageSearch(imageDataUrl, callback) {
   const results = [];
   let processed = 0;
   
-  // 逐个处理（颜色直方图很快，不需要并行）
-  for (let i = 0; i < itemsWithImage.length; i++) {
-    const item = itemsWithImage[i];
-    const idx = styles.indexOf(item);
-    let features = historyImageFeatures[item.id];
-    if (!features) {
-      features = await extractColorHistogram(item.imgs[0]);
-      if (features) {
-        historyImageFeatures[item.id] = features;
+  // 并行处理（同时处理10个图片，大幅提高速度）
+  const batchSize = 10;
+  for (let batchStart = 0; batchStart < itemsWithImage.length; batchStart += batchSize) {
+    const batch = itemsWithImage.slice(batchStart, batchStart + batchSize);
+    
+    // 并行提取当前批次的特征
+    const batchPromises = batch.map(async (item) => {
+      const idx = styles.indexOf(item);
+      let features = historyImageFeatures[item.id];
+      if (!features) {
+        features = await extractColorHistogram(item.imgs[0]);
+        if (features) {
+          historyImageFeatures[item.id] = features;
+        }
       }
-    }
+      return { idx, item, features };
+    });
     
-    if (features) {
-      const similarity = histogramSimilarity(targetFeatures, features);
-      results.push({ idx, item, similarity });
-    }
+    const batchResults = await Promise.all(batchPromises);
     
-    processed++;
+    batchResults.forEach(({ idx, item, features }) => {
+      processed++;
+      if (features) {
+        const similarity = histogramSimilarity(targetFeatures, features);
+        results.push({ idx, item, similarity });
+      }
+    });
     
-    // 更新进度（每处理5个更新一次）
-    if (resultDiv && (processed % 5 === 0 || processed === total)) {
+    // 更新进度
+    if (resultDiv) {
       const percent = Math.round((processed / total) * 100);
       resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:#6b7280">' +
         '<div style="font-size:24px;margin-bottom:8px">🔍</div>' +
