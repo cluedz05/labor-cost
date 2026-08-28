@@ -7906,13 +7906,35 @@ function initLibraryButtons() {
   }
 }
 
+// 加载默认款式库数据（如果localStorage中没有数据）
+function loadDefaultLibrary() {
+  var library = JSON.parse(localStorage.getItem('style_library') || '[]');
+  if (library.length === 0) {
+    console.log('款式库为空，开始加载默认数据...');
+    fetch('styles_with_images_v3.json?t=' + Date.now())
+      .then(function(response) { return response.json(); })
+      .then(function(data) {
+        localStorage.setItem('style_library', JSON.stringify(data));
+        console.log('默认数据加载完成，共 ' + data.length + ' 个款式');
+        if (typeof renderLibrary === 'function') {
+          renderLibrary();
+        }
+      })
+      .catch(function(error) {
+        console.error('加载默认数据失败:', error);
+      });
+  }
+}
+
 // 页面加载完成后初始化按钮
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', function() {
     initLibraryButtons();
+    loadDefaultLibrary();
   });
 } else {
   initLibraryButtons();
+  loadDefaultLibrary();
 }
 
 
