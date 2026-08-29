@@ -5205,6 +5205,20 @@ function showDetail(id) {
   ab.className = 'btn-action ' + (style.status === 'approved' ? 'clear' : 'save');
 
   document.getElementById('detailModal').classList.add('show');
+  
+  // 给款式详情窗口添加拖动功能
+  setTimeout(function() {
+    var detailModal = document.querySelector('.detail-modal-content');
+    var detailHeader = document.querySelector('.detail-draggable-header');
+    if (detailModal && detailHeader) {
+      // 重置位置样式，确保拖动正常
+      detailModal.style.position = 'absolute';
+      detailModal.style.left = '50px';
+      detailModal.style.top = '50px';
+      detailModal.style.transform = 'none';
+      makeDraggable(detailModal, detailHeader);
+    }
+  }, 100);
 
 
 
@@ -7863,14 +7877,14 @@ function makeDraggable(modal, handle) {
     initialLeft = rect.left;
     initialTop = rect.top;
     
+    // 确保使用fixed定位，相对于视口
     modal.style.position = 'fixed';
     modal.style.margin = '0';
     modal.style.left = initialLeft + 'px';
     modal.style.top = initialTop + 'px';
+    modal.style.right = 'auto';
+    modal.style.bottom = 'auto';
     modal.style.transform = 'none';
-    modal.style.alignItems = 'flex-start';
-    modal.style.justifyContent = 'flex-start';
-    modal.style.padding = '0';
     
     e.preventDefault();
   });
