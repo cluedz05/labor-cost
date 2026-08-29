@@ -805,6 +805,9 @@
         
         // 初始化应用
         function initApp() {
+            // 初始化默认主账号（如果不存在）
+            initDefaultAdmin();
+            
             // 检查登录状态
             checkLogin();
             
@@ -824,6 +827,31 @@
                 }).catch(function(err) {
                     console.log('Service Worker 注册失败:', err);
                 });
+            }
+        }
+        
+        // 初始化默认主账号
+        function initDefaultAdmin() {
+            var users = JSON.parse(localStorage.getItem('users') || '[]');
+            
+            // 检查是否已有管理员账号
+            var adminUser = users.find(function(u) { return u.role === 'admin'; });
+            
+            if (!adminUser) {
+                // 创建默认主账号
+                var defaultAdmin = {
+                    username: 'admin',
+                    password: 'admin123',
+                    role: 'admin',
+                    createTime: new Date().toLocaleString(),
+                    avatar: '',
+                    phone: '',
+                    email: ''
+                };
+                
+                users.push(defaultAdmin);
+                localStorage.setItem('users', JSON.stringify(users));
+                console.log('已创建默认主账号: admin/admin123');
             }
         }
         
@@ -1176,10 +1204,23 @@
             if (user) {
                 currentUser = user;
                 localStorage.setItem('current_user', JSON.stringify(user));
-                showToast('登录成功');
+                showToast('登录成功，正在跳转...');
+                
+                // 更新页面显示
                 checkLogin();
                 loadStats();
-                switchPage('home');
+                
+                // 延迟切换页面，确保toast显示
+                setTimeout(function() {
+                    switchPage('home');
+                    // 再次确保页面切换成功
+                    setTimeout(function() {
+                        var homePage = document.getElementById('page-home');
+                        if (homePage && !homePage.classList.contains('active')) {
+                            switchPage('home');
+                        }
+                    }, 100);
+                }, 500);
             } else {
                 showToast('账号或密码错误');
             }
