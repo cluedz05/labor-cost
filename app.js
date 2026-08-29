@@ -5211,19 +5211,19 @@ function showDetail(id) {
   var modalContent = detailModal ? detailModal.querySelector('.modal') : null;
   
   if (modalContent) {
-    // 计算窗口居中的位置
+    // 计算窗口显示在右侧的位置
     var windowWidth = window.innerWidth;
     var windowHeight = window.innerHeight;
     var modalWidth = Math.min(700, windowWidth - 40);
     var modalHeight = Math.min(600, windowHeight - 40);
-    var centerLeft = Math.max(20, (windowWidth - modalWidth) / 2);
+    var rightLeft = Math.max(20, windowWidth - modalWidth - 30);
     var centerTop = Math.max(20, (windowHeight - modalHeight) / 2);
     
     // 设置overlay样式
     detailModal.style.cssText = 'background:transparent !important; pointer-events:none !important; z-index:99998 !important;';
     
-    // 设置窗口样式（使用cssText + !important确保优先级最高），默认显示在页面中间
-    modalContent.style.cssText = 'position:fixed !important; top:' + centerTop + 'px !important; left:' + centerLeft + 'px !important; right:auto !important; bottom:auto !important; margin:0 !important; transform:none !important; cursor:move !important; z-index:100000 !important; pointer-events:auto !important; max-width:700px; max-height:90vh; padding-bottom:16px; overflow-y:auto; background:#fff; border-radius:16px; box-shadow:0 20px 60px rgba(0,0,0,0.3);';
+    // 设置窗口样式（使用cssText + !important确保优先级最高），默认显示在右侧
+    modalContent.style.cssText = 'position:fixed !important; top:' + centerTop + 'px !important; left:' + rightLeft + 'px !important; right:auto !important; bottom:auto !important; margin:0 !important; transform:none !important; cursor:move !important; z-index:100000 !important; pointer-events:auto !important; max-width:700px; max-height:90vh; padding-bottom:16px; overflow-y:auto; background:#fff; border-radius:16px; box-shadow:0 20px 60px rgba(0,0,0,0.3);';
     
     // 最可靠的拖动实现 - 使用addEventListener + 捕获阶段
     var isDragging = false;
