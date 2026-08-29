@@ -1198,29 +1198,24 @@
                 return;
             }
             
+            // 确保默认主账号已创建
+            initDefaultAdmin();
+            
             const users = JSON.parse(localStorage.getItem('users') || '[]');
             const user = users.find(function(u) { return u.username === username && u.password === password; });
             
             if (user) {
                 currentUser = user;
                 localStorage.setItem('current_user', JSON.stringify(user));
-                showToast('登录成功，正在跳转...');
                 
                 // 更新页面显示
                 checkLogin();
                 loadStats();
                 
-                // 延迟切换页面，确保toast显示
-                setTimeout(function() {
-                    switchPage('home');
-                    // 再次确保页面切换成功
-                    setTimeout(function() {
-                        var homePage = document.getElementById('page-home');
-                        if (homePage && !homePage.classList.contains('active')) {
-                            switchPage('home');
-                        }
-                    }, 100);
-                }, 500);
+                // 直接切换到首页
+                switchPage('home');
+                
+                showToast('登录成功');
             } else {
                 showToast('账号或密码错误');
             }
