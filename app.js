@@ -8360,7 +8360,7 @@ function syncAllApprovedToLibrary() {
 // 颜色直方图图像相似度搜索（不依赖外部模型，快速稳定）
 let historyImageFeatures = {}; // 缓存历史款式图片的特征向量
 
-// 提取图像颜色直方图特征（简化版：只使用颜色直方图，速度快，手机也能用）
+// 提取图像颜色直方图特征（超快速版：8x8，8个bin，手机也能秒速）
 function extractColorHistogram(imageSrc) {
   return new Promise((resolve) => {
     const img = new Image();
@@ -8369,33 +8369,33 @@ function extractColorHistogram(imageSrc) {
       try {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-        // 缩放到16x16，更快速度
-        canvas.width = 16;
-        canvas.height = 16;
-        ctx.drawImage(img, 0, 0, 16, 16);
+        // 缩放到8x8，超快速
+        canvas.width = 8;
+        canvas.height = 8;
+        ctx.drawImage(img, 0, 0, 8, 8);
         
-        const imageData = ctx.getImageData(0, 0, 16, 16);
+        const imageData = ctx.getImageData(0, 0, 8, 8);
         const data = imageData.data;
         
-        // 颜色直方图：每个通道4个区间，共64个bin，速度快
-        const bins = 64;
+        // 超快速颜色直方图：每个通道2个区间，共8个bin
+        const bins = 8;
         const histogram = new Array(bins).fill(0);
         
         for (let i = 0; i < data.length; i += 4) {
-          const r = data[i] >> 6;     // 0-3 (除以64)
-          const g = data[i + 1] >> 6; // 0-3
-          const b = data[i + 2] >> 6; // 0-3
-          const idx = (r << 4) | (g << 2) | b;
+          const r = data[i] >> 7;     // 0-1 (除以128)
+          const g = data[i + 1] >> 7; // 0-1
+          const b = data[i + 2] >> 7; // 0-1
+          const idx = (r << 2) | (g << 1) | b;
           histogram[idx]++;
         }
         
         // 归一化颜色直方图
-        const total = 16 * 16;
+        const total = 8 * 8;
         for (let i = 0; i < bins; i++) {
           histogram[i] /= total;
         }
         
-        // 只返回颜色直方图数组，简化格式，速度快
+        // 只返回颜色直方图数组，超快速
         resolve(histogram);
       } catch (e) {
         console.error('特征提取失败:', e);
@@ -8500,8 +8500,8 @@ async function aiImageSearch(imageDataUrl, callback) {
       '<button onclick="window.aiSearchCancelled=true" style="padding:8px 20px;background:#ef4444;color:#fff;border:none;border-radius:8px;font-size:13px;cursor:pointer">取消搜索</button></div>';
   }
   
-  // 并行处理（同时处理30个图片，大幅提高速度）
-  const batchSize = 30;
+  // 并行处理（同时处理10个图片，手机也能快速运行）
+  const batchSize = 10;
   for (let batchStart = 0; batchStart < itemsWithImage.length; batchStart += batchSize) {
     // 检查是否取消
     if (window.aiSearchCancelled) {
