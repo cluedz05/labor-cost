@@ -79,6 +79,22 @@ button[style*="color:#fff"][style*="background:transparent"]:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4) !important;
 }
+/* 更通用的按钮文字可见性修复 */
+button:not([class*="tab"]):not([class*="nav"]):not(.topbar button) {
+    text-shadow: none !important;
+}
+/* 确保所有有文字的按钮都有合适的对比度 */
+button:empty {
+    min-width: 32px;
+}
+/* 导航栏和侧边栏按钮保持原样 */
+.topbar button,
+.sidebar button,
+.nav button,
+[class*="tab"] button {
+    background: transparent !important;
+    color: inherit !important;
+}
 /* 确保模态框和内容区域的按钮文字可见 */
 .modal button,
 .modal-content button,
@@ -1171,7 +1187,68 @@ button[style*="color:#fff"][style*="background:transparent"]:hover {
 
 
 
+<script>
+// 动态修复按钮文字显示问题
+function fixButtonStyles() {
+    try {
+        var buttons = document.querySelectorAll('button');
+        var fixedCount = 0;
+        
+        buttons.forEach(function(button) {
+            // 跳过导航栏和侧边栏按钮
+            if (button.closest('.topbar') || button.closest('.sidebar') || 
+                button.closest('.nav') || button.classList.contains('tab') ||
+                button.closest('[class*="tab"]')) {
+                return;
+            }
+            
+            var text = button.textContent.trim();
+            if (!text || text.length === 0) return;
+            
+            var style = window.getComputedStyle(button);
+            var color = style.color;
+            var bgColor = style.backgroundColor;
+            var bgImage = style.backgroundImage;
+            
+            // 检查是否是白色文字且透明背景（可能看不见）
+            var isWhiteText = (color === 'rgb(255, 255, 255)' || color === '#fff' || color === '#ffffff');
+            var isTransparentBg = (bgColor === 'rgba(0, 0, 0, 0)' || bgColor === 'transparent' || bgColor === 'rgba(0, 0, 0, 0)');
+            var hasBgImage = (bgImage && bgImage !== 'none' && bgImage.indexOf('gradient') >= 0);
+            
+            if (isWhiteText && isTransparentBg && !hasBgImage) {
+                // 给按钮添加渐变背景
+                button.style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
+                button.style.color = '#ffffff';
+                button.style.border = 'none';
+                button.style.boxShadow = '0 2px 8px rgba(102, 126, 234, 0.3)';
+                button.style.padding = '6px 12px';
+                button.style.borderRadius = '6px';
+                button.style.cursor = 'pointer';
+                button.style.fontSize = '13px';
+                button.style.minHeight = '32px';
+                fixedCount++;
+            }
+        });
+        
+        if (fixedCount > 0) {
+            console.log('已修复 ' + fixedCount + ' 个按钮的文字显示问题');
+        }
+    } catch(e) {
+        console.error('修复按钮样式时出错:', e);
+    }
+}
 
-
+// 页面加载完成后执行
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(fixButtonStyles, 500);
+        // 定期检查新创建的按钮
+        setInterval(fixButtonStyles, 2000);
+    });
+} else {
+    setTimeout(fixButtonStyles, 500);
+    setInterval(fixButtonStyles, 2000);
+}
+</script>
 
 </body></html>
