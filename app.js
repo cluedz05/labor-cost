@@ -7832,6 +7832,89 @@ function importLibrary(event) {
 
 
 
+// 使模态框可拖动
+function makeDraggable(modal, handle) {
+  var isDragging = false;
+  var startX, startY, initialLeft, initialTop;
+  
+  handle = handle || modal.querySelector('.draggable-header') || modal.querySelector('h3') || modal.firstElementChild;
+  
+  if (!handle) return;
+  
+  handle.style.cursor = 'move';
+  handle.style.userSelect = 'none';
+  
+  handle.addEventListener('mousedown', function(e) {
+    isDragging = true;
+    startX = e.clientX;
+    startY = e.clientY;
+    
+    var rect = modal.getBoundingClientRect();
+    initialLeft = rect.left;
+    initialTop = rect.top;
+    
+    modal.style.position = 'fixed';
+    modal.style.margin = '0';
+    modal.style.left = initialLeft + 'px';
+    modal.style.top = initialTop + 'px';
+    modal.style.transform = 'none';
+    modal.style.alignItems = 'flex-start';
+    modal.style.justifyContent = 'flex-start';
+    modal.style.padding = '0';
+    
+    e.preventDefault();
+  });
+  
+  document.addEventListener('mousemove', function(e) {
+    if (!isDragging) return;
+    
+    var dx = e.clientX - startX;
+    var dy = e.clientY - startY;
+    
+    modal.style.left = (initialLeft + dx) + 'px';
+    modal.style.top = (initialTop + dy) + 'px';
+  });
+  
+  document.addEventListener('mouseup', function() {
+    isDragging = false;
+  });
+  
+  // 触摸设备支持
+  handle.addEventListener('touchstart', function(e) {
+    isDragging = true;
+    var touch = e.touches[0];
+    startX = touch.clientX;
+    startY = touch.clientY;
+    
+    var rect = modal.getBoundingClientRect();
+    initialLeft = rect.left;
+    initialTop = rect.top;
+    
+    modal.style.position = 'fixed';
+    modal.style.margin = '0';
+    modal.style.left = initialLeft + 'px';
+    modal.style.top = initialTop + 'px';
+    modal.style.transform = 'none';
+    
+    e.preventDefault();
+  });
+  
+  document.addEventListener('touchmove', function(e) {
+    if (!isDragging) return;
+    
+    var touch = e.touches[0];
+    var dx = touch.clientX - startX;
+    var dy = touch.clientY - startY;
+    
+    modal.style.left = (initialLeft + dx) + 'px';
+    modal.style.top = (initialTop + dy) + 'px';
+  });
+  
+  document.addEventListener('touchend', function() {
+    isDragging = false;
+  });
+}
+
 function searchByImage(event) {
   var file = event.target.files[0];
   if (!file) return;
@@ -7842,10 +7925,10 @@ function searchByImage(event) {
     
     // 创建图片预览和搜索弹窗
     var modal = document.createElement('div');
-    modal.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px';
-    modal.innerHTML = '<div style="background:#fff;border-radius:16px;padding:24px;max-width:500px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3)">' +
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">' +
-        '<h3 style="margin:0;font-size:18px;color:#1a1a2e">🖼️ 以图搜款</h3>' +
+    modal.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;padding:20px';
+    modal.innerHTML = '<div class="search-modal-content" style="background:#fff;border-radius:16px;padding:24px;max-width:500px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3)">' +
+      '<div class="draggable-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;cursor:move;padding-bottom:8px;border-bottom:2px solid #f3f4f6">' +
+        '<h3 style="margin:0;font-size:18px;color:#1a1a2e">🖼️ 以图搜款 <span style="font-size:12px;color:#9ca3af;font-weight:normal">（按住标题可拖动）</span></h3>' +
         '<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#999;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%">✕</button>' +
       '</div>' +
       '<img src="' + imageData + '" style="width:100%;max-height:250px;object-fit:contain;border-radius:12px;background:#f5f5f5;margin-bottom:16px">' +
@@ -7875,6 +7958,13 @@ function searchByImage(event) {
     '</div>';
     document.body.appendChild(modal);
     
+    // 使模态框可拖动
+    var modalContent = modal.querySelector('.search-modal-content');
+    var draggableHeader = modal.querySelector('.draggable-header');
+    if (modalContent && draggableHeader) {
+      makeDraggable(modalContent, draggableHeader);
+    }
+    
     // 聚焦输入框
     setTimeout(function() {
       var input = document.getElementById('imageSearchKeyword');
@@ -7896,10 +7986,10 @@ function searchHistoryByImage(event) {
     
     // 创建图片预览和搜索弹窗
     var modal = document.createElement('div');
-    modal.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px';
-    modal.innerHTML = '<div style="background:#fff;border-radius:16px;padding:24px;max-width:500px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3)">' +
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">' +
-        '<h3 style="margin:0;font-size:18px;color:#1a1a2e">🖼️ 历史款式以图搜款</h3>' +
+    modal.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;padding:20px';
+    modal.innerHTML = '<div class="search-modal-content" style="background:#fff;border-radius:16px;padding:24px;max-width:500px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3)">' +
+      '<div class="draggable-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;cursor:move;padding-bottom:8px;border-bottom:2px solid #f3f4f6">' +
+        '<h3 style="margin:0;font-size:18px;color:#1a1a2e">🖼️ 历史款式以图搜款 <span style="font-size:12px;color:#9ca3af;font-weight:normal">（按住标题可拖动）</span></h3>' +
         '<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#999;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%">✕</button>' +
       '</div>' +
       '<img src="' + imageData + '" style="width:100%;max-height:250px;object-fit:contain;border-radius:12px;background:#f5f5f5;margin-bottom:16px">' +
@@ -7928,6 +8018,13 @@ function searchHistoryByImage(event) {
       '<div style="margin-top:16px;padding:12px;background:#dbeafe;border-radius:10px;font-size:12px;color:#1e40af;line-height:1.6">🤖 <b>AI图像识别</b>：使用颜色直方图算法提取图片特征，自动搜索历史款式中视觉相似的款式。分析速度快，无需下载模型。</div>' +
     '</div>';
     document.body.appendChild(modal);
+    
+    // 使模态框可拖动
+    var modalContent = modal.querySelector('.search-modal-content');
+    var draggableHeader = modal.querySelector('.draggable-header');
+    if (modalContent && draggableHeader) {
+      makeDraggable(modalContent, draggableHeader);
+    }
     
     // 聚焦输入框
     setTimeout(function() {
