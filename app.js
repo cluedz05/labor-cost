@@ -5206,14 +5206,11 @@ function showDetail(id) {
 
   document.getElementById('detailModal').classList.add('show');
   
-  // 最简单、最可靠的拖动实现
-  setTimeout(function() {
-    var detailModal = document.getElementById('detailModal');
-    var modalContent = detailModal ? detailModal.querySelector('.modal') : null;
-    var draggableHeader = modalContent ? modalContent.querySelector('.detail-draggable-header') : null;
-    
-    if (!modalContent) return;
-    
+  // 让整个窗口都可以拖动（不只是标题栏），最直接可靠的方式
+  var detailModal = document.getElementById('detailModal');
+  var modalContent = detailModal ? detailModal.querySelector('.modal') : null;
+  
+  if (modalContent) {
     // 设置overlay样式
     detailModal.style.background = 'transparent';
     detailModal.style.pointerEvents = 'none';
@@ -5221,65 +5218,33 @@ function showDetail(id) {
     
     // 设置窗口样式
     modalContent.style.position = 'fixed';
-    modalContent.style.top = '50px';
-    modalContent.style.left = '50px';
+    modalContent.style.top = '80px';
+    modalContent.style.left = '80px';
     modalContent.style.right = 'auto';
     modalContent.style.bottom = 'auto';
     modalContent.style.margin = '0';
     modalContent.style.transform = 'none';
     modalContent.style.pointerEvents = 'auto';
+    modalContent.style.cursor = 'move';
     modalContent.style.zIndex = '100000';
     
-    // 如果没有拖动标题栏，创建一个
-    if (!draggableHeader) {
-      draggableHeader = document.createElement('div');
-      draggableHeader.className = 'detail-draggable-header';
-      draggableHeader.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;cursor:move;padding-bottom:8px;border-bottom:2px solid #f3f4f6;user-select:none';
-      
-      var titleContainer = document.createElement('div');
-      titleContainer.style.cssText = 'display:flex;align-items:center;gap:8px';
-      
-      var title = modalContent.querySelector('h2');
-      if (title) {
-        title.style.margin = '0';
-        title.style.fontSize = '18px';
-        titleContainer.appendChild(title);
-      }
-      
-      var hint = document.createElement('span');
-      hint.style.cssText = 'font-size:12px;color:#9ca3af;font-weight:normal';
-      hint.textContent = '（拖动标题移动）';
-      titleContainer.appendChild(hint);
-      
-      draggableHeader.appendChild(titleContainer);
-      
-      var closeBtn = modalContent.querySelector('.modal-close');
-      if (closeBtn) {
-        closeBtn.style.position = 'static';
-        closeBtn.style.transform = 'none';
-        draggableHeader.appendChild(closeBtn);
-      }
-      
-      modalContent.insertBefore(draggableHeader, modalContent.firstChild);
-    }
-    
-    // 设置标题栏样式
-    draggableHeader.style.cursor = 'move';
-    draggableHeader.style.userSelect = 'none';
-    
-    // 最简单的拖动实现
+    // 最直接的拖动实现 - 让整个窗口都可以拖动
     var isDragging = false;
     var offsetX = 0;
     var offsetY = 0;
     
-    draggableHeader.onmousedown = function(e) {
+    modalContent.onmousedown = function(e) {
+      // 不阻止按钮、输入框、链接等可点击元素的点击
+      var clickable = e.target.closest('button, input, textarea, select, a, [onclick]');
+      if (clickable) {
+        return;
+      }
       isDragging = true;
       var rect = modalContent.getBoundingClientRect();
       offsetX = e.clientX - rect.left;
       offsetY = e.clientY - rect.top;
       modalContent.style.zIndex = '100001';
       e.preventDefault();
-      e.stopPropagation();
       return false;
     };
     
@@ -5294,7 +5259,11 @@ function showDetail(id) {
     };
     
     // 触摸设备支持
-    draggableHeader.ontouchstart = function(e) {
+    modalContent.ontouchstart = function(e) {
+      var clickable = e.target.closest('button, input, textarea, select, a, [onclick]');
+      if (clickable) {
+        return;
+      }
       isDragging = true;
       var touch = e.touches[0];
       var rect = modalContent.getBoundingClientRect();
@@ -5315,8 +5284,8 @@ function showDetail(id) {
       isDragging = false;
     };
     
-    console.log('款式详情窗口拖动功能已初始化（最简单可靠的方式）');
-  }, 100);
+    console.log('款式详情窗口拖动功能已初始化（整个窗口可拖动）');
+  }
 
 
 
