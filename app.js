@@ -8360,7 +8360,7 @@ function syncAllApprovedToLibrary() {
 // 颜色直方图图像相似度搜索（不依赖外部模型，快速稳定）
 let historyImageFeatures = {}; // 缓存历史款式图片的特征向量
 
-// 提取图像颜色直方图特征（优化版：32x32，更快速度）
+// 提取图像颜色直方图特征（简化版：只使用颜色直方图，速度快，手机也能用）
 function extractColorHistogram(imageSrc) {
   return new Promise((resolve) => {
     const img = new Image();
@@ -8377,36 +8377,9 @@ function extractColorHistogram(imageSrc) {
         const imageData = ctx.getImageData(0, 0, 16, 16);
         const data = imageData.data;
         
-        // 改进的颜色直方图：每个通道4个区间，共64个bin，速度快
+        // 颜色直方图：每个通道4个区间，共64个bin，速度快
         const bins = 64;
         const histogram = new Array(bins).fill(0);
-        
-        // 颜色布局特征：把图片分成2x2的网格，每个网格计算平均颜色
-        const gridSize = 2;
-        const gridColors = [];
-        for (let gy = 0; gy < gridSize; gy++) {
-          for (let gx = 0; gx < gridSize; gx++) {
-            let rSum = 0, gSum = 0, bSum = 0, count = 0;
-            const xStart = Math.floor(gx * 16 / gridSize);
-            const xEnd = Math.floor((gx + 1) * 16 / gridSize);
-            const yStart = Math.floor(gy * 16 / gridSize);
-            const yEnd = Math.floor((gy + 1) * 16 / gridSize);
-            for (let y = yStart; y < yEnd; y++) {
-              for (let x = xStart; x < xEnd; x++) {
-                const idx = (y * 16 + x) * 4;
-                rSum += data[idx];
-                gSum += data[idx + 1];
-                bSum += data[idx + 2];
-                count++;
-              }
-            }
-            gridColors.push({
-              r: Math.round(rSum / count),
-              g: Math.round(gSum / count),
-              b: Math.round(bSum / count)
-            });
-          }
-        }
         
         for (let i = 0; i < data.length; i += 4) {
           const r = data[i] >> 6;     // 0-3 (除以64)
@@ -8422,13 +8395,8 @@ function extractColorHistogram(imageSrc) {
           histogram[i] /= total;
         }
         
-        // 组合特征：颜色直方图 + 颜色布局特征
-        const features = {
-          histogram: histogram,
-          gridColors: gridColors
-        };
-        
-        resolve(features);
+        // 只返回颜色直方图数组，简化格式，速度快
+        resolve(histogram);
       } catch (e) {
         console.error('特征提取失败:', e);
         resolve(null);
