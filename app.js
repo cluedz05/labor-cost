@@ -5211,11 +5211,19 @@ function showDetail(id) {
   var modalContent = detailModal ? detailModal.querySelector('.modal') : null;
   
   if (modalContent) {
+    // 计算窗口居中的位置
+    var windowWidth = window.innerWidth;
+    var windowHeight = window.innerHeight;
+    var modalWidth = Math.min(700, windowWidth - 40);
+    var modalHeight = Math.min(600, windowHeight - 40);
+    var centerLeft = Math.max(20, (windowWidth - modalWidth) / 2);
+    var centerTop = Math.max(20, (windowHeight - modalHeight) / 2);
+    
     // 设置overlay样式
     detailModal.style.cssText = 'background:transparent !important; pointer-events:none !important; z-index:99998 !important;';
     
-    // 设置窗口样式（使用cssText + !important确保优先级最高）
-    modalContent.style.cssText = 'position:fixed !important; top:80px !important; left:80px !important; right:auto !important; bottom:auto !important; margin:0 !important; transform:none !important; cursor:move !important; z-index:100000 !important; pointer-events:auto !important; max-width:700px; max-height:90vh; padding-bottom:16px; overflow-y:auto; background:#fff; border-radius:16px; box-shadow:0 20px 60px rgba(0,0,0,0.3);';
+    // 设置窗口样式（使用cssText + !important确保优先级最高），默认显示在页面中间
+    modalContent.style.cssText = 'position:fixed !important; top:' + centerTop + 'px !important; left:' + centerLeft + 'px !important; right:auto !important; bottom:auto !important; margin:0 !important; transform:none !important; cursor:move !important; z-index:100000 !important; pointer-events:auto !important; max-width:700px; max-height:90vh; padding-bottom:16px; overflow-y:auto; background:#fff; border-radius:16px; box-shadow:0 20px 60px rgba(0,0,0,0.3);';
     
     // 最可靠的拖动实现 - 使用addEventListener + 捕获阶段
     var isDragging = false;
@@ -5271,7 +5279,7 @@ function showDetail(id) {
       isDragging = false;
     }, true);
     
-    console.log('款式详情窗口拖动功能已初始化（最可靠的方式）');
+    console.log('款式详情窗口拖动功能已初始化（最可靠的方式，默认居中显示）');
   }
 
 
@@ -8004,7 +8012,7 @@ function searchByImage(event) {
     // 创建图片预览和搜索弹窗
     var modal = document.createElement('div');
     modal.style.cssText = 'position:fixed;inset:0;z-index:99999;background:transparent;pointer-events:none';
-    modal.innerHTML = '<div class="search-modal-content" style="position:absolute;top:20px;right:20px;background:#fff;border-radius:16px;padding:20px;max-width:420px;width:90%;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);pointer-events:auto">' +
+    modal.innerHTML = '<div class="search-modal-content" style="position:fixed;background:#fff;border-radius:16px;padding:20px;max-width:420px;width:90%;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);pointer-events:auto">' +
       '<div class="draggable-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;cursor:move;padding-bottom:8px;border-bottom:2px solid #f3f4f6">' +
         '<h3 style="margin:0;font-size:16px;color:#1a1a2e">🖼️ 以图搜款 <span style="font-size:11px;color:#9ca3af;font-weight:normal">（拖动标题）</span></h3>' +
         '<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#999;padding:0;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:50%">✕</button>' +
@@ -8036,8 +8044,21 @@ function searchByImage(event) {
     '</div>';
     document.body.appendChild(modal);
     
-    // 使模态框可拖动
+    // 计算窗口居中的位置
     var modalContent = modal.querySelector('.search-modal-content');
+    if (modalContent) {
+      var windowWidth = window.innerWidth;
+      var windowHeight = window.innerHeight;
+      var modalWidth = Math.min(420, windowWidth - 40);
+      var modalHeight = Math.min(500, windowHeight - 40);
+      var centerLeft = Math.max(20, (windowWidth - modalWidth) / 2);
+      var centerTop = Math.max(20, (windowHeight - modalHeight) / 2);
+      
+      modalContent.style.left = centerLeft + 'px';
+      modalContent.style.top = centerTop + 'px';
+    }
+    
+    // 使模态框可拖动
     var draggableHeader = modal.querySelector('.draggable-header');
     if (modalContent && draggableHeader) {
       makeDraggable(modalContent, draggableHeader);
@@ -8065,7 +8086,7 @@ function searchHistoryByImage(event) {
     // 创建图片预览和搜索弹窗
     var modal = document.createElement('div');
     modal.style.cssText = 'position:fixed;inset:0;z-index:99999;background:transparent;pointer-events:none';
-    modal.innerHTML = '<div class="search-modal-content" style="position:absolute;top:20px;right:20px;background:#fff;border-radius:16px;padding:20px;max-width:420px;width:90%;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);pointer-events:auto">' +
+    modal.innerHTML = '<div class="search-modal-content" style="position:fixed;background:#fff;border-radius:16px;padding:20px;max-width:420px;width:90%;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);pointer-events:auto">' +
       '<div class="draggable-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;cursor:move;padding-bottom:8px;border-bottom:2px solid #f3f4f6">' +
         '<h3 style="margin:0;font-size:16px;color:#1a1a2e">🖼️ 历史款式以图搜款 <span style="font-size:11px;color:#9ca3af;font-weight:normal">（拖动标题）</span></h3>' +
         '<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#999;padding:0;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:50%">✕</button>' +
@@ -8097,8 +8118,21 @@ function searchHistoryByImage(event) {
     '</div>';
     document.body.appendChild(modal);
     
-    // 使模态框可拖动
+    // 计算窗口居中的位置
     var modalContent = modal.querySelector('.search-modal-content');
+    if (modalContent) {
+      var windowWidth = window.innerWidth;
+      var windowHeight = window.innerHeight;
+      var modalWidth = Math.min(420, windowWidth - 40);
+      var modalHeight = Math.min(500, windowHeight - 40);
+      var centerLeft = Math.max(20, (windowWidth - modalWidth) / 2);
+      var centerTop = Math.max(20, (windowHeight - modalHeight) / 2);
+      
+      modalContent.style.left = centerLeft + 'px';
+      modalContent.style.top = centerTop + 'px';
+    }
+    
+    // 使模态框可拖动
     var draggableHeader = modal.querySelector('.draggable-header');
     if (modalContent && draggableHeader) {
       makeDraggable(modalContent, draggableHeader);
@@ -8335,31 +8369,31 @@ function extractColorHistogram(imageSrc) {
       try {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-        // 缩放到32x32，更准确的特征
-        canvas.width = 32;
-        canvas.height = 32;
-        ctx.drawImage(img, 0, 0, 32, 32);
+        // 缩放到16x16，更快速度
+        canvas.width = 16;
+        canvas.height = 16;
+        ctx.drawImage(img, 0, 0, 16, 16);
         
-        const imageData = ctx.getImageData(0, 0, 32, 32);
+        const imageData = ctx.getImageData(0, 0, 16, 16);
         const data = imageData.data;
         
-        // 改进的颜色直方图：每个通道8个区间，共512个bin，更准确
-        const bins = 512;
+        // 改进的颜色直方图：每个通道4个区间，共64个bin，速度快
+        const bins = 64;
         const histogram = new Array(bins).fill(0);
         
-        // 颜色布局特征：把图片分成4x4的网格，每个网格计算平均颜色
-        const gridSize = 4;
+        // 颜色布局特征：把图片分成2x2的网格，每个网格计算平均颜色
+        const gridSize = 2;
         const gridColors = [];
         for (let gy = 0; gy < gridSize; gy++) {
           for (let gx = 0; gx < gridSize; gx++) {
             let rSum = 0, gSum = 0, bSum = 0, count = 0;
-            const xStart = Math.floor(gx * 32 / gridSize);
-            const xEnd = Math.floor((gx + 1) * 32 / gridSize);
-            const yStart = Math.floor(gy * 32 / gridSize);
-            const yEnd = Math.floor((gy + 1) * 32 / gridSize);
+            const xStart = Math.floor(gx * 16 / gridSize);
+            const xEnd = Math.floor((gx + 1) * 16 / gridSize);
+            const yStart = Math.floor(gy * 16 / gridSize);
+            const yEnd = Math.floor((gy + 1) * 16 / gridSize);
             for (let y = yStart; y < yEnd; y++) {
               for (let x = xStart; x < xEnd; x++) {
-                const idx = (y * 32 + x) * 4;
+                const idx = (y * 16 + x) * 4;
                 rSum += data[idx];
                 gSum += data[idx + 1];
                 bSum += data[idx + 2];
@@ -8375,15 +8409,15 @@ function extractColorHistogram(imageSrc) {
         }
         
         for (let i = 0; i < data.length; i += 4) {
-          const r = data[i] >> 5;     // 0-7 (除以32)
-          const g = data[i + 1] >> 5; // 0-7
-          const b = data[i + 2] >> 5; // 0-7
-          const idx = (r << 6) | (g << 3) | b;
+          const r = data[i] >> 6;     // 0-3 (除以64)
+          const g = data[i + 1] >> 6; // 0-3
+          const b = data[i + 2] >> 6; // 0-3
+          const idx = (r << 4) | (g << 2) | b;
           histogram[idx]++;
         }
         
         // 归一化颜色直方图
-        const total = 32 * 32;
+        const total = 16 * 16;
         for (let i = 0; i < bins; i++) {
           histogram[i] /= total;
         }
@@ -8498,8 +8532,8 @@ async function aiImageSearch(imageDataUrl, callback) {
       '<button onclick="window.aiSearchCancelled=true" style="padding:8px 20px;background:#ef4444;color:#fff;border:none;border-radius:8px;font-size:13px;cursor:pointer">取消搜索</button></div>';
   }
   
-  // 并行处理（同时处理20个图片，大幅提高速度）
-  const batchSize = 20;
+  // 并行处理（同时处理30个图片，大幅提高速度）
+  const batchSize = 30;
   for (let batchStart = 0; batchStart < itemsWithImage.length; batchStart += batchSize) {
     // 检查是否取消
     if (window.aiSearchCancelled) {
