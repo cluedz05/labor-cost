@@ -805,8 +805,8 @@
         
         // 初始化应用
         function initApp() {
-            // 初始化默认主账号（如果不存在）
-            initDefaultAdmin();
+            // 初始化用户系统（与电脑版一致）
+            initUsers();
             
             // 检查登录状态
             checkLogin();
@@ -830,34 +830,71 @@
             }
         }
         
-        // 初始化默认主账号
-        function initDefaultAdmin() {
-            var users = JSON.parse(localStorage.getItem('users') || '[]');
-            
-            // 检查是否已有管理员账号
-            var adminUser = users.find(function(u) { return u.role === 'admin'; });
-            
-            if (!adminUser) {
-                // 创建默认主账号
-                var defaultAdmin = {
-                    username: 'admin',
-                    password: 'admin123',
-                    role: 'admin',
-                    createTime: new Date().toLocaleString(),
-                    avatar: '',
-                    phone: '',
-                    email: ''
-                };
-                
-                users.push(defaultAdmin);
-                localStorage.setItem('users', JSON.stringify(users));
-                console.log('已创建默认主账号: admin/admin123');
+        // 密码哈希（与电脑版一致）
+        function hashPassword(pwd) {
+            try {
+                return btoa(unescape(encodeURIComponent(pwd + '_dqas_salt')));
+            } catch(e) {
+                return pwd;
             }
         }
         
-        // 检查登录状态
+        // 初始化用户系统（与电脑版一致）
+        function initUsers() {
+            var users = localStorage.getItem('app_users');
+            
+            if (!users) {
+                // 预设主账号（管理员）
+                var defaultUsers = {
+                    'admin': {
+                        username: 'admin',
+                        password: hashPassword('admin123'),
+                        role: 'admin',
+                        isAdmin: true,
+                        createdAt: Date.now(),
+                        uid: 'admin_001'
+                    }
+                };
+                
+                localStorage.setItem('app_users', JSON.stringify(defaultUsers));
+                console.log('已初始化用户系统，主账号: admin / admin123');
+            } else {
+                // 确保主账号admin始终存在
+                try {
+                    var userData = JSON.parse(users);
+                    if (!userData['admin']) {
+                        userData['admin'] = {
+                            username: 'admin',
+                            password: hashPassword('admin123'),
+                            role: 'admin',
+                            isAdmin: true,
+                            createdAt: Date.now(),
+                            uid: 'admin_001'
+                        };
+                        localStorage.setItem('app_users', JSON.stringify(userData));
+                        console.log('已添加主账号admin');
+                    }
+                } catch(e) {}
+            }
+        }
+        
+        // 获取所有用户（与电脑版一致）
+        function getUsers() {
+            try {
+                return JSON.parse(localStorage.getItem('app_users') || '{}');
+            } catch(e) {
+                return {};
+            }
+        }
+        
+        // 保存用户（与电脑版一致）
+        function saveUsers(users) {
+            localStorage.setItem('app_users', JSON.stringify(users));
+        }
+        
+        // 检查登录状态（与电脑版一致，使用sessionStorage）
         function checkLogin() {
-            const user = localStorage.getItem('current_user');
+            const user = sessionStorage.getItem('app_current_user');
             if (user) {
                 currentUser = JSON.parse(user);
                 document.getElementById('userName').textContent = currentUser.username || '用户';
@@ -1075,7 +1112,7 @@
             container.innerHTML = html;
         }
         
-        // 加载管理后台
+        // 加载管理后台（与电脑版一致）
         function loadAdmin() {
             const container = document.getElementById('adminContent');
             
@@ -1089,15 +1126,16 @@
                 return;
             }
             
-            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const users = getUsers();
+            const userList = Object.values(users);
             
             let html = `
                 <div style="margin-bottom: 20px;">
-                    <div class="card-title">👥 用户管理 (${users.length}人)</div>
+                    <div class="card-title">👥 用户管理 (${userList.length}人)</div>
                 </div>
             `;
             
-            if (users.length === 0) {
+            if (userList.length === 0) {
                 html += `
                     <div class="empty-state">
                         <div class="icon">👥</div>
@@ -1105,14 +1143,15 @@
                     </div>
                 `;
             } else {
-                users.forEach(function(user, index) {
+                userList.forEach(function(user, index) {
                     const roleClass = user.role === 'admin' ? 'red' : 'blue';
                     const roleText = user.role === 'admin' ? '管理员' : '普通用户';
+                    const createTime = user.createdAt ? new Date(user.createdAt).toLocaleString() : '未知';
                     html += `
                         <div class="list-item">
                             <div class="info">
                                 <div class="title">${user.username}</div>
-                                <div class="desc">注册时间: ${user.createTime || '未知'}</div>
+                                <div class="desc">注册时间: ${createTime}</div>
                             </div>
                             <div class="action">
                                 <span class="tag ${roleClass}">${roleText}</span>
@@ -1188,59 +1227,60 @@
             container.innerHTML = html;
         }
         
-        // 登录
+        // 登录（与电脑版一致）
         function login() {
             console.log('login函数被调用');
             
             const username = document.getElementById('loginUsername').value.trim();
             const password = document.getElementById('loginPassword').value;
             
-            console.log('登录信息:', username, password);
+            console.log('登录信息:', username);
             
             if (!username || !password) {
                 showToast('请输入账号和密码');
                 return;
             }
             
-            // 确保默认主账号已创建
-            initDefaultAdmin();
+            // 确保用户系统已初始化
+            initUsers();
             
-            const users = JSON.parse(localStorage.getItem('users') || '[]');
-            console.log('用户列表:', users);
+            const users = getUsers();
+            console.log('用户列表:', Object.keys(users));
             
-            const user = users.find(function(u) { return u.username === username && u.password === password; });
-            console.log('找到用户:', user);
+            const user = users[username];
+            console.log('找到用户:', user ? user.username : '不存在');
             
-            if (user) {
-                currentUser = user;
-                localStorage.setItem('current_user', JSON.stringify(user));
-                
-                console.log('登录成功，准备切换到首页');
-                
-                // 更新页面显示
-                checkLogin();
-                loadStats();
-                
-                // 直接切换到首页
-                console.log('调用switchPage(home)');
-                switchPage('home');
-                
-                // 验证页面是否切换成功
-                setTimeout(function() {
-                    var activePage = document.querySelector('.page.active');
-                    console.log('切换后激活页面:', activePage ? activePage.id : '无');
-                    
-                    // 如果没有切换成功，再次切换
-                    if (activePage && activePage.id !== 'page-home') {
-                        console.log('页面切换失败，再次尝试');
-                        switchPage('home');
-                    }
-                }, 100);
-                
-                showToast('登录成功');
-            } else {
-                showToast('账号或密码错误');
+            if (!user) {
+                showToast('用户不存在，请先注册');
+                return;
             }
+            
+            if (user.password !== hashPassword(password)) {
+                showToast('密码错误');
+                return;
+            }
+            
+            // 登录成功
+            currentUser = {
+                username: user.username,
+                role: user.role,
+                isAdmin: user.isAdmin,
+                uid: user.uid
+            };
+            
+            sessionStorage.setItem('app_current_user', JSON.stringify(currentUser));
+            
+            console.log('登录成功，准备切换到首页');
+            
+            // 更新页面显示
+            checkLogin();
+            loadStats();
+            
+            // 直接切换到首页
+            console.log('调用switchPage(home)');
+            switchPage('home');
+            
+            showToast('登录成功，欢迎 ' + user.username);
         }
         
         // 显示注册弹窗
@@ -1248,7 +1288,7 @@
             document.getElementById('registerModal').classList.add('show');
         }
         
-        // 注册
+        // 注册（与电脑版一致）
         function register() {
             const username = document.getElementById('regUsername').value.trim();
             const password = document.getElementById('regPassword').value;
@@ -1264,29 +1304,43 @@
                 return;
             }
             
-            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            // 确保用户系统已初始化
+            initUsers();
             
-            if (users.find(function(u) { return u.username === username; })) {
+            const users = getUsers();
+            
+            if (users[username]) {
                 showToast('该账号已被注册');
                 return;
             }
             
             const newUser = {
                 username: username,
-                password: password,
+                password: hashPassword(password),
                 role: 'user',
-                createTime: new Date().toLocaleString()
+                isAdmin: false,
+                createdAt: Date.now(),
+                uid: 'user_' + Date.now()
             };
             
-            users.push(newUser);
-            localStorage.setItem('users', JSON.stringify(users));
+            users[username] = newUser;
+            saveUsers(users);
+            
+            showToast('注册成功，请登录');
+            closeModal('registerModal');
+            
+            // 清空注册表单
+            document.getElementById('regUsername').value = '';
+            document.getElementById('regPassword').value = '';
+            document.getElementById('regPassword2').value = '';
+        }
             
             showToast('注册成功，请登录');
             closeModal('registerModal');
             loadStats();
         }
         
-        // 退出登录
+        // 退出登录（与电脑版一致）
         function logout() {
             if (!currentUser) {
                 showToast('您还未登录');
@@ -1294,7 +1348,7 @@
             }
             
             currentUser = null;
-            localStorage.removeItem('current_user');
+            sessionStorage.removeItem('app_current_user');
             showToast('已退出登录');
             checkLogin();
             switchPage('home');
