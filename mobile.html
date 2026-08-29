@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="多绮爱工具">
+    <link rel="manifest" href="manifest.json">
+    <title>多绮爱服饰工序成本工具 - 手机版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f7fa;
+            padding-bottom: 80px;
+            overflow-x: hidden;
+        }
+        
+        /* 顶部标题栏 */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        .header .user-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        
+        /* 主内容区域 */
+        .container {
+            padding: 16px;
+        }
+        
+        /* 卡片样式 */
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        }
+        
+        .card-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        /* 大按钮网格 */
+        .btn-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+        }
+        
+        .big-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            padding: 20px 16px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            min-height: 100px;
+            justify-content: center;
+        }
+        
+        .big-btn:active {
+            transform: scale(0.96);
+        }
+        
+        .big-btn .icon {
+            font-size: 32px;
+        }
+        
+        .big-btn.blue {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .big-btn.green {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+        
+        .big-btn.orange {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+        
+        .big-btn.purple {
+            background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+        }
+        
+        .big-btn.teal {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .big-btn.red {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        /* 底部导航栏 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            padding-bottom: env(safe-area-inset-bottom, 8px);
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.08);
+            z-index: 100;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 6px 12px;
+            cursor: pointer;
+            color: #999;
+            font-size: 11px;
+            transition: color 0.2s;
+            min-width: 60px;
+        }
+        
+        .nav-item.active {
+            color: #667eea;
+        }
+        
+        .nav-item .icon {
+            font-size: 22px;
+            margin-bottom: 2px;
+        }
+        
+        /* 输入框样式 */
+        .input-group {
+            margin-bottom: 16px;
+        }
+        
+        .input-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+        }
+        
+        .input-group input,
+        .input-group select,
+        .input-group textarea {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            background: #fafafa;
+            transition: border-color 0.2s;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        
+        .input-group input:focus,
+        .input-group select:focus,
+        .input-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+        }
+        
+        /* 普通按钮 */
+        .btn {
+            width: 100%;
+            padding: 14px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+            margin-bottom: 12px;
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+        
+        .btn-outline {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        
+        /* 列表项 */
+        .list-item {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        
+        .list-item .info {
+            flex: 1;
+        }
+        
+        .list-item .title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 4px;
+        }
+        
+        .list-item .desc {
+            font-size: 13px;
+            color: #888;
+        }
+        
+        .list-item .action {
+            margin-left: 12px;
+        }
+        
+        /* 统计卡片 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 14px;
+            padding: 18px 16px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        
+        .stat-card .number {
+            font-size: 28px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 4px;
+        }
+        
+        .stat-card .label {
+            font-size: 13px;
+            color: #888;
+        }
+        
+        /* 搜索框 */
+        .search-box {
+            position: relative;
+            margin-bottom: 16px;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 14px 16px 14px 44px;
+            font-size: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            background: white;
+        }
+        
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .search-box .icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+        }
+        
+        /* 标签 */
+        .tag {
+            display: inline-block;
+            padding: 4px 10px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 20px;
+            margin-right: 6px;
+        }
+        
+        .tag.blue {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .tag.green {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .tag.orange {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .tag.red {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+        
+        .empty-state .icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+        
+        .empty-state .text {
+            font-size: 15px;
+        }
+        
+        /* 弹窗 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+        }
+        
+        .modal-overlay.show {
+            display: flex;
+        }
+        
+        .modal {
+            background: white;
+            width: 100%;
+            max-width: 500px;
+            border-radius: 20px 20px 0 0;
+            padding: 24px 20px;
+            max-height: 85vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+            }
+            to {
+                transform: translateY(0);
+            }
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #1a1a2e;
+        }
+        
+        /* Toast提示 */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 14px;
+            z-index: 2000;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .toast.show {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+        
+        /* 页面切换 */
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        /* 桌面端提示 */
+        .desktop-notice {
+            display: none;
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        @media (min-width: 768px) {
+            .mobile-content {
+                display: none;
+            }
+            .desktop-notice {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 桌面端提示 -->
+    <div class="desktop-notice">
+        <div style="font-size: 48px; margin-bottom: 16px;">📱</div>
+        <h2 style="font-size: 20px; margin-bottom: 12px; color: #333;">手机版页面</h2>
+        <p style="font-size: 15px; color: #666; margin-bottom: 20px;">请在手机上访问此页面，或</p>
+        <button onclick="window.location.href='index.html'" style="padding: 12px 24px; font-size: 15px; background: #667eea; color: white; border: none; border-radius: 10px; cursor: pointer;">访问电脑版</button>
+    </div>
+    
+    <!-- 手机端内容 -->
+    <div class="mobile-content">
+        <!-- 顶部标题栏 -->
+        <div class="header">
+            <h1>多绮爱服饰工序成本工具</h1>
+            <div class="user-info">
+                <span id="userName">未登录</span>
+                <span id="userRole"></span>
+            </div>
+        </div>
+        
+        <!-- 主内容区域 -->
+        <div class="container">
+            <!-- 首页 -->
+            <div id="page-home" class="page active">
+                <!-- 统计卡片 -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="number" id="statStyles">0</div>
+                        <div class="label">款式总数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number" id="statProcesses">0</div>
+                        <div class="label">工序总数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number" id="statUsers">0</div>
+                        <div class="label">用户数量</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number" id="statBackups">0</div>
+                        <div class="label">备份数量</div>
+                    </div>
+                </div>
+                
+                <!-- 快捷操作 -->
+                <div class="card">
+                    <div class="card-title">🚀 快捷操作</div>
+                    <div class="btn-grid">
+                        <button class="big-btn blue" onclick="switchPage('dev')">
+                            <span class="icon">📐</span>
+                            <span>新款开发</span>
+                        </button>
+                        <button class="big-btn green" onclick="switchPage('library')">
+                            <span class="icon">📚</span>
+                            <span>款式库</span>
+                        </button>
+                        <button class="big-btn orange" onclick="switchPage('history')">
+                            <span class="icon">📁</span>
+                            <span>历史款式</span>
+                        </button>
+                        <button class="big-btn purple" onclick="switchPage('process')">
+                            <span class="icon">⚙️</span>
+                            <span>工序管理</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 数据管理 -->
+                <div class="card">
+                    <div class="card-title">💾 数据管理</div>
+                    <div class="btn-grid">
+                        <button class="big-btn teal" onclick="exportData()">
+                            <span class="icon">📤</span>
+                            <span>导出数据</span>
+                        </button>
+                        <button class="big-btn red" onclick="document.getElementById('importFile').click()">
+                            <span class="icon">📥</span>
+                            <span>导入数据</span>
+                        </button>
+                        <button class="big-btn blue" onclick="backupData()">
+                            <span class="icon">☁️</span>
+                            <span>手动备份</span>
+                        </button>
+                        <button class="big-btn green" onclick="switchPage('admin')">
+                            <span class="icon">👑</span>
+                            <span>管理后台</span>
+                        </button>
+                    </div>
+                    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+                </div>
+                
+                <!-- 其他功能 -->
+                <div class="card">
+                    <div class="card-title">🔧 其他功能</div>
+                    <div class="btn-grid">
+                        <button class="big-btn orange" onclick="switchPage('recycle')">
+                            <span class="icon">🗑️</span>
+                            <span>回收站</span>
+                        </button>
+                        <button class="big-btn purple" onclick="switchPage('logs')">
+                            <span class="icon">📊</span>
+                            <span>操作日志</span>
+                        </button>
+                        <button class="big-btn teal" onclick="showInstallGuide()">
+                            <span class="icon">📱</span>
+                            <span>安装到桌面</span>
+                        </button>
+                        <button class="big-btn red" onclick="logout()">
+                            <span class="icon">🚪</span>
+                            <span>退出登录</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 新款开发页面 -->
+            <div id="page-dev" class="page">
+                <div class="card">
+                    <div class="card-title">📐 新款开发</div>
+                    <p style="color: #666; font-size: 14px; margin-bottom: 16px;">新款开发功能请在电脑版中使用，功能更完整，操作更方便。</p>
+                    <button class="btn btn-primary" onclick="window.location.href='index.html#dev'">前往电脑版使用</button>
+                </div>
+            </div>
+            
+            <!-- 款式库页面 -->
+            <div id="page-library" class="page">
+                <div class="card">
+                    <div class="card-title">📚 款式库</div>
+                    <div class="search-box">
+                        <span class="icon">🔍</span>
+                        <input type="text" id="librarySearch" placeholder="搜索款式名称、工序、标签..." oninput="searchLibrary()">
+                    </div>
+                    <div style="display: flex; gap: 10px; margin-bottom: 16px;">
+                        <button class="btn btn-primary" style="flex:1; margin-bottom:0;" onclick="document.getElementById('libraryImportFile').click()">📥 导入Excel</button>
+                        <button class="btn btn-success" style="flex:1; margin-bottom:0;" onclick="exportLibrary()">📤 导出Excel</button>
+                    </div>
+                    <input type="file" id="libraryImportFile" accept=".xlsx,.xls" style="display:none" onchange="importLibrary(event)">
+                    <div id="libraryList">
+                        <div class="empty-state">
+                            <div class="icon">📚</div>
+                            <div class="text">款式库为空</div>
+                            <div class="text" style="font-size: 13px; margin-top: 4px;">点击"导入Excel"或在电脑版添加款式</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 历史款式页面 -->
+            <div id="page-history" class="page">
+                <div class="card">
+                    <div class="card-title">📁 历史款式</div>
+                    <div class="search-box">
+                        <span class="icon">🔍</span>
+                        <input type="text" id="historySearch" placeholder="搜索款式名称..." oninput="searchHistory()">
+                    </div>
+                    <div id="historyList">
+                        <div class="empty-state">
+                            <div class="icon">📁</div>
+                            <div class="text">暂无历史款式</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 工序管理页面 -->
+            <div id="page-process" class="page">
+                <div class="card">
+                    <div class="card-title">⚙️ 工序管理</div>
+                    <p style="color: #666; font-size: 14px; margin-bottom: 16px;">工序管理功能请在电脑版中使用，功能更完整，操作更方便。</p>
+                    <button class="btn btn-primary" onclick="window.location.href='index.html#process'">前往电脑版使用</button>
+                </div>
+            </div>
+            
+            <!-- 管理后台页面 -->
+            <div id="page-admin" class="page">
+                <div class="card">
+                    <div class="card-title">👑 管理后台</div>
+                    <div id="adminContent">
+                        <div class="empty-state">
+                            <div class="icon">🔒</div>
+                            <div class="text">请先登录管理员账号</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 回收站页面 -->
+            <div id="page-recycle" class="page">
+                <div class="card">
+                    <div class="card-title">🗑️ 回收站</div>
+                    <div id="recycleList">
+                        <div class="empty-state">
+                            <div class="icon">🗑️</div>
+                            <div class="text">回收站为空</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 操作日志页面 -->
+            <div id="page-logs" class="page">
+                <div class="card">
+                    <div class="card-title">📊 操作日志</div>
+                    <div id="logsList">
+                        <div class="empty-state">
+                            <div class="icon">📊</div>
+                            <div class="text">暂无操作日志</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 登录页面 -->
+            <div id="page-login" class="page">
+                <div class="card" style="margin-top: 40px;">
+                    <div style="text-align: center; margin-bottom: 24px;">
+                        <div style="font-size: 48px; margin-bottom: 12px;">👔</div>
+                        <h2 style="font-size: 20px; color: #1a1a2e;">多绮爱服饰</h2>
+                        <p style="font-size: 14px; color: #888; margin-top: 4px;">工序成本管理系统</p>
+                    </div>
+                    <div class="input-group">
+                        <label>账号</label>
+                        <input type="text" id="loginUsername" placeholder="请输入账号">
+                    </div>
+                    <div class="input-group">
+                        <label>密码</label>
+                        <input type="password" id="loginPassword" placeholder="请输入密码">
+                    </div>
+                    <button class="btn btn-primary" onclick="login()">登录</button>
+                    <button class="btn btn-outline" onclick="showRegister()">没有账号？立即注册</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 底部导航栏 -->
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="switchPage('home')" data-page="home">
+                <span class="icon">🏠</span>
+                <span>首页</span>
+            </div>
+            <div class="nav-item" onclick="switchPage('library')" data-page="library">
+                <span class="icon">📚</span>
+                <span>款式库</span>
+            </div>
+            <div class="nav-item" onclick="switchPage('history')" data-page="history">
+                <span class="icon">📁</span>
+                <span>历史</span>
+            </div>
+            <div class="nav-item" onclick="switchPage('admin')" data-page="admin">
+                <span class="icon">👑</span>
+                <span>管理</span>
+            </div>
+            <div class="nav-item" onclick="switchPage('login')" data-page="login">
+                <span class="icon">👤</span>
+                <span>我的</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast提示 -->
+    <div class="toast" id="toast"></div>
+    
+    <!-- 安装指南弹窗 -->
+    <div class="modal-overlay" id="installModal">
+        <div class="modal">
+            <div class="modal-title">📱 安装到手机桌面</div>
+            <div id="installGuideContent" style="font-size: 15px; color: #555; line-height: 1.8; margin-bottom: 20px;">
+                <!-- 动态内容 -->
+            </div>
+            <button class="btn btn-primary" onclick="closeModal('installModal')">我知道了</button>
+        </div>
+    </div>
+    
+    <!-- 注册弹窗 -->
+    <div class="modal-overlay" id="registerModal">
+        <div class="modal">
+            <div class="modal-title">📝 注册账号</div>
+            <div class="input-group">
+                <label>账号</label>
+                <input type="text" id="regUsername" placeholder="请输入账号">
+            </div>
+            <div class="input-group">
+                <label>密码</label>
+                <input type="password" id="regPassword" placeholder="请输入密码">
+            </div>
+            <div class="input-group">
+                <label>确认密码</label>
+                <input type="password" id="regPassword2" placeholder="请再次输入密码">
+            </div>
+            <button class="btn btn-primary" onclick="register()">注册</button>
+            <button class="btn btn-outline" onclick="closeModal('registerModal')">取消</button>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let currentUser = null;
+        let currentPage = 'home';
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initApp();
+        });
+        
+        // 初始化应用
+        function initApp() {
+            // 检查登录状态
+            checkLogin();
+            
+            // 加载统计数据
+            loadStats();
+            
+            // 加载款式库
+            loadLibrary();
+            
+            // 加载历史款式
+            loadHistory();
+            
+            // 注册Service Worker
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/labor-cost/sw.js').then(function(reg) {
+                    console.log('Service Worker 注册成功');
+                }).catch(function(err) {
+                    console.log('Service Worker 注册失败:', err);
+                });
+            }
+        }
+        
+        // 检查登录状态
+        function checkLogin() {
+            const user = localStorage.getItem('current_user');
+            if (user) {
+                currentUser = JSON.parse(user);
+                document.getElementById('userName').textContent = currentUser.username || '用户';
+                document.getElementById('userRole').textContent = currentUser.role === 'admin' ? '管理员' : '普通用户';
+            } else {
+                document.getElementById('userName').textContent = '未登录';
+                document.getElementById('userRole').textContent = '';
+            }
+        }
+        
+        // 切换页面
+        function switchPage(page) {
+            // 隐藏所有页面
+            document.querySelectorAll('.page').forEach(function(p) {
+                p.classList.remove('active');
+            });
+            
+            // 显示目标页面
+            const targetPage = document.getElementById('page-' + page);
+            if (targetPage) {
+                targetPage.classList.add('active');
+                currentPage = page;
+            }
+            
+            // 更新底部导航
+            document.querySelectorAll('.nav-item').forEach(function(item) {
+                item.classList.remove('active');
+                if (item.dataset.page === page) {
+                    item.classList.add('active');
+                }
+            });
+            
+            // 页面特定操作
+            if (page === 'library') {
+                loadLibrary();
+            } else if (page === 'history') {
+                loadHistory();
+            } else if (page === 'admin') {
+                loadAdmin();
+            } else if (page === 'recycle') {
+                loadRecycle();
+            } else if (page === 'logs') {
+                loadLogs();
+            }
+            
+            // 滚动到顶部
+            window.scrollTo(0, 0);
+        }
+        
+        // 加载统计数据
+        function loadStats() {
+            const styles = JSON.parse(localStorage.getItem('style_library') || '[]');
+            const processes = JSON.parse(localStorage.getItem('processes') || '[]');
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const backups = JSON.parse(localStorage.getItem('backups') || '[]');
+            
+            document.getElementById('statStyles').textContent = styles.length;
+            document.getElementById('statProcesses').textContent = processes.length;
+            document.getElementById('statUsers').textContent = users.length;
+            document.getElementById('statBackups').textContent = backups.length;
+        }
+        
+        // 加载款式库
+        function loadLibrary() {
+            const library = JSON.parse(localStorage.getItem('style_library') || '[]');
+            const container = document.getElementById('libraryList');
+            
+            if (library.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">📚</div>
+                        <div class="text">款式库为空</div>
+                        <div class="text" style="font-size: 13px; margin-top: 4px;">点击"导入Excel"或在电脑版添加款式</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            library.slice(0, 50).forEach(function(item, index) {
+                html += `
+                    <div class="list-item">
+                        <div class="info">
+                            <div class="title">${item.name || item.styleName || '款式' + (index + 1)}</div>
+                            <div class="desc">款号: ${item.code || item.styleCode || '未设置'} | 工序: ${(item.processes || []).length}个</div>
+                        </div>
+                        <div class="action">
+                            <span class="tag blue">查看</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            if (library.length > 50) {
+                html += `<div style="text-align: center; padding: 12px; color: #888; font-size: 13px;">仅显示前50个，共${library.length}个款式</div>`;
+            }
+            
+            container.innerHTML = html;
+        }
+        
+        // 搜索款式库
+        function searchLibrary() {
+            const keyword = document.getElementById('librarySearch').value.toLowerCase();
+            const library = JSON.parse(localStorage.getItem('style_library') || '[]');
+            const container = document.getElementById('libraryList');
+            
+            const filtered = library.filter(function(item) {
+                const name = (item.name || item.styleName || '').toLowerCase();
+                const code = (item.code || item.styleCode || '').toLowerCase();
+                return name.indexOf(keyword) >= 0 || code.indexOf(keyword) >= 0;
+            });
+            
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">🔍</div>
+                        <div class="text">未找到匹配的款式</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            filtered.slice(0, 50).forEach(function(item, index) {
+                html += `
+                    <div class="list-item">
+                        <div class="info">
+                            <div class="title">${item.name || item.styleName || '款式' + (index + 1)}</div>
+                            <div class="desc">款号: ${item.code || item.styleCode || '未设置'} | 工序: ${(item.processes || []).length}个</div>
+                        </div>
+                        <div class="action">
+                            <span class="tag blue">查看</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        // 加载历史款式
+        function loadHistory() {
+            const styles = JSON.parse(localStorage.getItem('styles') || '[]');
+            const container = document.getElementById('historyList');
+            
+            if (styles.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">📁</div>
+                        <div class="text">暂无历史款式</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            styles.slice(0, 50).forEach(function(item, index) {
+                const status = item.status || '待审批';
+                const statusClass = status === '已审批' ? 'green' : status === '已拒绝' ? 'red' : 'orange';
+                html += `
+                    <div class="list-item">
+                        <div class="info">
+                            <div class="title">${item.name || item.styleName || '款式' + (index + 1)}</div>
+                            <div class="desc">款号: ${item.code || item.styleCode || '未设置'} | 日期: ${item.date || '未设置'}</div>
+                        </div>
+                        <div class="action">
+                            <span class="tag ${statusClass}">${status}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        // 搜索历史款式
+        function searchHistory() {
+            const keyword = document.getElementById('historySearch').value.toLowerCase();
+            const styles = JSON.parse(localStorage.getItem('styles') || '[]');
+            const container = document.getElementById('historyList');
+            
+            const filtered = styles.filter(function(item) {
+                const name = (item.name || item.styleName || '').toLowerCase();
+                const code = (item.code || item.styleCode || '').toLowerCase();
+                return name.indexOf(keyword) >= 0 || code.indexOf(keyword) >= 0;
+            });
+            
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">🔍</div>
+                        <div class="text">未找到匹配的款式</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            filtered.slice(0, 50).forEach(function(item, index) {
+                const status = item.status || '待审批';
+                const statusClass = status === '已审批' ? 'green' : status === '已拒绝' ? 'red' : 'orange';
+                html += `
+                    <div class="list-item">
+                        <div class="info">
+                            <div class="title">${item.name || item.styleName || '款式' + (index + 1)}</div>
+                            <div class="desc">款号: ${item.code || item.styleCode || '未设置'} | 日期: ${item.date || '未设置'}</div>
+                        </div>
+                        <div class="action">
+                            <span class="tag ${statusClass}">${status}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        // 加载管理后台
+        function loadAdmin() {
+            const container = document.getElementById('adminContent');
+            
+            if (!currentUser || currentUser.role !== 'admin') {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">🔒</div>
+                        <div class="text">请先登录管理员账号</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            
+            let html = `
+                <div style="margin-bottom: 20px;">
+                    <div class="card-title">👥 用户管理 (${users.length}人)</div>
+                </div>
+            `;
+            
+            if (users.length === 0) {
+                html += `
+                    <div class="empty-state">
+                        <div class="icon">👥</div>
+                        <div class="text">暂无用户</div>
+                    </div>
+                `;
+            } else {
+                users.forEach(function(user, index) {
+                    const roleClass = user.role === 'admin' ? 'red' : 'blue';
+                    const roleText = user.role === 'admin' ? '管理员' : '普通用户';
+                    html += `
+                        <div class="list-item">
+                            <div class="info">
+                                <div class="title">${user.username}</div>
+                                <div class="desc">注册时间: ${user.createTime || '未知'}</div>
+                            </div>
+                            <div class="action">
+                                <span class="tag ${roleClass}">${roleText}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            container.innerHTML = html;
+        }
+        
+        // 加载回收站
+        function loadRecycle() {
+            const recycle = JSON.parse(localStorage.getItem('recycle_bin') || '[]');
+            const container = document.getElementById('recycleList');
+            
+            if (recycle.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">🗑️</div>
+                        <div class="text">回收站为空</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            recycle.forEach(function(item, index) {
+                html += `
+                    <div class="list-item">
+                        <div class="info">
+                            <div class="title">${item.name || '已删除项目'}</div>
+                            <div class="desc">删除时间: ${item.deleteTime || '未知'}</div>
+                        </div>
+                        <div class="action">
+                            <span class="tag orange">已删除</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        // 加载操作日志
+        function loadLogs() {
+            const logs = JSON.parse(localStorage.getItem('operation_logs') || '[]');
+            const container = document.getElementById('logsList');
+            
+            if (logs.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">📊</div>
+                        <div class="text">暂无操作日志</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            logs.slice(0, 50).forEach(function(log) {
+                html += `
+                    <div class="list-item">
+                        <div class="info">
+                            <div class="title">${log.action || '操作'}</div>
+                            <div class="desc">时间: ${log.time || '未知'} | 用户: ${log.user || '未知'}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        // 登录
+        function login() {
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!username || !password) {
+                showToast('请输入账号和密码');
+                return;
+            }
+            
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const user = users.find(function(u) { return u.username === username && u.password === password; });
+            
+            if (user) {
+                currentUser = user;
+                localStorage.setItem('current_user', JSON.stringify(user));
+                showToast('登录成功');
+                checkLogin();
+                loadStats();
+                switchPage('home');
+            } else {
+                showToast('账号或密码错误');
+            }
+        }
+        
+        // 显示注册弹窗
+        function showRegister() {
+            document.getElementById('registerModal').classList.add('show');
+        }
+        
+        // 注册
+        function register() {
+            const username = document.getElementById('regUsername').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const password2 = document.getElementById('regPassword2').value;
+            
+            if (!username || !password) {
+                showToast('请输入账号和密码');
+                return;
+            }
+            
+            if (password !== password2) {
+                showToast('两次密码输入不一致');
+                return;
+            }
+            
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            
+            if (users.find(function(u) { return u.username === username; })) {
+                showToast('该账号已被注册');
+                return;
+            }
+            
+            const newUser = {
+                username: username,
+                password: password,
+                role: 'user',
+                createTime: new Date().toLocaleString()
+            };
+            
+            users.push(newUser);
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            showToast('注册成功，请登录');
+            closeModal('registerModal');
+            loadStats();
+        }
+        
+        // 退出登录
+        function logout() {
+            if (!currentUser) {
+                showToast('您还未登录');
+                return;
+            }
+            
+            currentUser = null;
+            localStorage.removeItem('current_user');
+            showToast('已退出登录');
+            checkLogin();
+            switchPage('home');
+        }
+        
+        // 导出数据
+        function exportData() {
+            const data = {
+                styles: JSON.parse(localStorage.getItem('styles') || '[]'),
+                style_library: JSON.parse(localStorage.getItem('style_library') || '[]'),
+                processes: JSON.parse(localStorage.getItem('processes') || '[]'),
+                users: JSON.parse(localStorage.getItem('users') || '[]'),
+                backups: JSON.parse(localStorage.getItem('backups') || '[]'),
+                exportTime: new Date().toLocaleString()
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = '多绮爱数据备份_' + new Date().toISOString().slice(0, 10) + '.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showToast('数据导出成功');
+        }
+        
+        // 导入数据
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (data.styles) localStorage.setItem('styles', JSON.stringify(data.styles));
+                    if (data.style_library) localStorage.setItem('style_library', JSON.stringify(data.style_library));
+                    if (data.processes) localStorage.setItem('processes', JSON.stringify(data.processes));
+                    if (data.users) localStorage.setItem('users', JSON.stringify(data.users));
+                    
+                    showToast('数据导入成功');
+                    loadStats();
+                    loadLibrary();
+                    loadHistory();
+                } catch (err) {
+                    showToast('数据格式错误，导入失败');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+        
+        // 手动备份
+        function backupData() {
+            const backups = JSON.parse(localStorage.getItem('backups') || '[]');
+            const backup = {
+                id: Date.now(),
+                time: new Date().toLocaleString(),
+                data: {
+                    styles: JSON.parse(localStorage.getItem('styles') || '[]'),
+                    style_library: JSON.parse(localStorage.getItem('style_library') || '[]'),
+                    processes: JSON.parse(localStorage.getItem('processes') || '[]')
+                }
+            };
+            
+            backups.unshift(backup);
+            localStorage.setItem('backups', JSON.stringify(backups));
+            
+            showToast('备份成功');
+            loadStats();
+        }
+        
+        // 导入款式库Excel
+        function importLibrary(event) {
+            showToast('请在电脑版中导入Excel文件，功能更完整');
+            event.target.value = '';
+        }
+        
+        // 导出款式库Excel
+        function exportLibrary() {
+            showToast('请在电脑版中导出Excel文件，功能更完整');
+        }
+        
+        // 显示安装指南
+        function showInstallGuide() {
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+            
+            let content = '';
+            if (isIOS && isSafari) {
+                content = `
+                    <p style="margin-bottom: 12px;">📱 <strong>iPhone安装步骤：</strong></p>
+                    <p style="margin-bottom: 8px;">1. 点击底部的分享按钮 📤</p>
+                    <p style="margin-bottom: 8px;">2. 向下滑动，找到"添加到主屏幕"</p>
+                    <p style="margin-bottom: 8px;">3. 点击"添加到主屏幕"</p>
+                    <p style="margin-bottom: 8px;">4. 点击右上角的"添加"</p>
+                    <p style="margin-top: 12px; color: #667eea;">安装完成后，就可以像APP一样在桌面打开使用了！</p>
+                `;
+            } else if (isIOS) {
+                content = `
+                    <p style="margin-bottom: 12px;">⚠️ <strong>请在Safari浏览器中打开</strong></p>
+                    <p style="margin-bottom: 8px;">iPhone只能在Safari浏览器中添加到主屏幕</p>
+                    <p style="margin-bottom: 8px;">请复制链接，在Safari中打开后再安装</p>
+                `;
+            } else {
+                content = `
+                    <p style="margin-bottom: 12px;">📱 <strong>Android安装步骤：</strong></p>
+                    <p style="margin-bottom: 8px;">1. 页面会自动弹出"安装应用"提示</p>
+                    <p style="margin-bottom: 8px;">2. 点击"安装"按钮</p>
+                    <p style="margin-bottom: 8px;">3. 等待安装完成</p>
+                    <p style="margin-top: 12px; color: #667eea;">如果没有弹出提示，请点击浏览器菜单，选择"添加到主屏幕"或"安装应用"</p>
+                `;
+            }
+            
+            document.getElementById('installGuideContent').innerHTML = content;
+            document.getElementById('installModal').classList.add('show');
+        }
+        
+        // 关闭弹窗
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('show');
+        }
+        
+        // 显示Toast
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(function() {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+    </script>
+</body>
+</html>

@@ -20,6 +20,30 @@
 
 <meta property="og:type" content="website">
 
+<script>
+// 手机检测和手机版提示
+(function() {
+    var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    var isSmallScreen = window.innerWidth < 768;
+    
+    if (isMobile || isSmallScreen) {
+        // 检查用户是否选择不提示
+        if (!localStorage.getItem('hide_mobile_notice')) {
+            // 延迟显示提示，等页面加载完成
+            window.addEventListener('load', function() {
+                setTimeout(function() {
+                    if (confirm('检测到您正在使用手机访问，是否切换到手机版？手机版布局更适合手机操作。')) {
+                        window.location.href = 'mobile.html';
+                    } else {
+                        localStorage.setItem('hide_mobile_notice', 'true');
+                    }
+                }, 1000);
+            });
+        }
+    }
+})();
+</script>
+
 
 
 <meta name="theme-color" content="#667eea">
