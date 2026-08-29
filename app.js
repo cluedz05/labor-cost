@@ -5084,6 +5084,8 @@ function showDetail(id) {
 
           <span style="font-size:17px;font-weight:700;color:#1a1a2e">${escHtml(style.name)}</span>
 
+          ${currentUser && currentUser.role !== 'viewer' ? '<button onclick="editStyleBasicInfo(\'' + style.id + '\')" style="padding:3px 10px;background:#4361ee;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px;white-space:nowrap">✏️ 编辑</button>' : ''}
+
           ${exportBadge}
 
           <span style="font-size:12px;padding:2px 10px;border-radius:20px;font-weight:600;${style.status === 'approved' ? 'background:#dcfce7;color:#16a34a' : 'background:#fef9c3;color:#a16207'}">${style.status === 'approved' ? '✅ 已审批' : '⏳ 待审批'}</span>
@@ -5288,6 +5290,82 @@ function showDetail(id) {
 
   window._detailNewRowCount = (window._detailNewRowCount || 0);
 
+}
+
+
+
+// ── 编辑款式基本信息 ─────────────────────────────
+
+function editStyleBasicInfo(styleId) {
+  if (currentUser && currentUser.role === 'viewer') {
+    toast('普通用户只能查看，不能修改');
+    return;
+  }
+  
+  const style = DB.styles.find(s => s.id == styleId);
+  if (!style) return;
+  
+  // 创建编辑弹窗
+  const modal = document.createElement('div');
+  modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:100002;display:flex;align-items:center;justify-content:center';
+  
+  modal.innerHTML = `
+    <div style="background:#fff;border-radius:16px;padding:24px;width:90%;max-width:450px;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
+      <div style="font-size:18px;font-weight:700;color:#1a1a2e;margin-bottom:16px">✏️ 编辑款式信息</div>
+      
+      <div style="margin-bottom:14px">
+        <label style="display:block;font-size:13px;font-weight:600;color:#374151;margin-bottom:6px">款式名称</label>
+        <input type="text" id="editStyleName" value="${escAttr(style.name || '')}" style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;box-sizing:border-box">
+      </div>
+      
+      <div style="margin-bottom:14px">
+        <label style="display:block;font-size:13px;font-weight:600;color:#374151;margin-bottom:6px">日期</label>
+        <input type="date" id="editStyleDate" value="${escAttr(style.date || '')}" style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;box-sizing:border-box">
+      </div>
+      
+      <div style="margin-bottom:20px">
+        <label style="display:block;font-size:13px;font-weight:600;color:#374151;margin-bottom:6px">备注</label>
+        <textarea id="editStyleNote" rows="3" style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;box-sizing:border-box;resize:vertical">${escHtml(style.note || '')}</textarea>
+      </div>
+      
+      <div style="display:flex;gap:10px;justify-content:flex-end">
+        <button onclick="this.closest('div[style*=fixed]').remove()" style="padding:10px 20px;background:#f3f4f6;color:#374151;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer">取消</button>
+        <button onclick="saveStyleBasicInfo('${styleId}')" style="padding:10px 20px;background:#16a34a;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer">💾 保存</button>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+}
+
+function saveStyleBasicInfo(styleId) {
+  const style = DB.styles.find(s => s.id == styleId);
+  if (!style) return;
+  
+  const name = document.getElementById('editStyleName').value.trim();
+  const date = document.getElementById('editStyleDate').value;
+  const note = document.getElementById('editStyleNote').value.trim();
+  
+  if (!name) {
+    toast('款式名称不能为空');
+    return;
+  }
+  
+  style.name = name;
+  style.date = date;
+  style.note = note;
+  
+  saveDB();
+  renderHistory();
+  
+  // 关闭编辑弹窗
+  const editModal = document.querySelector('div[style*="z-index:100002"]');
+  if (editModal) editModal.remove();
+  
+  // 刷新款式详情
+  showDetail(styleId);
+  
+  toast('✅ 款式信息已保存');
 }
 
 
