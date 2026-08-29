@@ -5206,62 +5206,49 @@ function showDetail(id) {
 
   document.getElementById('detailModal').classList.add('show');
   
-  // 让整个窗口都可以拖动（不只是标题栏），最直接可靠的方式
+  // 让整个窗口都可以拖动（最可靠的方式：cssText + !important + addEventListener + 捕获阶段）
   var detailModal = document.getElementById('detailModal');
   var modalContent = detailModal ? detailModal.querySelector('.modal') : null;
   
   if (modalContent) {
     // 设置overlay样式
-    detailModal.style.background = 'transparent';
-    detailModal.style.pointerEvents = 'none';
-    detailModal.style.zIndex = '99998';
+    detailModal.style.cssText = 'background:transparent !important; pointer-events:none !important; z-index:99998 !important;';
     
-    // 设置窗口样式
-    modalContent.style.position = 'fixed';
-    modalContent.style.top = '80px';
-    modalContent.style.left = '80px';
-    modalContent.style.right = 'auto';
-    modalContent.style.bottom = 'auto';
-    modalContent.style.margin = '0';
-    modalContent.style.transform = 'none';
-    modalContent.style.pointerEvents = 'auto';
-    modalContent.style.cursor = 'move';
-    modalContent.style.zIndex = '100000';
+    // 设置窗口样式（使用cssText + !important确保优先级最高）
+    modalContent.style.cssText = 'position:fixed !important; top:80px !important; left:80px !important; right:auto !important; bottom:auto !important; margin:0 !important; transform:none !important; cursor:move !important; z-index:100000 !important; pointer-events:auto !important; max-width:700px; max-height:90vh; padding-bottom:16px; overflow-y:auto; background:#fff; border-radius:16px; box-shadow:0 20px 60px rgba(0,0,0,0.3);';
     
-    // 最直接的拖动实现 - 让整个窗口都可以拖动
+    // 最可靠的拖动实现 - 使用addEventListener + 捕获阶段
     var isDragging = false;
     var offsetX = 0;
     var offsetY = 0;
     
-    modalContent.onmousedown = function(e) {
+    modalContent.addEventListener('mousedown', function(e) {
       // 不阻止按钮、输入框、链接等可点击元素的点击
-      var clickable = e.target.closest('button, input, textarea, select, a, [onclick]');
-      if (clickable) {
+      if (e.target.closest('button, input, textarea, select, a')) {
         return;
       }
       isDragging = true;
       var rect = modalContent.getBoundingClientRect();
       offsetX = e.clientX - rect.left;
       offsetY = e.clientY - rect.top;
-      modalContent.style.zIndex = '100001';
+      modalContent.style.zIndex = '100001 !important';
       e.preventDefault();
-      return false;
-    };
+      e.stopPropagation();
+    }, true);
     
-    document.onmousemove = function(e) {
+    document.addEventListener('mousemove', function(e) {
       if (!isDragging) return;
       modalContent.style.left = (e.clientX - offsetX) + 'px';
       modalContent.style.top = (e.clientY - offsetY) + 'px';
-    };
+    }, true);
     
-    document.onmouseup = function() {
+    document.addEventListener('mouseup', function() {
       isDragging = false;
-    };
+    }, true);
     
     // 触摸设备支持
-    modalContent.ontouchstart = function(e) {
-      var clickable = e.target.closest('button, input, textarea, select, a, [onclick]');
-      if (clickable) {
+    modalContent.addEventListener('touchstart', function(e) {
+      if (e.target.closest('button, input, textarea, select, a')) {
         return;
       }
       isDragging = true;
@@ -5269,22 +5256,22 @@ function showDetail(id) {
       var rect = modalContent.getBoundingClientRect();
       offsetX = touch.clientX - rect.left;
       offsetY = touch.clientY - rect.top;
-      modalContent.style.zIndex = '100001';
+      modalContent.style.zIndex = '100001 !important';
       e.preventDefault();
-    };
+    }, true);
     
-    document.ontouchmove = function(e) {
+    document.addEventListener('touchmove', function(e) {
       if (!isDragging) return;
       var touch = e.touches[0];
       modalContent.style.left = (touch.clientX - offsetX) + 'px';
       modalContent.style.top = (touch.clientY - offsetY) + 'px';
-    };
+    }, true);
     
-    document.ontouchend = function() {
+    document.addEventListener('touchend', function() {
       isDragging = false;
-    };
+    }, true);
     
-    console.log('款式详情窗口拖动功能已初始化（整个窗口可拖动）');
+    console.log('款式详情窗口拖动功能已初始化（最可靠的方式）');
   }
 
 
