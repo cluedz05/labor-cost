@@ -56,6 +56,48 @@ table button {
     color: #333333 !important;
     background-color: #f5f5f5 !important;
 }
+/* 全局按钮文字和背景修复 - 确保所有按钮文字可见 */
+button {
+    min-height: 32px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+/* 白色文字透明背景的按钮添加默认背景 */
+button[style*="color: rgb(255, 255, 255)"][style*="background: rgba(0, 0, 0, 0)"],
+button[style*="color:#fff"][style*="background:transparent"] {
+    background: linear-gradient(135deg, #667eea, #764ba2) !important;
+    color: #ffffff !important;
+    border: none !important;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3) !important;
+}
+button[style*="color: rgb(255, 255, 255)"][style*="background: rgba(0, 0, 0, 0)"]:hover,
+button[style*="color:#fff"][style*="background:transparent"]:hover {
+    background: linear-gradient(135deg, #5a6fd6, #6a4190) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4) !important;
+}
+/* 确保模态框和内容区域的按钮文字可见 */
+.modal button,
+.modal-content button,
+[class*="modal"] button {
+    color: #333333 !important;
+}
+/* 操作按钮区域样式 */
+.action-btn,
+.btn-action,
+[class*="action"] button {
+    background: #f0f0f0 !important;
+    color: #333333 !important;
+    border: 1px solid #ddd !important;
+}
+.action-btn:hover,
+.btn-action:hover,
+[class*="action"] button:hover {
+    background: #e0e0e0 !important;
+}
 </style></head>
 
 <body>
