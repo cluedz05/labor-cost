@@ -5096,12 +5096,20 @@ function showDetail(id) {
         <div style="background:#f8fafc;border-radius:10px;padding:12px;margin-bottom:10px;border:1px solid #e2e8f0">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
             <div>
+              <label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:4px">款号</label>
+              <input type="text" id="detailStyleCode" value="${escAttr(style.code || style.id || '')}" style="width:100%;padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;box-sizing:border-box" onchange="saveDetailBasicInfo()">
+            </div>
+            <div>
               <label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:4px">款式名称</label>
               <input type="text" id="detailStyleName" value="${escAttr(style.name || '')}" style="width:100%;padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;box-sizing:border-box" onchange="saveDetailBasicInfo()">
             </div>
             <div>
               <label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:4px">日期</label>
               <input type="date" id="detailStyleDate" value="${escAttr(style.date || '')}" style="width:100%;padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;box-sizing:border-box" onchange="saveDetailBasicInfo()">
+            </div>
+            <div>
+              <label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:4px">客户</label>
+              <input type="text" id="detailStyleCustomer" value="${escAttr(style.customer || '')}" style="width:100%;padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;box-sizing:border-box" onchange="saveDetailBasicInfo()">
             </div>
           </div>
           <div>
@@ -5323,12 +5331,16 @@ function saveDetailBasicInfo() {
   const style = DB.styles.find(s => s.id == currentHistoryId);
   if (!style) return;
   
+  const codeInput = document.getElementById('detailStyleCode');
   const nameInput = document.getElementById('detailStyleName');
   const dateInput = document.getElementById('detailStyleDate');
+  const customerInput = document.getElementById('detailStyleCustomer');
   const noteInput = document.getElementById('detailStyleNote');
   
+  if (codeInput) style.code = codeInput.value.trim();
   if (nameInput) style.name = nameInput.value.trim();
   if (dateInput) style.date = dateInput.value;
+  if (customerInput) style.customer = customerInput.value.trim();
   if (noteInput) style.note = noteInput.value.trim();
   
   saveDB();
