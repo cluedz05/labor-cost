@@ -5206,17 +5206,104 @@ function showDetail(id) {
 
   document.getElementById('detailModal').classList.add('show');
   
-  // 给款式详情窗口添加拖动功能
+  // 直接在JavaScript中设置样式和初始化拖动功能
   setTimeout(function() {
-    var detailModal = document.querySelector('.detail-modal-content');
-    var detailHeader = document.querySelector('.detail-draggable-header');
-    if (detailModal && detailHeader) {
-      // 重置位置样式，确保拖动正常
-      detailModal.style.position = 'absolute';
-      detailModal.style.left = '50px';
-      detailModal.style.top = '50px';
-      detailModal.style.transform = 'none';
-      makeDraggable(detailModal, detailHeader);
+    var detailModal = document.getElementById('detailModal');
+    var modalContent = detailModal ? detailModal.querySelector('.modal') : null;
+    
+    if (detailModal && modalContent) {
+      // 设置overlay样式
+      detailModal.style.background = 'transparent !important';
+      detailModal.style.pointerEvents = 'none !important';
+      detailModal.style.zIndex = '99998';
+      
+      // 设置modal内容样式
+      modalContent.style.position = 'fixed';
+      modalContent.style.top = '50px';
+      modalContent.style.left = '50px';
+      modalContent.style.right = 'auto';
+      modalContent.style.bottom = 'auto';
+      modalContent.style.margin = '0';
+      modalContent.style.transform = 'none';
+      modalContent.style.pointerEvents = 'auto';
+      
+      // 查找或创建拖动标题栏
+      var draggableHeader = modalContent.querySelector('.detail-draggable-header');
+      if (!draggableHeader) {
+        // 创建拖动标题栏
+        draggableHeader = document.createElement('div');
+        draggableHeader.className = 'detail-draggable-header';
+        draggableHeader.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;cursor:move;padding-bottom:8px;border-bottom:2px solid #f3f4f6;user-select:none';
+        
+        // 创建标题容器
+        var titleContainer = document.createElement('div');
+        titleContainer.style.cssText = 'display:flex;align-items:center;gap:8px';
+        
+        var title = modalContent.querySelector('h2');
+        if (title) {
+          title.style.margin = '0';
+          title.style.fontSize = '18px';
+          titleContainer.appendChild(title);
+        }
+        
+        var hint = document.createElement('span');
+        hint.style.cssText = 'font-size:12px;color:#9ca3af;font-weight:normal';
+        hint.textContent = '（拖动标题移动）';
+        titleContainer.appendChild(hint);
+        
+        draggableHeader.appendChild(titleContainer);
+        
+        // 把关闭按钮移到拖动标题栏
+        var closeBtn = modalContent.querySelector('.modal-close');
+        if (closeBtn) {
+          closeBtn.style.position = 'static';
+          closeBtn.style.transform = 'none';
+          draggableHeader.appendChild(closeBtn);
+        }
+        
+        // 把拖动标题栏插入到modal内容的最前面
+        modalContent.insertBefore(draggableHeader, modalContent.firstChild);
+      }
+      
+      // 初始化拖动功能
+      var isDragging = false;
+      var startX, startY, initialLeft, initialTop;
+      
+      draggableHeader.addEventListener('mousedown', function(e) {
+        isDragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        
+        var rect = modalContent.getBoundingClientRect();
+        initialLeft = rect.left;
+        initialTop = rect.top;
+        
+        modalContent.style.position = 'fixed';
+        modalContent.style.left = initialLeft + 'px';
+        modalContent.style.top = initialTop + 'px';
+        modalContent.style.right = 'auto';
+        modalContent.style.bottom = 'auto';
+        modalContent.style.margin = '0';
+        modalContent.style.transform = 'none';
+        
+        e.preventDefault();
+      });
+      
+      document.addEventListener('mousemove', function(e) {
+        if (!isDragging) return;
+        
+        var dx = e.clientX - startX;
+        var dy = e.clientY - startY;
+        
+        modalContent.style.left = (initialLeft + dx) + 'px';
+        modalContent.style.top = (initialTop + dy) + 'px';
+      });
+      
+      document.addEventListener('mouseup', function() {
+        isDragging = false;
+      });
+      
+      console.log('款式详情窗口拖动功能已初始化');
     }
   }, 100);
 
