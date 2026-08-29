@@ -825,6 +825,16 @@ function saveUsers(users) {
 function checkLogin() {
 
   var savedUser = localStorage.getItem(CURRENT_USER_KEY);
+  
+  // 兼容逻辑：如果localStorage中没有，但是sessionStorage中有，就复制到localStorage
+  if (!savedUser) {
+    var sessionUser = sessionStorage.getItem(CURRENT_USER_KEY);
+    if (sessionUser) {
+      localStorage.setItem(CURRENT_USER_KEY, sessionUser);
+      savedUser = sessionUser;
+      console.log('已将登录状态从sessionStorage迁移到localStorage');
+    }
+  }
 
   if (savedUser) {
 
@@ -2054,7 +2064,7 @@ function saveEditUser(oldUsername) {
 
     currentUser.username = newUsername;
 
-    sessionStorage.setItem(CURRENT_USER_KEY, JSON.stringify(currentUser));
+    localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(currentUser));
 
     updateUserUI();
 
