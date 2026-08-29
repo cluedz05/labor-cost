@@ -8500,9 +8500,8 @@ async function aiImageSearch(imageDataUrl, callback) {
       '<button onclick="window.aiSearchCancelled=true" style="padding:8px 20px;background:#ef4444;color:#fff;border:none;border-radius:8px;font-size:13px;cursor:pointer">取消搜索</button></div>';
   }
   
-  // 并行处理（同时处理10个图片，手机也能快速运行）
-  const batchSize = 10;
-  for (let batchStart = 0; batchStart < itemsWithImage.length; batchStart += batchSize) {
+  // 串行处理（一次只处理一个图片，手机不会卡住）
+  for (let i = 0; i < itemsWithImage.length; i++) {
     // 检查是否取消
     if (window.aiSearchCancelled) {
       if (resultDiv) {
@@ -8513,30 +8512,23 @@ async function aiImageSearch(imageDataUrl, callback) {
       return;
     }
     
-    const batch = itemsWithImage.slice(batchStart, batchStart + batchSize);
+    const item = itemsWithImage[i];
+    const idx = styles.indexOf(item);
     
-    // 并行提取当前批次的特征
-    const batchPromises = batch.map(async (item) => {
-      const idx = styles.indexOf(item);
-      let features = historyImageFeatures[item.id];
-      if (!features) {
-        features = await extractColorHistogram(item.imgs[0]);
-        if (features) {
-          historyImageFeatures[item.id] = features;
-        }
-      }
-      return { idx, item, features };
-    });
-    
-    const batchResults = await Promise.all(batchPromises);
-    
-    batchResults.forEach(({ idx, item, features }) => {
-      processed++;
+    // 提取特征（先检查缓存）
+    let features = historyImageFeatures[item.id];
+    if (!features) {
+      features = await extractColorHistogram(item.imgs[0]);
       if (features) {
-        const similarity = histogramSimilarity(targetFeatures, features);
-        results.push({ idx, item, similarity });
+        historyImageFeatures[item.id] = features;
       }
-    });
+    }
+    
+    processed++;
+    if (features) {
+      const similarity = histogramSimilarity(targetFeatures, features);
+      results.push({ idx, item, similarity });
+    }
     
     // 更新进度
     if (resultDiv) {
@@ -8551,8 +8543,10 @@ async function aiImageSearch(imageDataUrl, callback) {
       }
     }
     
-    // 让浏览器有时间响应，避免页面卡住
-    await new Promise(resolve => setTimeout(resolve, 0));
+    // 让浏览器有时间响应，避免页面卡住（每处理5个图片休息一下）
+    if (processed % 5 === 0) {
+      await new Promise(resolve => setTimeout(resolve, 50));
+    }
   }
   
   // 按相似度排序
