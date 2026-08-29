@@ -824,7 +824,7 @@ function saveUsers(users) {
 
 function checkLogin() {
 
-  var savedUser = sessionStorage.getItem(CURRENT_USER_KEY);
+  var savedUser = localStorage.getItem(CURRENT_USER_KEY);
 
   if (savedUser) {
 
@@ -1008,7 +1008,7 @@ function doLogin() {
 
   };
 
-  sessionStorage.setItem(CURRENT_USER_KEY, JSON.stringify(currentUser));
+  localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(currentUser));
 
   updateUserUI();
 
@@ -1132,7 +1132,7 @@ function doRegister() {
 
   };
 
-  sessionStorage.setItem(CURRENT_USER_KEY, JSON.stringify(currentUser));
+  localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(currentUser));
 
   updateUserUI();
 
@@ -1152,7 +1152,7 @@ function doLogout() {
 
   currentUser = null;
 
-  sessionStorage.removeItem(CURRENT_USER_KEY);
+  localStorage.removeItem(CURRENT_USER_KEY);
 
   document.getElementById('loginUsername').value = '';
 
@@ -8241,12 +8241,12 @@ function extractColorHistogram(imageSrc) {
       try {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-        // 缩放到32x32，更快速度
-        canvas.width = 32;
-        canvas.height = 32;
-        ctx.drawImage(img, 0, 0, 32, 32);
+        // 缩放到16x16，更快速度
+        canvas.width = 16;
+        canvas.height = 16;
+        ctx.drawImage(img, 0, 0, 16, 16);
         
-        const imageData = ctx.getImageData(0, 0, 32, 32);
+        const imageData = ctx.getImageData(0, 0, 16, 16);
         const data = imageData.data;
         
         // 颜色直方图：每个通道4个区间，共64个bin
@@ -8262,7 +8262,7 @@ function extractColorHistogram(imageSrc) {
         }
         
         // 归一化
-        const total = 32 * 32;
+        const total = 16 * 16;
         for (let i = 0; i < bins; i++) {
           histogram[i] /= total;
         }
@@ -8322,10 +8322,31 @@ async function aiImageSearch(imageDataUrl, callback) {
   
   const results = [];
   let processed = 0;
+  let isCancelled = false;
   
-  // 并行处理（同时处理10个图片，大幅提高速度）
-  const batchSize = 10;
+  // 添加取消搜索按钮
+  if (resultDiv) {
+    resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:#6b7280">' +
+      '<div style="font-size:24px;margin-bottom:8px">🔍</div>' +
+      '<div style="margin-bottom:8px">正在分析图片... (0/' + total + ')</div>' +
+      '<div style="width:100%;height:8px;background:#e5e7eb;border-radius:4px;overflow:hidden;margin-bottom:12px">' +
+      '<div id="aiSearchProgress" style="width:0%;height:100%;background:linear-gradient(90deg,#10b981,#059669);transition:width 0.3s"></div></div>' +
+      '<button onclick="window.aiSearchCancelled=true" style="padding:8px 20px;background:#ef4444;color:#fff;border:none;border-radius:8px;font-size:13px;cursor:pointer">取消搜索</button></div>';
+  }
+  
+  // 并行处理（同时处理20个图片，大幅提高速度）
+  const batchSize = 20;
   for (let batchStart = 0; batchStart < itemsWithImage.length; batchStart += batchSize) {
+    // 检查是否取消
+    if (window.aiSearchCancelled) {
+      if (resultDiv) {
+        resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:#6b7280">⏹️ 搜索已取消</div>';
+      }
+      window.aiSearchCancelled = false;
+      callback([]);
+      return;
+    }
+    
     const batch = itemsWithImage.slice(batchStart, batchStart + batchSize);
     
     // 并行提取当前批次的特征
@@ -8354,13 +8375,18 @@ async function aiImageSearch(imageDataUrl, callback) {
     // 更新进度
     if (resultDiv) {
       const percent = Math.round((processed / total) * 100);
-      resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:#6b7280">' +
-        '<div style="font-size:24px;margin-bottom:8px">🔍</div>' +
-        '<div style="margin-bottom:8px">正在分析图片... (' + processed + '/' + total + ')</div>' +
-        '<div style="width:100%;height:8px;background:#e5e7eb;border-radius:4px;overflow:hidden">' +
-        '<div style="width:' + percent + '%;height:100%;background:linear-gradient(90deg,#10b981,#059669);transition:width 0.3s"></div>' +
-        '</div></div>';
+      const progressBar = document.getElementById('aiSearchProgress');
+      if (progressBar) {
+        progressBar.style.width = percent + '%';
+      }
+      const progressText = resultDiv.querySelector('div');
+      if (progressText && progressText.textContent.indexOf('正在分析图片') >= 0) {
+        progressText.innerHTML = '正在分析图片... (' + processed + '/' + total + ')';
+      }
     }
+    
+    // 让浏览器有时间响应，避免页面卡住
+    await new Promise(resolve => setTimeout(resolve, 0));
   }
   
   // 按相似度排序
