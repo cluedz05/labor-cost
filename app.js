@@ -8438,60 +8438,88 @@ function syncAllApprovedToLibrary() {
 // 颜色直方图图像相似度搜索（不依赖外部模型，快速稳定）
 let historyImageFeatures = {}; // 缓存历史款式图片的特征向量
 
-// 提取图像颜色直方图特征（超快速版：8x8，8个bin，手机也能秒速）
+// 提取图像平均颜色特征（超简单超快速，绝对不会卡住）
 function extractColorHistogram(imageSrc) {
   return new Promise((resolve) => {
     const img = new Image();
     img.crossOrigin = 'anonymous';
+    
+    // 5秒超时，避免图片加载失败导致卡住
+    const timeout = setTimeout(() => {
+      resolve(null);
+    }, 5000);
+    
     img.onload = function() {
+      clearTimeout(timeout);
       try {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-        // 缩放到8x8，超快速
-        canvas.width = 8;
-        canvas.height = 8;
-        ctx.drawImage(img, 0, 0, 8, 8);
+        // 缩放到4x4，超快速
+        canvas.width = 4;
+        canvas.height = 4;
+        ctx.drawImage(img, 0, 0, 4, 4);
         
-        const imageData = ctx.getImageData(0, 0, 8, 8);
+        const imageData = ctx.getImageData(0, 0, 4, 4);
         const data = imageData.data;
         
-        // 超快速颜色直方图：每个通道2个区间，共8个bin
-        const bins = 8;
-        const histogram = new Array(bins).fill(0);
+        // 只计算平均颜色（RGB三个值），超简单超快速
+        let rSum = 0, gSum = 0, bSum = 0;
+        const pixelCount = 16; // 4x4 = 16个像素
         
         for (let i = 0; i < data.length; i += 4) {
-          const r = data[i] >> 7;     // 0-1 (除以128)
-          const g = data[i + 1] >> 7; // 0-1
-          const b = data[i + 2] >> 7; // 0-1
-          const idx = (r << 2) | (g << 1) | b;
-          histogram[idx]++;
+          rSum += data[i];
+          gSum += data[i + 1];
+          bSum += data[i + 2];
         }
         
-        // 归一化颜色直方图
-        const total = 8 * 8;
-        for (let i = 0; i < bins; i++) {
-          histogram[i] /= total;
-        }
+        // 返回平均颜色数组 [r, g, b]
+        const avgColor = [
+          Math.round(rSum / pixelCount),
+          Math.round(gSum / pixelCount),
+          Math.round(bSum / pixelCount)
+        ];
         
-        // 只返回颜色直方图数组，超快速
-        resolve(histogram);
+        resolve(avgColor);
       } catch (e) {
         console.error('特征提取失败:', e);
         resolve(null);
       }
     };
+    
     img.onerror = function() {
+      clearTimeout(timeout);
       resolve(null);
     };
+    
     img.src = imageSrc;
   });
 }
 
 // 计算两个特征的相似度（颜色直方图 + 颜色布局）
+// 计算两个特征的相似度（兼容平均颜色数组和颜色直方图）
 function histogramSimilarity(feat1, feat2) {
   if (!feat1 || !feat2) return 0;
   
-  // 兼容旧格式（纯数组）
+  // 如果是平均颜色数组（长度为3），使用颜色距离算法
+  if (feat1.length === 3 && feat2.length === 3) {
+    const r1 = feat1[0], g1 = feat1[1], b1 = feat1[2];
+    const r2 = feat2[0], g2 = feat2[1], b2 = feat2[2];
+    
+    // 计算RGB颜色距离（欧氏距离）
+    const distance = Math.sqrt(
+      Math.pow(r1 - r2, 2) + 
+      Math.pow(g1 - g2, 2) + 
+      Math.pow(b1 - b2, 2)
+    );
+    
+    // 最大距离是 sqrt(255^2 * 3) ≈ 441.67
+    const maxDistance = 441.67;
+    const similarity = 1 - (distance / maxDistance);
+    
+    return Math.max(0, similarity);
+  }
+  
+  // 兼容旧格式（纯数组，颜色直方图）
   if (Array.isArray(feat1) && Array.isArray(feat2)) {
     if (feat1.length !== feat2.length) return 0;
     let intersection = 0;
@@ -8515,7 +8543,7 @@ function histogramSimilarity(feat1, feat2) {
     }
   }
   
-  // 颜色布局相似度（4x4网格的平均颜色差异）
+  // 颜色布局相似度
   let layoutSim = 0;
   if (grid1 && grid2 && grid1.length === grid2.length) {
     let totalDiff = 0;
@@ -8528,7 +8556,7 @@ function histogramSimilarity(feat1, feat2) {
     layoutSim = 1 - (totalDiff / grid1.length);
   }
   
-  // 加权组合：颜色直方图占60%，颜色布局占40%
+  // 加权组合
   const finalSim = histSim * 0.6 + layoutSim * 0.4;
   
   return finalSim;
@@ -8621,10 +8649,8 @@ async function aiImageSearch(imageDataUrl, callback) {
       }
     }
     
-    // 让浏览器有时间响应，避免页面卡住（每处理5个图片休息一下）
-    if (processed % 5 === 0) {
-      await new Promise(resolve => setTimeout(resolve, 50));
-    }
+    // 让浏览器有时间响应，避免页面卡住（每处理一个图片都休息10毫秒）
+    await new Promise(resolve => setTimeout(resolve, 10));
   }
   
   // 按相似度排序
