@@ -7935,11 +7935,11 @@ function searchByImage(event) {
     
     // 创建图片预览和搜索弹窗
     var modal = document.createElement('div');
-    modal.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;padding:20px';
-    modal.innerHTML = '<div class="search-modal-content" style="background:#fff;border-radius:16px;padding:24px;max-width:500px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3)">' +
-      '<div class="draggable-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;cursor:move;padding-bottom:8px;border-bottom:2px solid #f3f4f6">' +
-        '<h3 style="margin:0;font-size:18px;color:#1a1a2e">🖼️ 以图搜款 <span style="font-size:12px;color:#9ca3af;font-weight:normal">（按住标题可拖动）</span></h3>' +
-        '<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#999;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%">✕</button>' +
+    modal.style.cssText = 'position:fixed;inset:0;z-index:99999;background:transparent;pointer-events:none';
+    modal.innerHTML = '<div class="search-modal-content" style="position:absolute;top:20px;right:20px;background:#fff;border-radius:16px;padding:20px;max-width:420px;width:90%;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);pointer-events:auto">' +
+      '<div class="draggable-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;cursor:move;padding-bottom:8px;border-bottom:2px solid #f3f4f6">' +
+        '<h3 style="margin:0;font-size:16px;color:#1a1a2e">🖼️ 以图搜款 <span style="font-size:11px;color:#9ca3af;font-weight:normal">（拖动标题）</span></h3>' +
+        '<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#999;padding:0;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:50%">✕</button>' +
       '</div>' +
       '<img src="' + imageData + '" style="width:100%;max-height:250px;object-fit:contain;border-radius:12px;background:#f5f5f5;margin-bottom:16px">' +
       '<div style="margin-bottom:12px"><label style="font-size:14px;color:#555;font-weight:600;display:block;margin-bottom:8px">输入关键词搜索：</label>' +
@@ -7996,11 +7996,11 @@ function searchHistoryByImage(event) {
     
     // 创建图片预览和搜索弹窗
     var modal = document.createElement('div');
-    modal.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;padding:20px';
-    modal.innerHTML = '<div class="search-modal-content" style="background:#fff;border-radius:16px;padding:24px;max-width:500px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3)">' +
-      '<div class="draggable-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;cursor:move;padding-bottom:8px;border-bottom:2px solid #f3f4f6">' +
-        '<h3 style="margin:0;font-size:18px;color:#1a1a2e">🖼️ 历史款式以图搜款 <span style="font-size:12px;color:#9ca3af;font-weight:normal">（按住标题可拖动）</span></h3>' +
-        '<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#999;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%">✕</button>' +
+    modal.style.cssText = 'position:fixed;inset:0;z-index:99999;background:transparent;pointer-events:none';
+    modal.innerHTML = '<div class="search-modal-content" style="position:absolute;top:20px;right:20px;background:#fff;border-radius:16px;padding:20px;max-width:420px;width:90%;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);pointer-events:auto">' +
+      '<div class="draggable-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;cursor:move;padding-bottom:8px;border-bottom:2px solid #f3f4f6">' +
+        '<h3 style="margin:0;font-size:16px;color:#1a1a2e">🖼️ 历史款式以图搜款 <span style="font-size:11px;color:#9ca3af;font-weight:normal">（拖动标题）</span></h3>' +
+        '<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#999;padding:0;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:50%">✕</button>' +
       '</div>' +
       '<img src="' + imageData + '" style="width:100%;max-height:250px;object-fit:contain;border-radius:12px;background:#f5f5f5;margin-bottom:16px">' +
       '<div style="margin-bottom:12px"><label style="font-size:14px;color:#555;font-weight:600;display:block;margin-bottom:8px">输入关键词搜索：</label>' +
