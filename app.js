@@ -5084,7 +5084,7 @@ function showDetail(id) {
 
           <span style="font-size:17px;font-weight:700;color:#1a1a2e">${escHtml(style.name)}</span>
 
-          ${currentUser && currentUser.role !== 'viewer' ? '<button onclick="editStyleBasicInfo(\'' + style.id + '\')" style="padding:3px 10px;background:#4361ee;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px;white-space:nowrap">✏️ 编辑</button>' : ''}
+          <button onclick="editStyleBasicInfo('${style.id}')" style="padding:4px 12px;background:#4361ee;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;white-space:nowrap;font-weight:600">✏️ 编辑信息</button>
 
           ${exportBadge}
 
@@ -5297,11 +5297,6 @@ function showDetail(id) {
 // ── 编辑款式基本信息 ─────────────────────────────
 
 function editStyleBasicInfo(styleId) {
-  if (currentUser && currentUser.role === 'viewer') {
-    toast('普通用户只能查看，不能修改');
-    return;
-  }
-  
   const style = DB.styles.find(s => s.id == styleId);
   if (!style) return;
   
