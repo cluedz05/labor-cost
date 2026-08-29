@@ -5080,15 +5080,40 @@ function showDetail(id) {
 
       <div style="flex:1;min-width:0">
 
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">
 
           <span style="font-size:17px;font-weight:700;color:#1a1a2e">${escHtml(style.name)}</span>
-
-          <button onclick="editStyleBasicInfo('${style.id}')" style="padding:4px 12px;background:#4361ee;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;white-space:nowrap;font-weight:600">✏️ 编辑信息</button>
 
           ${exportBadge}
 
           <span style="font-size:12px;padding:2px 10px;border-radius:20px;font-weight:600;${style.status === 'approved' ? 'background:#dcfce7;color:#16a34a' : 'background:#fef9c3;color:#a16207'}">${style.status === 'approved' ? '✅ 已审批' : '⏳ 待审批'}</span>
+
+          <span style="font-size:15px;font-weight:700;color:#e94560;margin-left:4px" id="detailTotalHeader">¥${total.toFixed(2)} 元</span>
+
+        </div>
+        
+        <!-- 可编辑的基本信息区域 -->
+        <div style="background:#f8fafc;border-radius:10px;padding:12px;margin-bottom:10px;border:1px solid #e2e8f0">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+            <div>
+              <label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:4px">款式名称</label>
+              <input type="text" id="detailStyleName" value="${escAttr(style.name || '')}" style="width:100%;padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;box-sizing:border-box" onchange="saveDetailBasicInfo()">
+            </div>
+            <div>
+              <label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:4px">日期</label>
+              <input type="date" id="detailStyleDate" value="${escAttr(style.date || '')}" style="width:100%;padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;box-sizing:border-box" onchange="saveDetailBasicInfo()">
+            </div>
+          </div>
+          <div>
+            <label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:4px">备注</label>
+            <textarea id="detailStyleNote" rows="2" style="width:100%;padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;box-sizing:border-box;resize:vertical" onchange="saveDetailBasicInfo()">${escHtml(style.note || '')}</textarea>
+          </div>
+          <div style="margin-top:8px;text-align:right">
+            <span style="font-size:11px;color:#6b7280">💡 修改后自动保存</span>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
 
           ${style.note ? '<span style="font-size:12px;padding:2px 10px;border-radius:20px;background:#f3f4f6;color:#6b7280;max-width:140px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis" title="' + escAttr(style.note||'') + '">📝 ' + escHtml(style.note) + '</span>' : ''}
 
@@ -5103,8 +5128,6 @@ function showDetail(id) {
           <span class="detail-chip" style="font-size:11px;color:#fff;padding:2px 10px;border-radius:20px;background:#10b981">扎车 ¥${sub.zache.toFixed(2)}</span>
 
           <span class="detail-chip" style="font-size:11px;color:#fff;padding:2px 10px;border-radius:20px;background:#f59e0b">坎车 ¥${sub.kanche.toFixed(2)}</span>
-
-          <span style="font-size:15px;font-weight:700;color:#e94560;margin-left:4px" id="detailTotalHeader">¥${total.toFixed(2)} 元</span>
 
         </div>
 
@@ -5294,7 +5317,34 @@ function showDetail(id) {
 
 
 
-// ── 编辑款式基本信息 ─────────────────────────────
+// ── 保存款式详情中的基本信息（自动保存）─────────────────────────────
+
+function saveDetailBasicInfo() {
+  const style = DB.styles.find(s => s.id == currentHistoryId);
+  if (!style) return;
+  
+  const nameInput = document.getElementById('detailStyleName');
+  const dateInput = document.getElementById('detailStyleDate');
+  const noteInput = document.getElementById('detailStyleNote');
+  
+  if (nameInput) style.name = nameInput.value.trim();
+  if (dateInput) style.date = dateInput.value;
+  if (noteInput) style.note = noteInput.value.trim();
+  
+  saveDB();
+  renderHistory();
+  
+  // 显示保存成功提示
+  const saveTip = document.createElement('div');
+  saveTip.style.cssText = 'position:fixed;top:20px;right:20px;background:#16a34a;color:#fff;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:600;z-index:100003;box-shadow:0 4px 12px rgba(0,0,0,0.15)';
+  saveTip.textContent = '✅ 已保存';
+  document.body.appendChild(saveTip);
+  setTimeout(() => saveTip.remove(), 1500);
+}
+
+
+
+// ── 编辑款式基本信息（弹窗方式，保留备用）─────────────────────────────
 
 function editStyleBasicInfo(styleId) {
   const style = DB.styles.find(s => s.id == styleId);
