@@ -8251,33 +8251,66 @@ function extractColorHistogram(imageSrc) {
       try {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-        // 缩放到16x16，更快速度
-        canvas.width = 16;
-        canvas.height = 16;
-        ctx.drawImage(img, 0, 0, 16, 16);
+        // 缩放到32x32，更准确的特征
+        canvas.width = 32;
+        canvas.height = 32;
+        ctx.drawImage(img, 0, 0, 32, 32);
         
-        const imageData = ctx.getImageData(0, 0, 16, 16);
+        const imageData = ctx.getImageData(0, 0, 32, 32);
         const data = imageData.data;
         
-        // 颜色直方图：每个通道4个区间，共64个bin
-        const bins = 64;
+        // 改进的颜色直方图：每个通道8个区间，共512个bin，更准确
+        const bins = 512;
         const histogram = new Array(bins).fill(0);
         
+        // 颜色布局特征：把图片分成4x4的网格，每个网格计算平均颜色
+        const gridSize = 4;
+        const gridColors = [];
+        for (let gy = 0; gy < gridSize; gy++) {
+          for (let gx = 0; gx < gridSize; gx++) {
+            let rSum = 0, gSum = 0, bSum = 0, count = 0;
+            const xStart = Math.floor(gx * 32 / gridSize);
+            const xEnd = Math.floor((gx + 1) * 32 / gridSize);
+            const yStart = Math.floor(gy * 32 / gridSize);
+            const yEnd = Math.floor((gy + 1) * 32 / gridSize);
+            for (let y = yStart; y < yEnd; y++) {
+              for (let x = xStart; x < xEnd; x++) {
+                const idx = (y * 32 + x) * 4;
+                rSum += data[idx];
+                gSum += data[idx + 1];
+                bSum += data[idx + 2];
+                count++;
+              }
+            }
+            gridColors.push({
+              r: Math.round(rSum / count),
+              g: Math.round(gSum / count),
+              b: Math.round(bSum / count)
+            });
+          }
+        }
+        
         for (let i = 0; i < data.length; i += 4) {
-          const r = data[i] >> 6;     // 0-3 (除以64)
-          const g = data[i + 1] >> 6; // 0-3
-          const b = data[i + 2] >> 6; // 0-3
-          const idx = (r << 4) | (g << 2) | b;
+          const r = data[i] >> 5;     // 0-7 (除以32)
+          const g = data[i + 1] >> 5; // 0-7
+          const b = data[i + 2] >> 5; // 0-7
+          const idx = (r << 6) | (g << 3) | b;
           histogram[idx]++;
         }
         
-        // 归一化
-        const total = 16 * 16;
+        // 归一化颜色直方图
+        const total = 32 * 32;
         for (let i = 0; i < bins; i++) {
           histogram[i] /= total;
         }
         
-        resolve(histogram);
+        // 组合特征：颜色直方图 + 颜色布局特征
+        const features = {
+          histogram: histogram,
+          gridColors: gridColors
+        };
+        
+        resolve(features);
       } catch (e) {
         console.error('特征提取失败:', e);
         resolve(null);
@@ -8290,14 +8323,51 @@ function extractColorHistogram(imageSrc) {
   });
 }
 
-// 计算两个直方图的相似度（直方图交集）
-function histogramSimilarity(hist1, hist2) {
-  if (!hist1 || !hist2 || hist1.length !== hist2.length) return 0;
-  let intersection = 0;
-  for (let i = 0; i < hist1.length; i++) {
-    intersection += Math.min(hist1[i], hist2[i]);
+// 计算两个特征的相似度（颜色直方图 + 颜色布局）
+function histogramSimilarity(feat1, feat2) {
+  if (!feat1 || !feat2) return 0;
+  
+  // 兼容旧格式（纯数组）
+  if (Array.isArray(feat1) && Array.isArray(feat2)) {
+    if (feat1.length !== feat2.length) return 0;
+    let intersection = 0;
+    for (let i = 0; i < feat1.length; i++) {
+      intersection += Math.min(feat1[i], feat2[i]);
+    }
+    return intersection;
   }
-  return intersection;
+  
+  // 新格式（包含histogram和gridColors）
+  const hist1 = feat1.histogram || feat1;
+  const hist2 = feat2.histogram || feat2;
+  const grid1 = feat1.gridColors;
+  const grid2 = feat2.gridColors;
+  
+  // 颜色直方图相似度（直方图交集）
+  let histSim = 0;
+  if (Array.isArray(hist1) && Array.isArray(hist2) && hist1.length === hist2.length) {
+    for (let i = 0; i < hist1.length; i++) {
+      histSim += Math.min(hist1[i], hist2[i]);
+    }
+  }
+  
+  // 颜色布局相似度（4x4网格的平均颜色差异）
+  let layoutSim = 0;
+  if (grid1 && grid2 && grid1.length === grid2.length) {
+    let totalDiff = 0;
+    for (let i = 0; i < grid1.length; i++) {
+      const dr = Math.abs(grid1[i].r - grid2[i].r) / 255;
+      const dg = Math.abs(grid1[i].g - grid2[i].g) / 255;
+      const db = Math.abs(grid1[i].b - grid2[i].b) / 255;
+      totalDiff += (dr + dg + db) / 3;
+    }
+    layoutSim = 1 - (totalDiff / grid1.length);
+  }
+  
+  // 加权组合：颜色直方图占60%，颜色布局占40%
+  const finalSim = histSim * 0.6 + layoutSim * 0.4;
+  
+  return finalSim;
 }
 
 // AI图像搜款（使用颜色直方图，搜索历史款式）
