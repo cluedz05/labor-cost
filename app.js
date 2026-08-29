@@ -7955,7 +7955,8 @@ function initLibraryButtons() {
       var div = document.createElement('div');
       div.textContent = btn.text;
       div.setAttribute('onclick', btn.action);
-      div.style.cssText = 'min-width:100px;padding:8px 12px;background:' + btn.bg + ';color:' + btn.color + ';font-size:13px;font-weight:600;text-align:center;border:2px solid ' + btn.border + ';border-radius:8px;cursor:pointer;user-select:none;display:inline-block;line-height:1.4;';
+      div.className = 'library-action-btn';
+      div.style.cssText = 'min-width:100px;padding:10px 14px;background:' + btn.bg + ' !important;color:' + btn.color + ' !important;font-size:13px;font-weight:600;text-align:center;border:2px solid ' + btn.border + ';border-radius:8px;cursor:pointer;user-select:none;display:inline-block;line-height:1.4;white-space:nowrap;';
       btnContainer.appendChild(div);
     });
   }
@@ -7965,7 +7966,8 @@ function initLibraryButtons() {
     var div = document.createElement('div');
     div.textContent = '🖼️ 以图搜款';
     div.setAttribute('onclick', "document.getElementById('libraryImageSearch').click()");
-    div.style.cssText = 'padding:8px 12px;background:#ede9fe;color:#5b21b6;font-size:13px;font-weight:600;text-align:center;border:2px solid #8b5cf6;border-radius:8px;cursor:pointer;user-select:none;display:inline-block;line-height:1.4;';
+    div.className = 'library-action-btn';
+    div.style.cssText = 'padding:10px 14px;background:#ede9fe !important;color:#5b21b6 !important;font-size:13px;font-weight:600;text-align:center;border:2px solid #8b5cf6;border-radius:8px;cursor:pointer;user-select:none;display:inline-block;line-height:1.4;white-space:nowrap;';
     imgBtnContainer.appendChild(div);
   }
 }

@@ -22,13 +22,17 @@
 
 
 
-<meta name="theme-color" content="#ff6600">
+<meta name="theme-color" content="#667eea">
 
 <meta name="apple-mobile-web-app-capable" content="yes">
 
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
-<meta name="apple-mobile-web-app-title" content="王炸工具">
+<meta name="apple-mobile-web-app-title" content="多绮爱工具">
+
+<link rel="manifest" href="manifest.json">
+
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' fill='%23667eea' rx='22'/%3E%3Ctext x='90' y='115' font-size='75' text-anchor='middle' fill='white' font-family='Arial'%3E👔%3C/text%3E%3C/svg%3E">
 
 
 
@@ -119,49 +123,94 @@ button:empty {
     /* 全局调整 */
     * {
         -webkit-tap-highlight-color: transparent;
+        box-sizing: border-box;
     }
     body {
-        font-size: 14px;
+        font-size: 15px;
         overflow-x: hidden;
+        line-height: 1.6;
     }
     /* 顶部导航 */
     .topbar {
         flex-wrap: wrap;
-        padding: 8px;
+        padding: 12px 10px;
         height: auto;
-        min-height: 60px;
+        min-height: 70px;
+        gap: 8px;
     }
     .topbar h1 {
-        font-size: 16px;
+        font-size: 18px;
         width: 100%;
         text-align: center;
-        margin-bottom: 8px;
+        margin-bottom: 10px;
     }
     .topbar .tab-btn {
-        flex: 1;
-        min-width: 70px;
-        font-size: 12px;
-        padding: 8px 4px;
-        margin: 2px;
+        flex: 1 1 auto;
+        min-width: 75px;
+        font-size: 13px;
+        padding: 12px 8px;
+        margin: 3px;
         height: auto;
         white-space: nowrap;
+        border-radius: 10px;
     }
     .topbar-right {
         width: 100%;
         justify-content: center;
-        margin-top: 8px;
+        margin-top: 10px;
         flex-wrap: wrap;
+        gap: 6px;
     }
     .btn-top {
-        font-size: 12px;
-        padding: 6px 10px;
-        margin: 2px;
+        font-size: 13px;
+        padding: 10px 14px;
+        margin: 3px;
+        border-radius: 8px;
     }
     /* 主内容区域 */
     .main-content,
     #app {
-        padding: 10px;
-        margin-top: 120px;
+        padding: 16px 12px;
+        margin-top: 140px;
+    }
+    /* 款式库标题区域 */
+    .library-header,
+    [class*="library-header"] {
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+    .library-header h2,
+    [class*="library-header"] h2 {
+        font-size: 18px;
+        width: 100%;
+        margin-bottom: 8px;
+    }
+    #libraryButtons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        width: 100%;
+    }
+    #libraryButtons > div {
+        flex: 1 1 auto;
+        min-width: 110px;
+        padding: 12px 16px !important;
+        font-size: 14px !important;
+        text-align: center;
+    }
+    /* 搜索区域 */
+    .search-area,
+    [class*="search"] {
+        margin-bottom: 16px;
+        gap: 10px;
+    }
+    .search-area input,
+    [class*="search"] input {
+        padding: 12px 16px;
+        font-size: 14px;
+        border-radius: 10px;
     }
     /* 表格适配 */
     table {
@@ -169,26 +218,29 @@ button:empty {
         overflow-x: auto;
         white-space: nowrap;
         -webkit-overflow-scrolling: touch;
+        border-radius: 10px;
     }
     table th,
     table td {
-        padding: 6px 8px;
-        font-size: 12px;
+        padding: 10px 12px;
+        font-size: 13px;
     }
     /* 按钮适配 */
     button {
-        font-size: 13px;
-        padding: 8px 12px;
-        min-height: 36px;
-        min-width: 44px;
+        font-size: 14px;
+        padding: 10px 16px;
+        min-height: 42px;
+        min-width: 48px;
+        border-radius: 8px;
     }
     /* 输入框适配 */
     input,
     select,
     textarea {
-        font-size: 14px;
-        padding: 10px;
-        min-height: 40px;
+        font-size: 15px;
+        padding: 12px 14px;
+        min-height: 44px;
+        border-radius: 8px;
     }
     /* 模态框适配 */
     .modal,
@@ -201,21 +253,25 @@ button:empty {
         margin: 10px auto;
         left: 2.5% !important;
         right: 2.5% !important;
+        padding: 20px;
+        border-radius: 16px;
     }
     /* 卡片适配 */
     .card,
     [class*="card"] {
-        padding: 12px;
-        margin-bottom: 10px;
+        padding: 18px 16px;
+        margin-bottom: 16px;
+        border-radius: 12px;
     }
     /* 网格布局适配 */
     [class*="grid"] {
         grid-template-columns: 1fr !important;
-        gap: 10px;
+        gap: 16px;
     }
     /* 弹性布局适配 */
     [class*="flex"] {
         flex-wrap: wrap;
+        gap: 10px;
     }
     /* 隐藏非必要元素 */
     .hide-mobile,
@@ -224,38 +280,63 @@ button:empty {
     }
     /* 云端同步按钮位置调整 */
     #cloudSyncBtn {
-        bottom: 15px;
-        right: 15px;
-        width: 45px;
-        height: 45px;
-        font-size: 20px;
+        bottom: 20px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+        font-size: 22px;
     }
     #syncIndicator {
-        bottom: 70px;
-        right: 15px;
-        font-size: 10px;
-        padding: 3px 8px;
+        bottom: 80px;
+        right: 20px;
+        font-size: 11px;
+        padding: 5px 10px;
+    }
+    /* 款式库列表项 */
+    .style-item,
+    [class*="style-item"] {
+        padding: 16px;
+        margin-bottom: 12px;
+        border-radius: 12px;
+    }
+    /* 工序列表项 */
+    .process-item,
+    [class*="process-item"] {
+        padding: 14px 12px;
+        margin-bottom: 10px;
+        border-radius: 10px;
+    }
+    /* 分页区域 */
+    .pagination,
+    [class*="pagination"] {
+        margin-top: 20px;
+        gap: 8px;
+    }
+    .pagination button,
+    [class*="pagination"] button {
+        min-width: 40px;
+        height: 40px;
     }
 }
 /* 小屏幕手机适配 */
 @media (max-width: 480px) {
     .topbar .tab-btn {
-        min-width: 60px;
-        font-size: 11px;
-        padding: 6px 2px;
+        min-width: 65px;
+        font-size: 12px;
+        padding: 10px 6px;
     }
     .topbar h1 {
-        font-size: 14px;
+        font-size: 16px;
     }
     table th,
     table td {
-        padding: 4px 6px;
-        font-size: 11px;
+        padding: 8px 10px;
+        font-size: 12px;
     }
     button {
-        font-size: 12px;
-        padding: 6px 10px;
-        min-height: 32px;
+        font-size: 13px;
+        padding: 10px 14px;
+        min-height: 38px;
     }
 }
 /* 横屏手机适配 */
@@ -1408,6 +1489,193 @@ if (document.readyState === 'loading') {
     setTimeout(fixButtonStyles, 500);
     setInterval(fixButtonStyles, 2000);
 }
+</script>
+
+<!-- PWA - Service Worker 注册和添加到主屏幕提示 -->
+<script>
+// PWA安装提示状态
+let deferredPrompt = null;
+let pwaInstallShown = false;
+
+// 注册Service Worker
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/labor-cost/sw.js').then(function(registration) {
+            console.log('[PWA] Service Worker 注册成功:', registration.scope);
+            
+            // 检查更新
+            registration.addEventListener('updatefound', function() {
+                console.log('[PWA] 发现新版本，正在更新...');
+                const newWorker = registration.installing;
+                newWorker.addEventListener('statechange', function() {
+                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                        console.log('[PWA] 新版本已安装，刷新页面以应用更新');
+                        // 可以在这里提示用户刷新
+                    }
+                });
+            });
+        }).catch(function(error) {
+            console.log('[PWA] Service Worker 注册失败:', error);
+        });
+    });
+    
+    // 监听Service Worker消息
+    navigator.serviceWorker.addEventListener('message', function(event) {
+        console.log('[PWA] 收到Service Worker消息:', event.data);
+    });
+}
+
+// 监听PWA安装提示
+window.addEventListener('beforeinstallprompt', function(event) {
+    console.log('[PWA] 收到安装提示');
+    // 阻止默认提示
+    event.preventDefault();
+    // 保存事件以便稍后触发
+    deferredPrompt = event;
+    
+    // 显示自定义安装提示（只显示一次）
+    if (!pwaInstallShown && !localStorage.getItem('pwa_install_dismissed')) {
+        setTimeout(showPWAInstallPrompt, 3000);
+    }
+});
+
+// PWA安装成功
+window.addEventListener('appinstalled', function(event) {
+    console.log('[PWA] 应用已安装到主屏幕');
+    pwaInstallShown = true;
+    hidePWAInstallPrompt();
+    localStorage.setItem('pwa_installed', 'true');
+    
+    // 显示安装成功提示
+    showToast('✅ 应用已安装到主屏幕！');
+});
+
+// 显示PWA安装提示
+function showPWAInstallPrompt() {
+    if (pwaInstallShown) return;
+    pwaInstallShown = true;
+    
+    // 检查是否已经安装
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+        console.log('[PWA] 应用已在独立模式运行');
+        return;
+    }
+    
+    // 创建提示弹窗
+    const prompt = document.createElement('div');
+    prompt.id = 'pwaInstallPrompt';
+    prompt.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#fff;border-radius:16px;padding:20px;box-shadow:0 10px 40px rgba(0,0,0,0.2);z-index:100000;max-width:340px;width:90%;text-align:center;animation:pwaSlideUp .3s ease;font-family:inherit';
+    
+    prompt.innerHTML = `
+        <div style="font-size:40px;margin-bottom:10px">📱</div>
+        <div style="font-size:18px;font-weight:700;color:#1a1a2e;margin-bottom:6px">安装多绮爱工具</div>
+        <div style="font-size:13px;color:#666;margin-bottom:16px;line-height:1.5">将应用添加到主屏幕，像APP一样使用，支持离线访问</div>
+        <div style="display:flex;gap:10px">
+            <button onclick="dismissPWAInstall()" style="flex:1;padding:12px;background:#f0f0f0;color:#666;border:none;border-radius:10px;font-size:14px;cursor:pointer">稍后</button>
+            <button onclick="installPWA()" style="flex:1;padding:12px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer">立即安装</button>
+        </div>
+    `;
+    
+    // 添加动画样式
+    if (!document.getElementById('pwaStyles')) {
+        const style = document.createElement('style');
+        style.id = 'pwaStyles';
+        style.textContent = '@keyframes pwaSlideUp{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}';
+        document.head.appendChild(style);
+    }
+    
+    document.body.appendChild(prompt);
+}
+
+// 隐藏PWA安装提示
+function hidePWAInstallPrompt() {
+    const prompt = document.getElementById('pwaInstallPrompt');
+    if (prompt) {
+        prompt.remove();
+    }
+}
+
+// 关闭PWA安装提示
+function dismissPWAInstall() {
+    hidePWAInstallPrompt();
+    localStorage.setItem('pwa_install_dismissed', 'true');
+    console.log('[PWA] 用户关闭安装提示');
+}
+
+// 安装PWA
+function installPWA() {
+    if (deferredPrompt) {
+        // 显示浏览器原生安装提示
+        deferredPrompt.prompt();
+        
+        // 等待用户选择
+        deferredPrompt.userChoice.then(function(choiceResult) {
+            console.log('[PWA] 用户选择:', choiceResult.outcome);
+            
+            if (choiceResult.outcome === 'accepted') {
+                console.log('[PWA] 用户接受安装');
+                showToast('✅ 正在安装应用...');
+            } else {
+                console.log('[PWA] 用户拒绝安装');
+                showToast('安装已取消');
+            }
+            
+            // 清除保存的事件
+            deferredPrompt = null;
+            hidePWAInstallPrompt();
+        });
+    } else {
+        // 如果没有保存的事件，显示手动安装说明
+        showManualInstallGuide();
+    }
+}
+
+// 显示手动安装指南（iOS Safari等不支持自动安装的浏览器）
+function showManualInstallGuide() {
+    hidePWAInstallPrompt();
+    
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    
+    let guideText = '';
+    if (isIOS && isSafari) {
+        guideText = '点击底部的分享按钮 📤，然后选择"添加到主屏幕"';
+    } else if (isIOS) {
+        guideText = '请在Safari浏览器中打开本页面，然后点击分享按钮 📤，选择"添加到主屏幕"';
+    } else {
+        guideText = '点击浏览器菜单，选择"添加到主屏幕"或"安装应用"';
+    }
+    
+    // 创建指南弹窗
+    const guide = document.createElement('div');
+    guide.id = 'pwaInstallGuide';
+    guide.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:100001;display:flex;align-items:center;justify-content:center;font-family:inherit';
+    
+    guide.innerHTML = `
+        <div style="background:#fff;border-radius:20px;padding:28px 24px;max-width:320px;width:90%;text-align:center">
+            <div style="font-size:48px;margin-bottom:12px">📱</div>
+            <div style="font-size:18px;font-weight:700;color:#1a1a2e;margin-bottom:10px">手动安装指南</div>
+            <div style="font-size:14px;color:#666;margin-bottom:20px;line-height:1.6">${guideText}</div>
+            <button onclick="document.getElementById('pwaInstallGuide').remove()" style="width:100%;padding:12px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer">我知道了</button>
+        </div>
+    `;
+    
+    document.body.appendChild(guide);
+}
+
+// 检查是否已安装
+function isPWAInstalled() {
+    return window.matchMedia('(display-mode: standalone)').matches || 
+           window.navigator.standalone === true ||
+           localStorage.getItem('pwa_installed') === 'true';
+}
+
+// 页面加载完成后检查PWA状态
+document.addEventListener('DOMContentLoaded', function() {
+    if (isPWAInstalled()) {
+        console.log('[PWA] 应用已安装');
+    }
+});
 </script>
 
 </body></html>
