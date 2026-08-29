@@ -114,6 +114,165 @@ button:empty {
 [class*="action"] button:hover {
     background: #e0e0e0 !important;
 }
+/* 手机网页版本适配 - 响应式设计 */
+@media (max-width: 768px) {
+    /* 全局调整 */
+    * {
+        -webkit-tap-highlight-color: transparent;
+    }
+    body {
+        font-size: 14px;
+        overflow-x: hidden;
+    }
+    /* 顶部导航 */
+    .topbar {
+        flex-wrap: wrap;
+        padding: 8px;
+        height: auto;
+        min-height: 60px;
+    }
+    .topbar h1 {
+        font-size: 16px;
+        width: 100%;
+        text-align: center;
+        margin-bottom: 8px;
+    }
+    .topbar .tab-btn {
+        flex: 1;
+        min-width: 70px;
+        font-size: 12px;
+        padding: 8px 4px;
+        margin: 2px;
+        height: auto;
+        white-space: nowrap;
+    }
+    .topbar-right {
+        width: 100%;
+        justify-content: center;
+        margin-top: 8px;
+        flex-wrap: wrap;
+    }
+    .btn-top {
+        font-size: 12px;
+        padding: 6px 10px;
+        margin: 2px;
+    }
+    /* 主内容区域 */
+    .main-content,
+    #app {
+        padding: 10px;
+        margin-top: 120px;
+    }
+    /* 表格适配 */
+    table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+    }
+    table th,
+    table td {
+        padding: 6px 8px;
+        font-size: 12px;
+    }
+    /* 按钮适配 */
+    button {
+        font-size: 13px;
+        padding: 8px 12px;
+        min-height: 36px;
+        min-width: 44px;
+    }
+    /* 输入框适配 */
+    input,
+    select,
+    textarea {
+        font-size: 14px;
+        padding: 10px;
+        min-height: 40px;
+    }
+    /* 模态框适配 */
+    .modal,
+    .modal-content,
+    [class*="modal"] {
+        width: 95% !important;
+        max-width: 95% !important;
+        max-height: 90vh;
+        overflow-y: auto;
+        margin: 10px auto;
+        left: 2.5% !important;
+        right: 2.5% !important;
+    }
+    /* 卡片适配 */
+    .card,
+    [class*="card"] {
+        padding: 12px;
+        margin-bottom: 10px;
+    }
+    /* 网格布局适配 */
+    [class*="grid"] {
+        grid-template-columns: 1fr !important;
+        gap: 10px;
+    }
+    /* 弹性布局适配 */
+    [class*="flex"] {
+        flex-wrap: wrap;
+    }
+    /* 隐藏非必要元素 */
+    .hide-mobile,
+    [class*="hide-mobile"] {
+        display: none !important;
+    }
+    /* 云端同步按钮位置调整 */
+    #cloudSyncBtn {
+        bottom: 15px;
+        right: 15px;
+        width: 45px;
+        height: 45px;
+        font-size: 20px;
+    }
+    #syncIndicator {
+        bottom: 70px;
+        right: 15px;
+        font-size: 10px;
+        padding: 3px 8px;
+    }
+}
+/* 小屏幕手机适配 */
+@media (max-width: 480px) {
+    .topbar .tab-btn {
+        min-width: 60px;
+        font-size: 11px;
+        padding: 6px 2px;
+    }
+    .topbar h1 {
+        font-size: 14px;
+    }
+    table th,
+    table td {
+        padding: 4px 6px;
+        font-size: 11px;
+    }
+    button {
+        font-size: 12px;
+        padding: 6px 10px;
+        min-height: 32px;
+    }
+}
+/* 横屏手机适配 */
+@media (max-width: 768px) and (orientation: landscape) {
+    .topbar {
+        height: 50px;
+    }
+    .topbar h1 {
+        width: auto;
+        margin-bottom: 0;
+        font-size: 14px;
+    }
+    .main-content,
+    #app {
+        margin-top: 60px;
+    }
+}
 </style></head>
 
 <body>
