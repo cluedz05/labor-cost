@@ -1190,8 +1190,12 @@
         
         // 登录
         function login() {
+            console.log('login函数被调用');
+            
             const username = document.getElementById('loginUsername').value.trim();
             const password = document.getElementById('loginPassword').value;
+            
+            console.log('登录信息:', username, password);
             
             if (!username || !password) {
                 showToast('请输入账号和密码');
@@ -1202,18 +1206,36 @@
             initDefaultAdmin();
             
             const users = JSON.parse(localStorage.getItem('users') || '[]');
+            console.log('用户列表:', users);
+            
             const user = users.find(function(u) { return u.username === username && u.password === password; });
+            console.log('找到用户:', user);
             
             if (user) {
                 currentUser = user;
                 localStorage.setItem('current_user', JSON.stringify(user));
+                
+                console.log('登录成功，准备切换到首页');
                 
                 // 更新页面显示
                 checkLogin();
                 loadStats();
                 
                 // 直接切换到首页
+                console.log('调用switchPage(home)');
                 switchPage('home');
+                
+                // 验证页面是否切换成功
+                setTimeout(function() {
+                    var activePage = document.querySelector('.page.active');
+                    console.log('切换后激活页面:', activePage ? activePage.id : '无');
+                    
+                    // 如果没有切换成功，再次切换
+                    if (activePage && activePage.id !== 'page-home') {
+                        console.log('页面切换失败，再次尝试');
+                        switchPage('home');
+                    }
+                }, 100);
                 
                 showToast('登录成功');
             } else {
