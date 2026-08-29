@@ -8104,10 +8104,26 @@ if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', function() {
     initLibraryButtons();
     loadDefaultLibrary();
+    // 给款式详情窗口添加拖动功能
+    setTimeout(function() {
+      var detailModal = document.querySelector('.detail-modal-content');
+      var detailHeader = document.querySelector('.detail-draggable-header');
+      if (detailModal && detailHeader) {
+        makeDraggable(detailModal, detailHeader);
+      }
+    }, 500);
   });
 } else {
   initLibraryButtons();
   loadDefaultLibrary();
+  // 给款式详情窗口添加拖动功能
+  setTimeout(function() {
+    var detailModal = document.querySelector('.detail-modal-content');
+    var detailHeader = document.querySelector('.detail-draggable-header');
+    if (detailModal && detailHeader) {
+      makeDraggable(detailModal, detailHeader);
+    }
+  }, 500);
 }
 
 
