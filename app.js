@@ -5206,12 +5206,117 @@ function showDetail(id) {
 
   document.getElementById('detailModal').classList.add('show');
   
-  // 使用requestAnimationFrame确保DOM更新完成后再初始化拖动功能
-  requestAnimationFrame(function() {
-    setTimeout(function() {
-      initDetailModalDrag();
-    }, 50);
-  });
+  // 最简单、最可靠的拖动实现
+  setTimeout(function() {
+    var detailModal = document.getElementById('detailModal');
+    var modalContent = detailModal ? detailModal.querySelector('.modal') : null;
+    var draggableHeader = modalContent ? modalContent.querySelector('.detail-draggable-header') : null;
+    
+    if (!modalContent) return;
+    
+    // 设置overlay样式
+    detailModal.style.background = 'transparent';
+    detailModal.style.pointerEvents = 'none';
+    detailModal.style.zIndex = '99998';
+    
+    // 设置窗口样式
+    modalContent.style.position = 'fixed';
+    modalContent.style.top = '50px';
+    modalContent.style.left = '50px';
+    modalContent.style.right = 'auto';
+    modalContent.style.bottom = 'auto';
+    modalContent.style.margin = '0';
+    modalContent.style.transform = 'none';
+    modalContent.style.pointerEvents = 'auto';
+    modalContent.style.zIndex = '100000';
+    
+    // 如果没有拖动标题栏，创建一个
+    if (!draggableHeader) {
+      draggableHeader = document.createElement('div');
+      draggableHeader.className = 'detail-draggable-header';
+      draggableHeader.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;cursor:move;padding-bottom:8px;border-bottom:2px solid #f3f4f6;user-select:none';
+      
+      var titleContainer = document.createElement('div');
+      titleContainer.style.cssText = 'display:flex;align-items:center;gap:8px';
+      
+      var title = modalContent.querySelector('h2');
+      if (title) {
+        title.style.margin = '0';
+        title.style.fontSize = '18px';
+        titleContainer.appendChild(title);
+      }
+      
+      var hint = document.createElement('span');
+      hint.style.cssText = 'font-size:12px;color:#9ca3af;font-weight:normal';
+      hint.textContent = '（拖动标题移动）';
+      titleContainer.appendChild(hint);
+      
+      draggableHeader.appendChild(titleContainer);
+      
+      var closeBtn = modalContent.querySelector('.modal-close');
+      if (closeBtn) {
+        closeBtn.style.position = 'static';
+        closeBtn.style.transform = 'none';
+        draggableHeader.appendChild(closeBtn);
+      }
+      
+      modalContent.insertBefore(draggableHeader, modalContent.firstChild);
+    }
+    
+    // 设置标题栏样式
+    draggableHeader.style.cursor = 'move';
+    draggableHeader.style.userSelect = 'none';
+    
+    // 最简单的拖动实现
+    var isDragging = false;
+    var offsetX = 0;
+    var offsetY = 0;
+    
+    draggableHeader.onmousedown = function(e) {
+      isDragging = true;
+      var rect = modalContent.getBoundingClientRect();
+      offsetX = e.clientX - rect.left;
+      offsetY = e.clientY - rect.top;
+      modalContent.style.zIndex = '100001';
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    };
+    
+    document.onmousemove = function(e) {
+      if (!isDragging) return;
+      modalContent.style.left = (e.clientX - offsetX) + 'px';
+      modalContent.style.top = (e.clientY - offsetY) + 'px';
+    };
+    
+    document.onmouseup = function() {
+      isDragging = false;
+    };
+    
+    // 触摸设备支持
+    draggableHeader.ontouchstart = function(e) {
+      isDragging = true;
+      var touch = e.touches[0];
+      var rect = modalContent.getBoundingClientRect();
+      offsetX = touch.clientX - rect.left;
+      offsetY = touch.clientY - rect.top;
+      modalContent.style.zIndex = '100001';
+      e.preventDefault();
+    };
+    
+    document.ontouchmove = function(e) {
+      if (!isDragging) return;
+      var touch = e.touches[0];
+      modalContent.style.left = (touch.clientX - offsetX) + 'px';
+      modalContent.style.top = (touch.clientY - offsetY) + 'px';
+    };
+    
+    document.ontouchend = function() {
+      isDragging = false;
+    };
+    
+    console.log('款式详情窗口拖动功能已初始化（最简单可靠的方式）');
+  }, 100);
 
 
 
@@ -5219,158 +5324,6 @@ function showDetail(id) {
 
   window._detailNewRowCount = (window._detailNewRowCount || 0);
 
-}
-
-// 初始化款式详情窗口拖动功能（独立函数，确保可靠执行）
-function initDetailModalDrag() {
-  var detailModal = document.getElementById('detailModal');
-  var modalContent = detailModal ? detailModal.querySelector('.modal') : null;
-  
-  if (!detailModal || !modalContent) {
-    console.log('initDetailModalDrag: 未找到窗口元素');
-    return;
-  }
-  
-  // 设置overlay样式
-  detailModal.style.background = 'transparent';
-  detailModal.style.pointerEvents = 'none';
-  detailModal.style.zIndex = '99998';
-  
-  // 设置modal内容样式
-  modalContent.style.position = 'fixed';
-  modalContent.style.top = '50px';
-  modalContent.style.left = '50px';
-  modalContent.style.right = 'auto';
-  modalContent.style.bottom = 'auto';
-  modalContent.style.margin = '0';
-  modalContent.style.transform = 'none';
-  modalContent.style.pointerEvents = 'auto';
-  
-  // 查找或创建拖动标题栏
-  var draggableHeader = modalContent.querySelector('.detail-draggable-header');
-  if (!draggableHeader) {
-    // 创建拖动标题栏
-    draggableHeader = document.createElement('div');
-    draggableHeader.className = 'detail-draggable-header';
-    draggableHeader.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;cursor:move;padding-bottom:8px;border-bottom:2px solid #f3f4f6;user-select:none;position:relative;z-index:10';
-    
-    // 创建标题容器
-    var titleContainer = document.createElement('div');
-    titleContainer.style.cssText = 'display:flex;align-items:center;gap:8px';
-    
-    var title = modalContent.querySelector('h2');
-    if (title) {
-      title.style.margin = '0';
-      title.style.fontSize = '18px';
-      titleContainer.appendChild(title);
-    }
-    
-    var hint = document.createElement('span');
-    hint.style.cssText = 'font-size:12px;color:#9ca3af;font-weight:normal';
-    hint.textContent = '（拖动标题移动）';
-    titleContainer.appendChild(hint);
-    
-    draggableHeader.appendChild(titleContainer);
-    
-    // 把关闭按钮移到拖动标题栏
-    var closeBtn = modalContent.querySelector('.modal-close');
-    if (closeBtn) {
-      closeBtn.style.position = 'static';
-      closeBtn.style.transform = 'none';
-      draggableHeader.appendChild(closeBtn);
-    }
-    
-    // 把拖动标题栏插入到modal内容的最前面
-    modalContent.insertBefore(draggableHeader, modalContent.firstChild);
-    console.log('initDetailModalDrag: 已创建拖动标题栏');
-  }
-  
-  // 移除旧的事件监听器（通过克隆元素）
-  var newHeader = draggableHeader.cloneNode(true);
-  draggableHeader.parentNode.replaceChild(newHeader, draggableHeader);
-  draggableHeader = newHeader;
-  
-  // 添加拖动事件监听器
-  var isDragging = false;
-  var startX, startY, initialLeft, initialTop;
-  
-  draggableHeader.addEventListener('mousedown', function(e) {
-    console.log('detail modal mousedown');
-    isDragging = true;
-    startX = e.clientX;
-    startY = e.clientY;
-    
-    var rect = modalContent.getBoundingClientRect();
-    initialLeft = rect.left;
-    initialTop = rect.top;
-    
-    modalContent.style.position = 'fixed';
-    modalContent.style.left = initialLeft + 'px';
-    modalContent.style.top = initialTop + 'px';
-    modalContent.style.right = 'auto';
-    modalContent.style.bottom = 'auto';
-    modalContent.style.margin = '0';
-    modalContent.style.transform = 'none';
-    modalContent.style.zIndex = '100000';
-    
-    e.preventDefault();
-    e.stopPropagation();
-  });
-  
-  document.addEventListener('mousemove', function(e) {
-    if (!isDragging) return;
-    
-    var dx = e.clientX - startX;
-    var dy = e.clientY - startY;
-    
-    modalContent.style.left = (initialLeft + dx) + 'px';
-    modalContent.style.top = (initialTop + dy) + 'px';
-  });
-  
-  document.addEventListener('mouseup', function() {
-    if (isDragging) {
-      isDragging = false;
-    }
-  });
-  
-  // 触摸设备支持
-  draggableHeader.addEventListener('touchstart', function(e) {
-    isDragging = true;
-    var touch = e.touches[0];
-    startX = touch.clientX;
-    startY = touch.clientY;
-    
-    var rect = modalContent.getBoundingClientRect();
-    initialLeft = rect.left;
-    initialTop = rect.top;
-    
-    modalContent.style.position = 'fixed';
-    modalContent.style.left = initialLeft + 'px';
-    modalContent.style.top = initialTop + 'px';
-    modalContent.style.right = 'auto';
-    modalContent.style.bottom = 'auto';
-    modalContent.style.margin = '0';
-    modalContent.style.transform = 'none';
-    
-    e.preventDefault();
-  });
-  
-  document.addEventListener('touchmove', function(e) {
-    if (!isDragging) return;
-    
-    var touch = e.touches[0];
-    var dx = touch.clientX - startX;
-    var dy = touch.clientY - startY;
-    
-    modalContent.style.left = (initialLeft + dx) + 'px';
-    modalContent.style.top = (initialTop + dy) + 'px';
-  });
-  
-  document.addEventListener('touchend', function() {
-    isDragging = false;
-  });
-  
-  console.log('initDetailModalDrag: 拖动功能已初始化完成');
 }
 
 
