@@ -267,6 +267,9 @@
                         console.log('数据保护期结束，可以同步到云端了');
                     }, 10000);
                     
+                    // 【重要】同步完成后触发自定义事件，通知页面数据已更新（无论是手动同步还是静默同步）
+                    window.dispatchEvent(new CustomEvent('cloudDataUpdated'));
+                    
                     if (!silent) {
                         addSyncLog(`同步完成，成功下载 ${successCount}/${DATA_KEYS.length} 项数据`, 'success');
                         showToast(`☁️ 云端数据已恢复 (${successCount}项)`);
@@ -274,7 +277,7 @@
                         // 刷新页面以应用新数据（仅手动同步时刷新）
                         setTimeout(() => location.reload(), 1000);
                     } else {
-                        addSyncLog(`定期同步完成，更新 ${successCount}/${DATA_KEYS.length} 项数据`, 'success');
+                        addSyncLog(`同步完成，更新 ${successCount}/${DATA_KEYS.length} 项数据`, 'success');
                     }
                     resolve();
                 } catch(e) {

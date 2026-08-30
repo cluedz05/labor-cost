@@ -8419,27 +8419,13 @@ if (document.readyState === 'loading') {
     
     // 定期从云端同步已禁用（只有页面聚焦/切换时才同步，避免频繁同步）
     
-    // 【重要】监听云端数据更新事件，当云端数据变化时自动重新加载DB并刷新页面
+    // 【重要】监听云端数据更新事件，当云端数据变化时自动刷新页面（确保删除操作也能同步显示）
     window.addEventListener('cloudDataUpdated', function() {
-      console.log('收到云端数据更新事件，重新加载DB并刷新页面...');
-      if (typeof loadDB === 'function') {
-        loadDB().then(function() {
-          if (typeof renderHistory === 'function') {
-            renderHistory();
-          }
-          if (typeof renderProcessSelect === 'function') {
-            renderProcessSelect();
-          }
-          if (typeof renderSelectedTable === 'function') {
-            renderSelectedTable();
-          }
-          console.log('云端数据更新后页面已刷新');
-        });
-      } else {
-        if (typeof renderHistory === 'function') {
-          renderHistory();
-        }
-      }
+      console.log('收到云端数据更新事件，刷新页面显示最新数据...');
+      // 延迟刷新，确保数据已经写入localStorage
+      setTimeout(function() {
+        location.reload();
+      }, 500);
     });
   });
 } else {
@@ -8490,27 +8476,13 @@ if (document.readyState === 'loading') {
   // 定期从云端同步最新数据（每隔30秒）
   // 定期从云端同步已禁用（只有页面聚焦/切换时才同步，避免频繁同步）
   
-  // 【重要】监听云端数据更新事件，当云端数据变化时自动重新加载DB并刷新页面
+  // 【重要】监听云端数据更新事件，当云端数据变化时自动刷新页面（确保删除操作也能同步显示）
   window.addEventListener('cloudDataUpdated', function() {
-    console.log('收到云端数据更新事件，重新加载DB并刷新页面...');
-    if (typeof loadDB === 'function') {
-      loadDB().then(function() {
-        if (typeof renderHistory === 'function') {
-          renderHistory();
-        }
-        if (typeof renderProcessSelect === 'function') {
-          renderProcessSelect();
-        }
-        if (typeof renderSelectedTable === 'function') {
-          renderSelectedTable();
-        }
-        console.log('云端数据更新后页面已刷新');
-      });
-    } else {
-      if (typeof renderHistory === 'function') {
-        renderHistory();
-      }
-    }
+    console.log('收到云端数据更新事件，刷新页面显示最新数据...');
+    // 延迟刷新，确保数据已经写入localStorage
+    setTimeout(function() {
+      location.reload();
+    }, 500);
   });
 }
 
