@@ -11,10 +11,10 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 
-<!-- 动态版本号，确保JS文件也是最新的 -->
+<!-- 动态版本号，确保JS文件也是最新的（每次页面加载都更新） -->
 <script>
-    // 生成动态版本号（基于当前日期，每天更新一次）
-    var dynamicVersion = 'v=' + new Date().toISOString().slice(0,10).replace(/-/g,'') + Math.floor(Date.now() / 3600000);
+    // 生成动态版本号（基于当前时间戳，每次页面加载都不一样）
+    var dynamicVersion = 'v=' + Date.now();
     document.write('<script src="app.js?' + dynamicVersion + '"><\/script>');
     document.write('<script src="cloud-sync.js?' + dynamicVersion + '"><\/script>');
 </script>

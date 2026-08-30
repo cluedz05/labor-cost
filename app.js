@@ -8419,9 +8419,17 @@ if (document.readyState === 'loading') {
     
     // 定期从云端同步已禁用（只有页面聚焦/切换时才同步，避免频繁同步）
     
+    // 【重要】页面加载时间标记，避免无限刷新循环
+    var pageLoadTime = Date.now();
+    
     // 【重要】监听云端数据更新事件，当云端数据变化时自动刷新页面（确保删除操作也能同步显示）
     window.addEventListener('cloudDataUpdated', function() {
       console.log('收到云端数据更新事件，刷新页面显示最新数据...');
+      // 【重要】页面加载后5秒内不要刷新，避免无限刷新循环（页面加载时的同步不刷新）
+      if (Date.now() - pageLoadTime < 5000) {
+        console.log('页面加载后5秒内，跳过刷新，避免无限循环');
+        return;
+      }
       // 延迟刷新，确保数据已经写入localStorage
       setTimeout(function() {
         location.reload();
@@ -8476,9 +8484,17 @@ if (document.readyState === 'loading') {
   // 定期从云端同步最新数据（每隔30秒）
   // 定期从云端同步已禁用（只有页面聚焦/切换时才同步，避免频繁同步）
   
+  // 【重要】页面加载时间标记，避免无限刷新循环
+  var pageLoadTime = Date.now();
+  
   // 【重要】监听云端数据更新事件，当云端数据变化时自动刷新页面（确保删除操作也能同步显示）
   window.addEventListener('cloudDataUpdated', function() {
     console.log('收到云端数据更新事件，刷新页面显示最新数据...');
+    // 【重要】页面加载后5秒内不要刷新，避免无限刷新循环（页面加载时的同步不刷新）
+    if (Date.now() - pageLoadTime < 5000) {
+      console.log('页面加载后5秒内，跳过刷新，避免无限循环');
+      return;
+    }
     // 延迟刷新，确保数据已经写入localStorage
     setTimeout(function() {
       location.reload();
