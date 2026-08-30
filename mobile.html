@@ -759,21 +759,38 @@
                         <div class="img-preview" id="newStyleImgPreview"></div>
                     </div>
                     
-                    <!-- 工序列表 -->
+                    <!-- 工序选择区域（和电脑版一致，直接在页面显示） -->
                     <div class="form-group">
-                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:8px">
-                            <label style="margin-bottom:0">工序明细</label>
-                            <div style="display:flex;gap:6px">
-                                <button onclick="showProcessLibraryModal()" style="padding:6px 10px;background:#4361ee;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer">📋 工序库</button>
-                                <button onclick="showAddProcessModal()" style="padding:6px 10px;background:#16a34a;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer">➕ 手动</button>
+                        <label>📋 工序选择</label>
+                        
+                        <!-- 工序筛选 -->
+                        <input type="text" id="mobileProcFilter" placeholder="🔍 搜索工序名称（三分类同步）..." oninput="filterMobileProcesses()" style="margin-bottom:10px">
+                        
+                        <!-- 三分类标签 -->
+                        <div style="display:flex;gap:6px;margin-bottom:10px">
+                            <button id="mobileProcTabPingche" onclick="switchMobileProcTab('pingche')" style="flex:1;padding:10px;background:#4361ee;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">🚲 平车</button>
+                            <button id="mobileProcTabZache" onclick="switchMobileProcTab('zache')" style="flex:1;padding:10px;background:#f3f4f6;color:#374151;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">⚡ 扎车</button>
+                            <button id="mobileProcTabKanche" onclick="switchMobileProcTab('kanche')" style="flex:1;padding:10px;background:#f3f4f6;color:#374151;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">🔪 坎车</button>
+                        </div>
+                        
+                        <!-- 工序列表（带复选框，和电脑版一致） -->
+                        <div id="mobileProcessList" style="max-height:250px;overflow-y:auto;border:1px solid #e5e7eb;border-radius:8px;margin-bottom:12px">
+                            <div style="text-align:center;padding:20px;color:#9ca3af;font-size:13px">加载中...</div>
+                        </div>
+                        
+                        <!-- 已选工序表格（和电脑版一致） -->
+                        <div style="background:#f8fafc;border-radius:8px;padding:10px">
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                                <span style="font-size:14px;font-weight:600;color:#1a1a2e">已选工序（<span id="mobileSelectedCount">0</span>个）</span>
+                                <button onclick="clearMobileSelectedProcesses()" style="padding:4px 10px;background:#fee2e2;color:#ef4444;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">清空全部</button>
                             </div>
-                        </div>
-                        <div id="newStyleProcessList">
-                            <div style="text-align:center;padding:20px;color:#9ca3af;font-size:13px">暂无工序，点击上方按钮添加</div>
-                        </div>
-                        <div class="total-row" id="newStyleTotalRow" style="display:none">
-                            <span class="label">合计</span>
-                            <span class="value" id="newStyleTotal">¥0.00</span>
+                            <div id="mobileSelectedProcessTable">
+                                <div style="text-align:center;padding:15px;color:#9ca3af;font-size:13px">暂无已选工序</div>
+                            </div>
+                            <div class="total-row" id="mobileTotalRow" style="display:none;margin-top:10px">
+                                <span class="label">合计</span>
+                                <span class="value" id="mobileTotal">¥0.00</span>
+                            </div>
                         </div>
                     </div>
                     
@@ -912,6 +929,8 @@
         let allStyles = [];
         let currentProcessTab = 'pingche';
         let selectedProcessIds = [];
+        let currentMobileProcTab = 'pingche';
+        let mobileSelectedProcesses = [];
         
         // 存储key（和电脑版一致）
         const DB_KEY = 'gf_cost_db';
@@ -1135,8 +1154,165 @@
             document.getElementById('newStyleDate').value = today;
             newStyleImages = [];
             newStyleProcesses = [];
+            mobileSelectedProcesses = [];
+            currentMobileProcTab = 'pingche';
             document.getElementById('newStyleImgPreview').innerHTML = '';
-            renderNewStyleProcessList();
+            document.getElementById('mobileProcFilter').value = '';
+            
+            // 初始化工序选择区域
+            switchMobileProcTab('pingche');
+            renderMobileSelectedTable();
+        }
+        
+        // 切换手机版工序类型标签
+        function switchMobileProcTab(type) {
+            currentMobileProcTab = type;
+            
+            // 更新标签样式
+            document.getElementById('mobileProcTabPingche').style.background = type === 'pingche' ? '#4361ee' : '#f3f4f6';
+            document.getElementById('mobileProcTabPingche').style.color = type === 'pingche' ? '#fff' : '#374151';
+            document.getElementById('mobileProcTabZache').style.background = type === 'zache' ? '#4361ee' : '#f3f4f6';
+            document.getElementById('mobileProcTabZache').style.color = type === 'zache' ? '#fff' : '#374151';
+            document.getElementById('mobileProcTabKanche').style.background = type === 'kanche' ? '#4361ee' : '#f3f4f6';
+            document.getElementById('mobileProcTabKanche').style.color = type === 'kanche' ? '#fff' : '#374151';
+            
+            renderMobileProcessList();
+        }
+        
+        // 筛选手机版工序
+        function filterMobileProcesses() {
+            renderMobileProcessList();
+        }
+        
+        // 渲染手机版工序列表
+        function renderMobileProcessList() {
+            const listArea = document.getElementById('mobileProcessList');
+            const filter = document.getElementById('mobileProcFilter').value.toLowerCase();
+            const processes = DB.processes[currentMobileProcTab] || [];
+            
+            const filtered = processes.filter(p => {
+                return !filter || (p.name && p.name.toLowerCase().includes(filter));
+            });
+            
+            if (filtered.length === 0) {
+                listArea.innerHTML = '<div style="text-align:center;padding:20px;color:#9ca3af;font-size:13px">暂无工序</div>';
+                return;
+            }
+            
+            let html = '';
+            filtered.forEach((p, idx) => {
+                const isSelected = mobileSelectedProcesses.some(sp => sp.name === p.name && sp.type === currentMobileProcTab);
+                html += `
+                    <div style="display:flex;align-items:center;padding:12px 14px;border-bottom:1px solid #f3f4f6;cursor:pointer;${isSelected ? 'background:#eff6ff' : ''}" onclick="toggleMobileProcess('${p.name}', ${p.price || 0})">
+                        <div style="width:24px;height:24px;border:2px solid ${isSelected ? '#4361ee' : '#d1d5db'};border-radius:5px;display:flex;align-items:center;justify-content:center;margin-right:12px;flex-shrink:0;background:${isSelected ? '#4361ee' : 'white'}">
+                            ${isSelected ? '<span style="color:white;font-size:14px;font-weight:bold">✓</span>' : ''}
+                        </div>
+                        <div style="flex:1;min-width:0">
+                            <div style="font-size:14px;color:#1a1a2e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(p.name || '')}</div>
+                        </div>
+                        <div style="font-size:15px;font-weight:700;color:#e94560;margin-left:10px;flex-shrink:0">¥${(p.price || 0).toFixed(2)}</div>
+                    </div>
+                `;
+            });
+            
+            listArea.innerHTML = html;
+        }
+        
+        // 切换手机版工序选中状态
+        function toggleMobileProcess(name, price) {
+            const existingIdx = mobileSelectedProcesses.findIndex(sp => sp.name === name && sp.type === currentMobileProcTab);
+            
+            if (existingIdx >= 0) {
+                mobileSelectedProcesses.splice(existingIdx, 1);
+            } else {
+                mobileSelectedProcesses.push({
+                    id: 'proc_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                    type: currentMobileProcTab,
+                    name: name,
+                    qty: 1,
+                    price: price
+                });
+            }
+            
+            renderMobileProcessList();
+            renderMobileSelectedTable();
+        }
+        
+        // 渲染手机版已选工序表格
+        function renderMobileSelectedTable() {
+            const tableArea = document.getElementById('mobileSelectedProcessTable');
+            const totalRow = document.getElementById('mobileTotalRow');
+            const totalSpan = document.getElementById('mobileTotal');
+            const countSpan = document.getElementById('mobileSelectedCount');
+            
+            countSpan.textContent = mobileSelectedProcesses.length;
+            
+            if (mobileSelectedProcesses.length === 0) {
+                tableArea.innerHTML = '<div style="text-align:center;padding:15px;color:#9ca3af;font-size:13px">暂无已选工序</div>';
+                totalRow.style.display = 'none';
+                return;
+            }
+            
+            const typeNames = { pingche: '平车', zache: '扎车', kanche: '坎车' };
+            let total = 0;
+            
+            let html = '<table class="process-table" style="font-size:12px"><thead><tr><th>工序</th><th>类型</th><th style="text-align:center">数量</th><th>单价</th><th>小计</th><th style="text-align:center">操作</th></tr></thead><tbody>';
+            
+            mobileSelectedProcesses.forEach((p, idx) => {
+                const subtotal = p.price * p.qty;
+                total += subtotal;
+                html += `
+                    <tr>
+                        <td>${escapeHtml(p.name)}</td>
+                        <td>${typeNames[p.type] || p.type}</td>
+                        <td style="text-align:center">
+                            <input type="number" value="${p.qty}" min="1" style="width:50px;padding:4px;border:1px solid #e5e7eb;border-radius:4px;text-align:center;font-size:12px" onchange="updateMobileProcessQty(${idx}, this.value)">
+                        </td>
+                        <td>
+                            <input type="number" value="${p.price.toFixed(2)}" min="0" step="0.01" style="width:60px;padding:4px;border:1px solid #e5e7eb;border-radius:4px;text-align:center;font-size:12px" onchange="updateMobileProcessPrice(${idx}, this.value)">
+                        </td>
+                        <td style="font-weight:600">¥${subtotal.toFixed(2)}</td>
+                        <td style="text-align:center">
+                            <button onclick="removeMobileProcess(${idx})" style="padding:4px 8px;background:#ef4444;color:#fff;border:none;border-radius:4px;font-size:11px;cursor:pointer">✕</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            tableArea.innerHTML = html;
+            totalRow.style.display = 'flex';
+            totalSpan.textContent = '¥' + total.toFixed(2);
+        }
+        
+        // 更新手机版已选工序数量
+        function updateMobileProcessQty(idx, value) {
+            const qty = parseInt(value) || 1;
+            mobileSelectedProcesses[idx].qty = qty;
+            renderMobileSelectedTable();
+        }
+        
+        // 更新手机版已选工序单价
+        function updateMobileProcessPrice(idx, value) {
+            const price = parseFloat(value) || 0;
+            mobileSelectedProcesses[idx].price = price;
+            renderMobileSelectedTable();
+        }
+        
+        // 删除手机版已选工序
+        function removeMobileProcess(idx) {
+            mobileSelectedProcesses.splice(idx, 1);
+            renderMobileProcessList();
+            renderMobileSelectedTable();
+            showToast('工序已删除');
+        }
+        
+        // 清空手机版已选工序
+        function clearMobileSelectedProcesses() {
+            mobileSelectedProcesses = [];
+            renderMobileProcessList();
+            renderMobileSelectedTable();
+            showToast('已清空全部工序');
         }
         
         // 显示添加工序弹窗
@@ -1662,7 +1838,7 @@
                 date: date,
                 note: note,
                 imgs: newStyleImages,
-                selections: newStyleProcesses,
+                selections: mobileSelectedProcesses,
                 status: 'pending',
                 createdBy: currentUser ? { id: currentUser.uid || currentUser.id, username: currentUser.username } : null,
                 createdAt: new Date().toISOString()
