@@ -2,7 +2,7 @@
 
 // ===== 应用版本号（每次更新递增）=====
 
-const APP_VERSION = '1.9.55';
+const APP_VERSION = '1.9.56';
 
 const VERSION_KEY = 'app_version';
 

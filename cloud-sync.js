@@ -295,7 +295,7 @@
         if (syncTimer) clearTimeout(syncTimer);
         syncTimer = setTimeout(() => {
             syncToCloud();
-        }, 5000); // 5秒后自动同步
+        }, 2000); // 2秒后自动同步（用户修改数据后快速同步到云端）
     }
     
     // 【重要】页面聚焦时立即从云端同步（实现准实时同步）
@@ -324,10 +324,16 @@
         });
     }
     
-    // 【重要】定期从云端同步（已禁用，只有页面聚焦时才同步，避免频繁同步）
+    // 【重要】定期从云端同步（每隔1分钟，确保数据最终一致，不会太频繁）
     function startPeriodicSync() {
-        // 已禁用定期同步，只有页面聚焦/切换时才同步
-        console.log('定期同步已禁用，只有页面聚焦时才同步');
+        setInterval(function() {
+            if (!justSyncedFromCloud) {
+                console.log('定期从云端同步最新数据...');
+                syncFromCloud(true).then(function() {
+                    window.dispatchEvent(new CustomEvent('cloudDataUpdated'));
+                });
+            }
+        }, 60000); // 每隔60秒（1分钟）从云端同步
     }
 
     // ============================================
