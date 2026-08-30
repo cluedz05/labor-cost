@@ -761,9 +761,12 @@
                     
                     <!-- 工序列表 -->
                     <div class="form-group">
-                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:8px">
                             <label style="margin-bottom:0">工序明细</label>
-                            <button onclick="showAddProcessModal()" style="padding:6px 12px;background:#16a34a;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">➕ 添加工序</button>
+                            <div style="display:flex;gap:6px">
+                                <button onclick="showProcessLibraryModal()" style="padding:6px 10px;background:#4361ee;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer">📋 工序库</button>
+                                <button onclick="showAddProcessModal()" style="padding:6px 10px;background:#16a34a;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer">➕ 手动</button>
+                            </div>
                         </div>
                         <div id="newStyleProcessList">
                             <div style="text-align:center;padding:20px;color:#9ca3af;font-size:13px">暂无工序，点击上方按钮添加</div>
@@ -861,6 +864,31 @@
         </div>
     </div>
     
+    <!-- 工序库选择弹窗 -->
+    <div class="modal-overlay" id="processLibraryModal">
+        <div class="modal" style="max-height:85vh">
+            <div class="modal-header">
+                <h2>📋 从工序库选择</h2>
+                <button class="close-btn" onclick="closeProcessLibraryModal()">✕</button>
+            </div>
+            <div class="form-group">
+                <input type="text" id="processLibraryFilter" placeholder="🔍 搜索工序名称..." oninput="filterProcessLibrary()">
+            </div>
+            <div style="display:flex;gap:8px;margin-bottom:12px">
+                <button id="procTabPingche" onclick="switchProcessTab('pingche')" style="flex:1;padding:8px;background:#4361ee;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">平车</button>
+                <button id="procTabZache" onclick="switchProcessTab('zache')" style="flex:1;padding:8px;background:#f3f4f6;color:#374151;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">扎车</button>
+                <button id="procTabKanche" onclick="switchProcessTab('kanche')" style="flex:1;padding:8px;background:#f3f4f6;color:#374151;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">坎车</button>
+            </div>
+            <div id="processLibraryList" style="max-height:40vh;overflow-y:auto;border:1px solid #e5e7eb;border-radius:8px">
+                <div style="text-align:center;padding:20px;color:#9ca3af;font-size:13px">加载中...</div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding:10px;background:#f8fafc;border-radius:8px">
+                <span style="font-size:13px;color:#374151">已选: <span id="selectedProcCount" style="font-weight:700;color:#4361ee">0</span> 个工序</span>
+                <button onclick="confirmProcessSelection()" style="padding:8px 16px;background:#16a34a;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">确认添加</button>
+            </div>
+        </div>
+    </div>
+    
     <script>
         // 全局变量
         let currentUser = null;
@@ -869,6 +897,8 @@
         let newStyleImages = [];
         let newStyleProcesses = [];
         let allStyles = [];
+        let currentProcessTab = 'pingche';
+        let selectedProcessIds = [];
         
         // 存储key（和电脑版一致）
         const DB_KEY = 'gf_cost_db';
@@ -1180,6 +1210,116 @@
             newStyleProcesses.splice(idx, 1);
             renderNewStyleProcessList();
             showToast('工序已删除');
+        }
+        
+        // 显示工序库选择弹窗
+        function showProcessLibraryModal() {
+            currentProcessTab = 'pingche';
+            selectedProcessIds = [];
+            document.getElementById('processLibraryFilter').value = '';
+            switchProcessTab('pingche');
+            document.getElementById('processLibraryModal').classList.add('show');
+        }
+        
+        // 关闭工序库选择弹窗
+        function closeProcessLibraryModal() {
+            document.getElementById('processLibraryModal').classList.remove('show');
+        }
+        
+        // 切换工序类型标签
+        function switchProcessTab(type) {
+            currentProcessTab = type;
+            
+            // 更新标签样式
+            document.getElementById('procTabPingche').style.background = type === 'pingche' ? '#4361ee' : '#f3f4f6';
+            document.getElementById('procTabPingche').style.color = type === 'pingche' ? '#fff' : '#374151';
+            document.getElementById('procTabZache').style.background = type === 'zache' ? '#4361ee' : '#f3f4f6';
+            document.getElementById('procTabZache').style.color = type === 'zache' ? '#fff' : '#374151';
+            document.getElementById('procTabKanche').style.background = type === 'kanche' ? '#4361ee' : '#f3f4f6';
+            document.getElementById('procTabKanche').style.color = type === 'kanche' ? '#fff' : '#374151';
+            
+            renderProcessLibrary();
+        }
+        
+        // 筛选工序库
+        function filterProcessLibrary() {
+            renderProcessLibrary();
+        }
+        
+        // 渲染工序库列表
+        function renderProcessLibrary() {
+            const listArea = document.getElementById('processLibraryList');
+            const filter = document.getElementById('processLibraryFilter').value.toLowerCase();
+            const processes = DB.processes[currentProcessTab] || [];
+            
+            const filtered = processes.filter(p => {
+                return !filter || (p.name && p.name.toLowerCase().includes(filter));
+            });
+            
+            if (filtered.length === 0) {
+                listArea.innerHTML = '<div style="text-align:center;padding:20px;color:#9ca3af;font-size:13px">暂无工序</div>';
+                document.getElementById('selectedProcCount').textContent = selectedProcessIds.length;
+                return;
+            }
+            
+            let html = '';
+            filtered.forEach((p, idx) => {
+                const isSelected = selectedProcessIds.includes(p.id || p.name);
+                html += `
+                    <div style="display:flex;align-items:center;padding:10px 12px;border-bottom:1px solid #f3f4f6;cursor:pointer;${isSelected ? 'background:#eff6ff' : ''}" onclick="toggleProcessSelection('${p.id || p.name}')">
+                        <div style="width:20px;height:20px;border:2px solid ${isSelected ? '#4361ee' : '#d1d5db'};border-radius:4px;display:flex;align-items:center;justify-content:center;margin-right:10px;flex-shrink:0;background:${isSelected ? '#4361ee' : 'white'}">
+                            ${isSelected ? '<span style="color:white;font-size:12px;font-weight:bold">✓</span>' : ''}
+                        </div>
+                        <div style="flex:1;min-width:0">
+                            <div style="font-size:14px;color:#1a1a2e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(p.name || '')}</div>
+                        </div>
+                        <div style="font-size:14px;font-weight:600;color:#e94560;margin-left:10px;flex-shrink:0">¥${(p.price || 0).toFixed(2)}</div>
+                    </div>
+                `;
+            });
+            
+            listArea.innerHTML = html;
+            document.getElementById('selectedProcCount').textContent = selectedProcessIds.length;
+        }
+        
+        // 切换工序选中状态
+        function toggleProcessSelection(id) {
+            const idx = selectedProcessIds.indexOf(id);
+            if (idx >= 0) {
+                selectedProcessIds.splice(idx, 1);
+            } else {
+                selectedProcessIds.push(id);
+            }
+            renderProcessLibrary();
+        }
+        
+        // 确认选择工序
+        function confirmProcessSelection() {
+            if (selectedProcessIds.length === 0) {
+                showToast('请先选择工序');
+                return;
+            }
+            
+            const processes = DB.processes[currentProcessTab] || [];
+            let addedCount = 0;
+            
+            selectedProcessIds.forEach(id => {
+                const proc = processes.find(p => (p.id || p.name) === id);
+                if (proc) {
+                    newStyleProcesses.push({
+                        id: 'proc_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                        type: currentProcessTab,
+                        name: proc.name,
+                        qty: 1,
+                        price: proc.price || 0
+                    });
+                    addedCount++;
+                }
+            });
+            
+            renderNewStyleProcessList();
+            closeProcessLibraryModal();
+            showToast('已添加 ' + addedCount + ' 个工序');
         }
         
         // 显示以图搜款
