@@ -814,10 +814,15 @@
     <script>
         // 全局变量
         let currentUser = null;
-        let DB = { styles: [], users: [] };
+        let DB = { processes: { pingche: [], zache: [], kanche: [] }, styles: [] };
         let currentPage = 'home';
         let newStyleImages = [];
         let allStyles = [];
+        
+        // 存储key（和电脑版一致）
+        const DB_KEY = 'gf_cost_db';
+        const USERS_KEY = 'app_users';
+        const CURRENT_USER_KEY = 'app_current_user';
         
         // 初始化
         function init() {
@@ -828,44 +833,60 @@
         // 加载数据
         function loadDB() {
             try {
-                const saved = localStorage.getItem('duoqi_db');
+                const saved = localStorage.getItem(DB_KEY);
                 if (saved) {
                     DB = JSON.parse(saved);
                 }
                 if (!DB.styles) DB.styles = [];
-                if (!DB.users) DB.users = [];
-                
-                // 确保有管理员账号
-                if (!DB.users.find(u => u.username === 'admin')) {
-                    DB.users.push({
-                        id: 'admin_' + Date.now(),
-                        username: 'admin',
-                        password: 'admin123',
-                        role: 'admin',
-                        createdAt: new Date().toISOString()
-                    });
-                    saveDB();
-                }
+                if (!DB.processes) DB.processes = { pingche: [], zache: [], kanche: [] };
             } catch (e) {
                 console.error('加载数据失败:', e);
-                DB = { styles: [], users: [] };
+                DB = { processes: { pingche: [], zache: [], kanche: [] }, styles: [] };
             }
         }
         
         // 保存数据
         function saveDB() {
             try {
-                localStorage.setItem('duoqi_db', JSON.stringify(DB));
+                localStorage.setItem(DB_KEY, JSON.stringify(DB));
             } catch (e) {
                 console.error('保存数据失败:', e);
                 showToast('保存失败：存储空间不足');
             }
         }
         
+        // 简单的密码哈希（和电脑版一致）
+        function hashPassword(pwd) {
+            try {
+                return btoa(unescape(encodeURIComponent(pwd + '_dqas_salt')));
+            } catch(e) {
+                return pwd;
+            }
+        }
+        
+        // 初始化用户系统，预设主账号
+        function initUsers() {
+            var users = localStorage.getItem(USERS_KEY);
+            if (!users) {
+                var defaultUsers = {
+                    'admin': {
+                        username: 'admin',
+                        password: hashPassword('admin123'),
+                        role: 'admin',
+                        isAdmin: true,
+                        createdAt: Date.now(),
+                        uid: 'admin_001'
+                    }
+                };
+                localStorage.setItem(USERS_KEY, JSON.stringify(defaultUsers));
+            }
+        }
+        
         // 检查登录状态
         function checkLogin() {
             try {
-                const savedUser = localStorage.getItem('duoqi_user');
+                initUsers();
+                const savedUser = localStorage.getItem(CURRENT_USER_KEY);
                 if (savedUser) {
                     currentUser = JSON.parse(savedUser);
                     showMain();
@@ -901,16 +922,22 @@
                 return;
             }
             
-            const user = DB.users.find(u => u.username === username && u.password === password);
-            if (!user) {
-                showToast('账号或密码错误');
-                return;
+            try {
+                const users = JSON.parse(localStorage.getItem(USERS_KEY) || '{}');
+                const user = users[username];
+                
+                if (!user || user.password !== hashPassword(password)) {
+                    showToast('账号或密码错误');
+                    return;
+                }
+                
+                currentUser = user;
+                localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
+                showToast('登录成功');
+                showMain();
+            } catch (e) {
+                showToast('登录失败：' + e.message);
             }
-            
-            currentUser = user;
-            localStorage.setItem('duoqi_user', JSON.stringify(user));
-            showToast('登录成功');
-            showMain();
         }
         
         // 注册
@@ -929,29 +956,36 @@
                 return;
             }
             
-            if (DB.users.find(u => u.username === username)) {
-                showToast('账号已存在');
-                return;
+            try {
+                const users = JSON.parse(localStorage.getItem(USERS_KEY) || '{}');
+                
+                if (users[username]) {
+                    showToast('账号已存在');
+                    return;
+                }
+                
+                const newUser = {
+                    username: username,
+                    password: hashPassword(password),
+                    role: 'viewer',
+                    isAdmin: false,
+                    createdAt: Date.now(),
+                    uid: 'user_' + Date.now()
+                };
+                
+                users[username] = newUser;
+                localStorage.setItem(USERS_KEY, JSON.stringify(users));
+                showToast('注册成功，请登录');
+                showLogin();
+            } catch (e) {
+                showToast('注册失败：' + e.message);
             }
-            
-            const newUser = {
-                id: 'user_' + Date.now(),
-                username: username,
-                password: password,
-                role: 'viewer',
-                createdAt: new Date().toISOString()
-            };
-            
-            DB.users.push(newUser);
-            saveDB();
-            showToast('注册成功，请登录');
-            showLogin();
         }
         
         // 退出登录
         function doLogout() {
             currentUser = null;
-            localStorage.removeItem('duoqi_user');
+            localStorage.removeItem(CURRENT_USER_KEY);
             showToast('已退出登录');
             showLogin();
         }
