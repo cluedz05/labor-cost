@@ -866,7 +866,7 @@
     
     <!-- 工序库选择弹窗 -->
     <div class="modal-overlay" id="processLibraryModal">
-        <div class="modal" style="max-height:85vh">
+        <div class="modal" style="max-height:90vh">
             <div class="modal-header">
                 <h2>📋 从工序库选择</h2>
                 <button class="close-btn" onclick="closeProcessLibraryModal()">✕</button>
@@ -874,17 +874,30 @@
             <div class="form-group">
                 <input type="text" id="processLibraryFilter" placeholder="🔍 搜索工序名称..." oninput="filterProcessLibrary()">
             </div>
-            <div style="display:flex;gap:8px;margin-bottom:12px">
-                <button id="procTabPingche" onclick="switchProcessTab('pingche')" style="flex:1;padding:8px;background:#4361ee;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">平车</button>
-                <button id="procTabZache" onclick="switchProcessTab('zache')" style="flex:1;padding:8px;background:#f3f4f6;color:#374151;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">扎车</button>
-                <button id="procTabKanche" onclick="switchProcessTab('kanche')" style="flex:1;padding:8px;background:#f3f4f6;color:#374151;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">坎车</button>
+            <div style="display:flex;gap:8px;margin-bottom:10px">
+                <button id="procTabPingche" onclick="switchProcessTab('pingche')" style="flex:1;padding:10px;background:#4361ee;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer">平车</button>
+                <button id="procTabZache" onclick="switchProcessTab('zache')" style="flex:1;padding:10px;background:#f3f4f6;color:#374151;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer">扎车</button>
+                <button id="procTabKanche" onclick="switchProcessTab('kanche')" style="flex:1;padding:10px;background:#f3f4f6;color:#374151;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer">坎车</button>
             </div>
-            <div id="processLibraryList" style="max-height:40vh;overflow-y:auto;border:1px solid #e5e7eb;border-radius:8px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                <span style="font-size:12px;color:#6b7280">共 <span id="totalProcCount">0</span> 个工序</span>
+                <div style="display:flex;gap:6px">
+                    <button onclick="selectAllProcesses()" style="padding:4px 10px;background:#e0e7ff;color:#4361ee;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">全选</button>
+                    <button onclick="deselectAllProcesses()" style="padding:4px 10px;background:#fee2e2;color:#ef4444;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">清空</button>
+                </div>
+            </div>
+            <div id="processLibraryList" style="max-height:35vh;overflow-y:auto;border:1px solid #e5e7eb;border-radius:8px">
                 <div style="text-align:center;padding:20px;color:#9ca3af;font-size:13px">加载中...</div>
             </div>
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding:10px;background:#f8fafc;border-radius:8px">
-                <span style="font-size:13px;color:#374151">已选: <span id="selectedProcCount" style="font-weight:700;color:#4361ee">0</span> 个工序</span>
-                <button onclick="confirmProcessSelection()" style="padding:8px 16px;background:#16a34a;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">确认添加</button>
+            <div style="margin-top:10px;padding:10px;background:#f8fafc;border-radius:8px">
+                <div style="font-size:12px;color:#6b7280;margin-bottom:6px">已选工序（<span id="selectedProcCount">0</span>个）：</div>
+                <div id="selectedProcPreview" style="display:flex;flex-wrap:wrap;gap:4px;max-height:60px;overflow-y:auto">
+                    <span style="font-size:12px;color:#9ca3af">暂无</span>
+                </div>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:12px">
+                <button onclick="closeProcessLibraryModal()" style="flex:1;padding:12px;background:#f3f4f6;color:#374151;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer">取消</button>
+                <button onclick="confirmProcessSelection()" style="flex:2;padding:12px;background:#16a34a;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer">确认添加（<span id="selectedProcCount2">0</span>）</button>
             </div>
         </div>
     </div>
@@ -1256,9 +1269,11 @@
                 return !filter || (p.name && p.name.toLowerCase().includes(filter));
             });
             
+            document.getElementById('totalProcCount').textContent = filtered.length;
+            
             if (filtered.length === 0) {
-                listArea.innerHTML = '<div style="text-align:center;padding:20px;color:#9ca3af;font-size:13px">暂无工序</div>';
-                document.getElementById('selectedProcCount').textContent = selectedProcessIds.length;
+                listArea.innerHTML = '<div style="text-align:center;padding:30px;color:#9ca3af;font-size:14px">暂无工序</div>';
+                updateSelectedProcPreview();
                 return;
             }
             
@@ -1266,20 +1281,69 @@
             filtered.forEach((p, idx) => {
                 const isSelected = selectedProcessIds.includes(p.id || p.name);
                 html += `
-                    <div style="display:flex;align-items:center;padding:10px 12px;border-bottom:1px solid #f3f4f6;cursor:pointer;${isSelected ? 'background:#eff6ff' : ''}" onclick="toggleProcessSelection('${p.id || p.name}')">
-                        <div style="width:20px;height:20px;border:2px solid ${isSelected ? '#4361ee' : '#d1d5db'};border-radius:4px;display:flex;align-items:center;justify-content:center;margin-right:10px;flex-shrink:0;background:${isSelected ? '#4361ee' : 'white'}">
-                            ${isSelected ? '<span style="color:white;font-size:12px;font-weight:bold">✓</span>' : ''}
+                    <div style="display:flex;align-items:center;padding:14px 16px;border-bottom:1px solid #f3f4f6;cursor:pointer;${isSelected ? 'background:#eff6ff' : ''}" onclick="toggleProcessSelection('${p.id || p.name}')">
+                        <div style="width:28px;height:28px;border:3px solid ${isSelected ? '#4361ee' : '#d1d5db'};border-radius:6px;display:flex;align-items:center;justify-content:center;margin-right:14px;flex-shrink:0;background:${isSelected ? '#4361ee' : 'white'}">
+                            ${isSelected ? '<span style="color:white;font-size:18px;font-weight:bold">✓</span>' : ''}
                         </div>
                         <div style="flex:1;min-width:0">
-                            <div style="font-size:14px;color:#1a1a2e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(p.name || '')}</div>
+                            <div style="font-size:15px;color:#1a1a2e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(p.name || '')}</div>
                         </div>
-                        <div style="font-size:14px;font-weight:600;color:#e94560;margin-left:10px;flex-shrink:0">¥${(p.price || 0).toFixed(2)}</div>
+                        <div style="font-size:16px;font-weight:700;color:#e94560;margin-left:12px;flex-shrink:0">¥${(p.price || 0).toFixed(2)}</div>
                     </div>
                 `;
             });
             
             listArea.innerHTML = html;
-            document.getElementById('selectedProcCount').textContent = selectedProcessIds.length;
+            updateSelectedProcPreview();
+        }
+        
+        // 更新已选工序预览
+        function updateSelectedProcPreview() {
+            const count = selectedProcessIds.length;
+            document.getElementById('selectedProcCount').textContent = count;
+            document.getElementById('selectedProcCount2').textContent = count;
+            
+            const previewArea = document.getElementById('selectedProcPreview');
+            if (count === 0) {
+                previewArea.innerHTML = '<span style="font-size:12px;color:#9ca3af">暂无</span>';
+                return;
+            }
+            
+            const processes = DB.processes[currentProcessTab] || [];
+            let html = '';
+            selectedProcessIds.forEach(id => {
+                const proc = processes.find(p => (p.id || p.name) === id);
+                if (proc) {
+                    html += `<span style="padding:3px 8px;background:#4361ee;color:white;border-radius:4px;font-size:11px;white-space:nowrap">${escapeHtml(proc.name.substring(0, 10))}</span>`;
+                }
+            });
+            previewArea.innerHTML = html;
+        }
+        
+        // 全选工序
+        function selectAllProcesses() {
+            const filter = document.getElementById('processLibraryFilter').value.toLowerCase();
+            const processes = DB.processes[currentProcessTab] || [];
+            const filtered = processes.filter(p => {
+                return !filter || (p.name && p.name.toLowerCase().includes(filter));
+            });
+            
+            filtered.forEach(p => {
+                const id = p.id || p.name;
+                if (!selectedProcessIds.includes(id)) {
+                    selectedProcessIds.push(id);
+                }
+            });
+            
+            renderProcessLibrary();
+            showToast('已全选 ' + filtered.length + ' 个工序');
+        }
+        
+        // 取消全选工序
+        function deselectAllProcesses() {
+            selectedProcessIds = [];
+            renderProcessLibrary();
+            showToast('已清空选择');
         }
         
         // 切换工序选中状态
