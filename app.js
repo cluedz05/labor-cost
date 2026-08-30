@@ -2751,6 +2751,15 @@ function saveDB() {
       console.warn('localStorage保存失败', e);
 
     }
+    
+    // 【重要】同时保存styles到localStorage，确保云端同步能读取到最新数据
+    try { 
+      if (DB.styles) {
+        localStorage.setItem('styles', JSON.stringify(DB.styles)); 
+      }
+    } catch(e) {
+      console.warn('styles保存失败', e);
+    }
 
     idbSave(DB);
 
