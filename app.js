@@ -8417,28 +8417,7 @@ if (document.readyState === 'loading') {
       }
     }, 1000);
     
-    // 定期从云端同步最新数据（每隔30秒）
-    setInterval(function() {
-      if (typeof window.CloudSync !== 'undefined' && typeof window.CloudSync.syncFromCloud === 'function') {
-        window.CloudSync.syncFromCloud(true).then(function() {
-          // 【重要】同步完成后重新加载DB对象
-          if (typeof loadDB === 'function') {
-            loadDB().then(function() {
-              // 重新加载DB后刷新款式列表显示
-              if (typeof renderHistory === 'function') {
-                renderHistory();
-              }
-            });
-          } else {
-            if (typeof renderHistory === 'function') {
-              renderHistory();
-            }
-          }
-        }).catch(function(e) {
-          console.error('定期同步失败:', e);
-        });
-      }
-    }, 30000);
+    // 定期从云端同步已禁用（只有页面聚焦/切换时才同步，避免频繁同步）
     
     // 【重要】监听云端数据更新事件，当云端数据变化时自动重新加载DB并刷新页面
     window.addEventListener('cloudDataUpdated', function() {
@@ -8509,27 +8488,7 @@ if (document.readyState === 'loading') {
   }, 1000);
   
   // 定期从云端同步最新数据（每隔30秒）
-  setInterval(function() {
-    if (typeof window.CloudSync !== 'undefined' && typeof window.CloudSync.syncFromCloud === 'function') {
-      window.CloudSync.syncFromCloud(true).then(function() {
-        // 【重要】同步完成后重新加载DB对象
-        if (typeof loadDB === 'function') {
-          loadDB().then(function() {
-            // 重新加载DB后刷新款式列表显示
-            if (typeof renderHistory === 'function') {
-              renderHistory();
-            }
-          });
-        } else {
-          if (typeof renderHistory === 'function') {
-            renderHistory();
-          }
-        }
-      }).catch(function(e) {
-        console.error('定期同步失败:', e);
-      });
-    }
-  }, 30000);
+  // 定期从云端同步已禁用（只有页面聚焦/切换时才同步，避免频繁同步）
   
   // 【重要】监听云端数据更新事件，当云端数据变化时自动重新加载DB并刷新页面
   window.addEventListener('cloudDataUpdated', function() {

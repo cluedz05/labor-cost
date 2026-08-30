@@ -321,16 +321,10 @@
         });
     }
     
-    // 【重要】定期从云端同步（每隔10秒，实现准实时同步）
+    // 【重要】定期从云端同步（已禁用，只有页面聚焦时才同步，避免频繁同步）
     function startPeriodicSync() {
-        setInterval(function() {
-            if (!justSyncedFromCloud) {
-                console.log('定期从云端同步最新数据...');
-                syncFromCloud(true).then(function() {
-                    window.dispatchEvent(new CustomEvent('cloudDataUpdated'));
-                });
-            }
-        }, 10000); // 每隔10秒从云端同步
+        // 已禁用定期同步，只有页面聚焦/切换时才同步
+        console.log('定期同步已禁用，只有页面聚焦时才同步');
     }
 
     // ============================================
