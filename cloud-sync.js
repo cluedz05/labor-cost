@@ -166,56 +166,105 @@
     // ============================================
     // 同步操作
     // ============================================
+    
+    // 同步队列，确保每次同步都能执行
+    let syncQueue = [];
+    let isProcessingQueue = false;
+    
+    // 处理同步队列
+    async function processSyncQueue() {
+        if (isProcessingQueue || syncQueue.length === 0) return;
+        isProcessingQueue = true;
+        
+        while (syncQueue.length > 0) {
+            const task = syncQueue.shift();
+            try {
+                await task();
+            } catch(e) {
+                console.error('同步队列任务执行失败:', e);
+            }
+        }
+        
+        isProcessingQueue = false;
+    }
+    
+    // 添加同步任务到队列
+    function addSyncTask(task) {
+        syncQueue.push(task);
+        processSyncQueue();
+    }
 
     // 同步所有数据到云端
     async function syncToCloud() {
-        if (isSyncing || !isConfigured()) return;
-        isSyncing = true;
-        addSyncLog('开始同步到云端...', 'info');
-
-        let successCount = 0;
-        for (const key of DATA_KEYS) {
-            const data = localStorage.getItem(key);
-            if (data !== null) {
-                const success = await uploadData(key, data);
-                if (success) successCount++;
-            }
-        }
-
-        localStorage.setItem(LAST_SYNC_KEY, new Date().toISOString());
-        isSyncing = false;
-        addSyncLog(`同步完成，成功上传 ${successCount}/${DATA_KEYS.length} 项数据`, 'success');
-        showToast(`☁️ 云端同步完成 (${successCount}项)`);
+        if (!isConfigured()) return;
+        
+        // 添加到同步队列，确保不会被跳过
+        return new Promise((resolve) => {
+            addSyncTask(async () => {
+                try {
+                    addSyncLog('开始同步到云端...', 'info');
+                    
+                    let successCount = 0;
+                    for (const key of DATA_KEYS) {
+                        const data = localStorage.getItem(key);
+                        if (data !== null) {
+                            const success = await uploadData(key, data);
+                            if (success) successCount++;
+                        }
+                    }
+                    
+                    localStorage.setItem(LAST_SYNC_KEY, new Date().toISOString());
+                    addSyncLog(`同步完成，成功上传 ${successCount}/${DATA_KEYS.length} 项数据`, 'success');
+                    showToast(`☁️ 云端同步完成 (${successCount}项)`);
+                    resolve();
+                } catch(e) {
+                    console.error('同步到云端失败:', e);
+                    addSyncLog('同步到云端失败: ' + e.message, 'error');
+                    resolve();
+                }
+            });
+        });
     }
 
     // 从云端同步所有数据
     async function syncFromCloud(silent = false) {
-        if (isSyncing || !isConfigured()) return;
-        isSyncing = true;
-        if (!silent) {
-            addSyncLog('开始从云端同步...', 'info');
-        }
-
-        let successCount = 0;
-        for (const key of DATA_KEYS) {
-            const data = await downloadData(key);
-            if (data !== null) {
-                localStorage.setItem(key, data);
-                successCount++;
-            }
-        }
-
-        localStorage.setItem(LAST_SYNC_KEY, new Date().toISOString());
-        isSyncing = false;
-        if (!silent) {
-            addSyncLog(`同步完成，成功下载 ${successCount}/${DATA_KEYS.length} 项数据`, 'success');
-            showToast(`☁️ 云端数据已恢复 (${successCount}项)`);
-            
-            // 刷新页面以应用新数据（仅手动同步时刷新）
-            setTimeout(() => location.reload(), 1000);
-        } else {
-            addSyncLog(`定期同步完成，更新 ${successCount}/${DATA_KEYS.length} 项数据`, 'success');
-        }
+        if (!isConfigured()) return;
+        
+        // 添加到同步队列，确保不会被跳过
+        return new Promise((resolve) => {
+            addSyncTask(async () => {
+                try {
+                    if (!silent) {
+                        addSyncLog('开始从云端同步...', 'info');
+                    }
+                    
+                    let successCount = 0;
+                    for (const key of DATA_KEYS) {
+                        const data = await downloadData(key);
+                        if (data !== null) {
+                            localStorage.setItem(key, data);
+                            successCount++;
+                        }
+                    }
+                    
+                    localStorage.setItem(LAST_SYNC_KEY, new Date().toISOString());
+                    if (!silent) {
+                        addSyncLog(`同步完成，成功下载 ${successCount}/${DATA_KEYS.length} 项数据`, 'success');
+                        showToast(`☁️ 云端数据已恢复 (${successCount}项)`);
+                        
+                        // 刷新页面以应用新数据（仅手动同步时刷新）
+                        setTimeout(() => location.reload(), 1000);
+                    } else {
+                        addSyncLog(`定期同步完成，更新 ${successCount}/${DATA_KEYS.length} 项数据`, 'success');
+                    }
+                    resolve();
+                } catch(e) {
+                    console.error('从云端同步失败:', e);
+                    addSyncLog('从云端同步失败: ' + e.message, 'error');
+                    resolve();
+                }
+            });
+        });
     }
 
     // 自动同步（延迟执行，避免频繁同步）

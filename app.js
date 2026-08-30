@@ -2770,9 +2770,26 @@ function saveDB() {
     toast('⚠️ 数据保存失败，请检查数据量');
 
   }
-
   
-
+  // 【重要】保存后立即同步到云端（延迟2秒，避免频繁同步）
+  try {
+    if (typeof window.CloudSync !== 'undefined' && typeof window.CloudSync.syncToCloud === 'function') {
+      // 清除之前的同步定时器
+      if (window._saveSyncTimer) clearTimeout(window._saveSyncTimer);
+      // 2秒后同步到云端
+      window._saveSyncTimer = setTimeout(function() {
+        console.log('saveDB触发云端同步...');
+        window.CloudSync.syncToCloud().then(function() {
+          console.log('saveDB云端同步完成');
+        }).catch(function(e) {
+          console.error('saveDB云端同步失败:', e);
+        });
+      }, 2000);
+    }
+  } catch(e) {
+    console.warn('触发云端同步失败:', e);
+  }
+  
   // 如果有后端API，同时保存到服务器
 
   if (useAPI) {
