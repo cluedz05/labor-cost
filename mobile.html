@@ -615,6 +615,8 @@
             color: #6b7280;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="cloud-sync.js"></script>
 </head>
 <body>
     <!-- 登录页面 -->
@@ -940,7 +942,23 @@
         // 初始化
         function init() {
             loadDB();
+            initUsers();
             checkLogin();
+            
+            // 初始化云端同步
+            setTimeout(function() {
+                if (typeof window.CloudSync !== 'undefined' && window.CloudSync.isConfigured()) {
+                    window.CloudSync.initSupabase();
+                    // 从云端同步数据（静默模式，不刷新页面）
+                    window.CloudSync.syncFromCloud(true).then(function() {
+                        // 云端数据同步完成后，重新加载本地数据
+                        loadDB();
+                        // 刷新当前页面显示
+                        if (currentPage === 'home') showHome();
+                        else if (currentPage === 'list') showStyleList();
+                    });
+                }
+            }, 1000);
         }
         
         // 加载数据
@@ -962,6 +980,11 @@
         function saveDB() {
             try {
                 localStorage.setItem(DB_KEY, JSON.stringify(DB));
+                
+                // 自动同步到云端（延迟5秒，避免频繁同步）
+                if (typeof window.CloudSync !== 'undefined' && window.CloudSync.isConfigured()) {
+                    window.CloudSync.scheduleAutoSync();
+                }
             } catch (e) {
                 console.error('保存数据失败:', e);
                 showToast('保存失败：存储空间不足');

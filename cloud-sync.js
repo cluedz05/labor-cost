@@ -20,7 +20,8 @@
         'backups',            // 备份记录
         'exportRecords',      // 导出记录
         'approvals',          // 审批记录
-        'settings'            // 应用设置
+        'settings',           // 应用设置
+        'gf_cost_db'          // 手机版统一数据
     ];
 
     // Supabase客户端
@@ -476,7 +477,9 @@
         openSettings: createSettingsModal,
         syncToCloud: syncToCloud,
         syncFromCloud: syncFromCloud,
-        isConfigured: isConfigured
+        isConfigured: isConfigured,
+        initSupabase: initSupabase,
+        scheduleAutoSync: scheduleAutoSync
     };
 
     // 自动初始化
