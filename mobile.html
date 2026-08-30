@@ -1016,35 +1016,17 @@
                 
                 addSyncLog('电脑版有 ' + desktopStyles.length + ' 个款式（来源：' + source + '）', 'info');
                 
-                let addedCount = 0;
-                let updatedCount = 0;
-                
-                desktopStyles.forEach(desktopStyle => {
-                    if (!desktopStyle || !desktopStyle.name) return;
-                    
-                    // 检查是否已存在（按id或name+date判断）
-                    const existingIdx = mobileDB.styles.findIndex(s => 
-                        (s.id && desktopStyle.id && s.id === desktopStyle.id) || 
-                        (s.name === desktopStyle.name && s.date === desktopStyle.date)
-                    );
-                    
-                    if (existingIdx >= 0) {
-                        // 更新已存在的款式（以云端数据为准）
-                        mobileDB.styles[existingIdx] = Object.assign({}, mobileDB.styles[existingIdx], desktopStyle);
-                        updatedCount++;
-                    } else {
-                        // 添加新款式
-                        mobileDB.styles.push(desktopStyle);
-                        addedCount++;
-                    }
-                });
+                // 【重要】直接用云端的styles覆盖本地的styles，确保完全一致（包括删除操作）
+                // 只覆盖styles，保留本地的其他数据（processes、用户数据等）
+                const oldCount = mobileDB.styles.length;
+                mobileDB.styles = JSON.parse(JSON.stringify(desktopStyles));
                 
                 // 保存转换后的数据到localStorage
                 localStorage.setItem(DB_KEY, JSON.stringify(mobileDB));
                 // 同时更新全局变量DB
                 DB = mobileDB;
                 
-                addSyncLog('转换完成：新增 ' + addedCount + ' 个，更新 ' + updatedCount + ' 个，手机版现有 ' + mobileDB.styles.length + ' 个款式', 'success');
+                addSyncLog('转换完成：云端 ' + desktopStyles.length + ' 个款式，本地从 ' + oldCount + ' 个更新为 ' + mobileDB.styles.length + ' 个（已同步删除操作）', 'success');
                 return true;
             } catch(e) {
                 addSyncLog('转换失败：' + e.message, 'error');
