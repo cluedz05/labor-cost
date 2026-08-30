@@ -1032,42 +1032,48 @@
         // 把电脑版的分开存储数据转换成手机版的统一格式
         function convertFromDesktopToMobile() {
             try {
+                // 从localStorage读取最新的手机版数据
+                let mobileDB = {};
+                try {
+                    mobileDB = JSON.parse(localStorage.getItem(DB_KEY) || '{}');
+                } catch(e) {
+                    mobileDB = {};
+                }
+                if (!mobileDB.styles) mobileDB.styles = [];
+                if (!mobileDB.processes) mobileDB.processes = { pingche: [], zache: [], kanche: [] };
+                
                 // 读取电脑版的styles数据
                 const desktopStyles = localStorage.getItem('styles');
                 if (desktopStyles) {
                     const styles = JSON.parse(desktopStyles);
-                    // 合并到手机版的gf_cost_db中
-                    if (!DB.styles) DB.styles = [];
                     
                     styles.forEach(desktopStyle => {
                         // 检查是否已存在（按id或name+date判断）
-                        const existingIdx = DB.styles.findIndex(s => 
+                        const existingIdx = mobileDB.styles.findIndex(s => 
                             s.id === desktopStyle.id || 
                             (s.name === desktopStyle.name && s.date === desktopStyle.date)
                         );
                         
                         if (existingIdx >= 0) {
                             // 更新已存在的款式（以云端数据为准）
-                            DB.styles[existingIdx] = Object.assign({}, DB.styles[existingIdx], desktopStyle);
+                            mobileDB.styles[existingIdx] = Object.assign({}, mobileDB.styles[existingIdx], desktopStyle);
                         } else {
                             // 添加新款式
-                            DB.styles.push(desktopStyle);
+                            mobileDB.styles.push(desktopStyle);
                         }
                     });
                     
-                    // 保存转换后的数据
-                    localStorage.setItem(DB_KEY, JSON.stringify(DB));
-                    console.log('已从电脑版同步 ' + styles.length + ' 个款式到手机版');
+                    // 保存转换后的数据到localStorage
+                    localStorage.setItem(DB_KEY, JSON.stringify(mobileDB));
+                    // 同时更新全局变量DB
+                    DB = mobileDB;
+                    console.log('已从电脑版同步 ' + styles.length + ' 个款式到手机版，手机版现有 ' + mobileDB.styles.length + ' 个款式');
                 }
                 
                 // 读取电脑版的用户数据
                 const desktopUsers = localStorage.getItem('app_users');
                 if (desktopUsers) {
-                    // 电脑版的用户数据直接使用（格式一致）
-                    const mobileUsers = localStorage.getItem(USERS_KEY);
-                    if (!mobileUsers) {
-                        localStorage.setItem(USERS_KEY, desktopUsers);
-                    }
+                    localStorage.setItem(USERS_KEY, desktopUsers);
                 }
             } catch(e) {
                 console.error('电脑版转手机版数据失败:', e);
@@ -1077,9 +1083,19 @@
         // 把手机版的统一格式转换成电脑版的分开存储格式
         function convertFromMobileToDesktop() {
             try {
+                // 从localStorage读取最新的手机版数据
+                let mobileDB = {};
+                try {
+                    mobileDB = JSON.parse(localStorage.getItem(DB_KEY) || '{}');
+                } catch(e) {
+                    mobileDB = {};
+                }
+                if (!mobileDB.styles) mobileDB.styles = [];
+                
                 // 把手机版的styles数据转换成电脑版格式
-                if (DB.styles && DB.styles.length > 0) {
-                    localStorage.setItem('styles', JSON.stringify(DB.styles));
+                if (mobileDB.styles.length > 0) {
+                    localStorage.setItem('styles', JSON.stringify(mobileDB.styles));
+                    console.log('已从手机版同步 ' + mobileDB.styles.length + ' 个款式到电脑版');
                 }
                 
                 // 把手机版的用户数据转换成电脑版格式
