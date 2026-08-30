@@ -8439,6 +8439,29 @@ if (document.readyState === 'loading') {
         });
       }
     }, 30000);
+    
+    // 【重要】监听云端数据更新事件，当云端数据变化时自动重新加载DB并刷新页面
+    window.addEventListener('cloudDataUpdated', function() {
+      console.log('收到云端数据更新事件，重新加载DB并刷新页面...');
+      if (typeof loadDB === 'function') {
+        loadDB().then(function() {
+          if (typeof renderHistory === 'function') {
+            renderHistory();
+          }
+          if (typeof renderProcessSelect === 'function') {
+            renderProcessSelect();
+          }
+          if (typeof renderSelectedTable === 'function') {
+            renderSelectedTable();
+          }
+          console.log('云端数据更新后页面已刷新');
+        });
+      } else {
+        if (typeof renderHistory === 'function') {
+          renderHistory();
+        }
+      }
+    });
   });
 } else {
   initLibraryButtons();
@@ -8507,6 +8530,29 @@ if (document.readyState === 'loading') {
       });
     }
   }, 30000);
+  
+  // 【重要】监听云端数据更新事件，当云端数据变化时自动重新加载DB并刷新页面
+  window.addEventListener('cloudDataUpdated', function() {
+    console.log('收到云端数据更新事件，重新加载DB并刷新页面...');
+    if (typeof loadDB === 'function') {
+      loadDB().then(function() {
+        if (typeof renderHistory === 'function') {
+          renderHistory();
+        }
+        if (typeof renderProcessSelect === 'function') {
+          renderProcessSelect();
+        }
+        if (typeof renderSelectedTable === 'function') {
+          renderSelectedTable();
+        }
+        console.log('云端数据更新后页面已刷新');
+      });
+    } else {
+      if (typeof renderHistory === 'function') {
+        renderHistory();
+      }
+    }
+  });
 }
 
 

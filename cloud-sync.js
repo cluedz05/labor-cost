@@ -171,6 +171,10 @@
     let syncQueue = [];
     let isProcessingQueue = false;
     
+    // 【重要】数据保护标志：刚从云端同步后，暂时不要同步到云端，避免旧数据覆盖新数据
+    let justSyncedFromCloud = false;
+    let justSyncedTimer = null;
+    
     // 处理同步队列
     async function processSyncQueue() {
         if (isProcessingQueue || syncQueue.length === 0) return;
@@ -197,6 +201,12 @@
     // 同步所有数据到云端
     async function syncToCloud() {
         if (!isConfigured()) return;
+        
+        // 【重要】如果刚从云端同步过，暂时不要同步到云端，避免旧数据覆盖新数据
+        if (justSyncedFromCloud) {
+            console.log('刚从云端同步过，跳过本次同步到云端，避免覆盖新数据');
+            return;
+        }
         
         // 添加到同步队列，确保不会被跳过
         return new Promise((resolve) => {
@@ -248,6 +258,15 @@
                     }
                     
                     localStorage.setItem(LAST_SYNC_KEY, new Date().toISOString());
+                    
+                    // 【重要】设置数据保护标志，10秒内不要同步到云端，避免旧数据覆盖新数据
+                    justSyncedFromCloud = true;
+                    if (justSyncedTimer) clearTimeout(justSyncedTimer);
+                    justSyncedTimer = setTimeout(function() {
+                        justSyncedFromCloud = false;
+                        console.log('数据保护期结束，可以同步到云端了');
+                    }, 10000);
+                    
                     if (!silent) {
                         addSyncLog(`同步完成，成功下载 ${successCount}/${DATA_KEYS.length} 项数据`, 'success');
                         showToast(`☁️ 云端数据已恢复 (${successCount}项)`);
@@ -274,6 +293,44 @@
         syncTimer = setTimeout(() => {
             syncToCloud();
         }, 5000); // 5秒后自动同步
+    }
+    
+    // 【重要】页面聚焦时立即从云端同步（实现准实时同步）
+    function initFocusSync() {
+        window.addEventListener('focus', function() {
+            console.log('页面聚焦，立即从云端同步最新数据...');
+            if (typeof syncFromCloud === 'function') {
+                syncFromCloud(true).then(function() {
+                    console.log('页面聚焦同步完成');
+                    // 触发自定义事件，通知页面数据已更新
+                    window.dispatchEvent(new CustomEvent('cloudDataUpdated'));
+                });
+            }
+        });
+        
+        // 页面可见性变化时同步
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'visible') {
+                console.log('页面可见，立即从云端同步最新数据...');
+                if (typeof syncFromCloud === 'function') {
+                    syncFromCloud(true).then(function() {
+                        window.dispatchEvent(new CustomEvent('cloudDataUpdated'));
+                    });
+                }
+            }
+        });
+    }
+    
+    // 【重要】定期从云端同步（每隔10秒，实现准实时同步）
+    function startPeriodicSync() {
+        setInterval(function() {
+            if (!justSyncedFromCloud) {
+                console.log('定期从云端同步最新数据...');
+                syncFromCloud(true).then(function() {
+                    window.dispatchEvent(new CustomEvent('cloudDataUpdated'));
+                });
+            }
+        }, 10000); // 每隔10秒从云端同步
     }
 
     // ============================================
@@ -505,19 +562,20 @@
             setTimeout(() => {
                 // 页面加载时使用静默同步（不刷新页面）
                 addSyncLog('正在从云端获取最新数据...', 'info');
-                syncFromCloud(true);
-                
-                // 设置定期自动同步，每隔1分钟从云端拉取数据（静默同步，不刷新页面）
-                setInterval(() => {
-                    if (!isSyncing) {
-                        addSyncLog('定期同步：正在从云端获取最新数据...', 'info');
-                        syncFromCloud(true);
-                    }
-                }, 60000); // 60秒
-            }, 3000);
+                syncFromCloud(true).then(function() {
+                    // 同步完成后触发自定义事件，通知页面数据已更新
+                    window.dispatchEvent(new CustomEvent('cloudDataUpdated'));
+                });
+            }, 2000);
         }
+        
+        // 【重要】初始化页面聚焦同步（切换到页面时立即同步）
+        initFocusSync();
+        
+        // 【重要】启动准实时定期同步（每隔10秒从云端同步）
+        startPeriodicSync();
 
-        console.log('☁️ 云端同步模块已加载（自动在线更新已启用）');
+        console.log('☁️ 云端同步模块已加载（自动在线更新已启用，准实时同步）');
     }
 
     // 暴露全局函数
@@ -528,7 +586,9 @@
         syncFromCloud: syncFromCloud,
         isConfigured: isConfigured,
         initSupabase: initSupabase,
-        scheduleAutoSync: scheduleAutoSync
+        scheduleAutoSync: scheduleAutoSync,
+        initFocusSync: initFocusSync,
+        startPeriodicSync: startPeriodicSync
     };
 
     // 自动初始化
