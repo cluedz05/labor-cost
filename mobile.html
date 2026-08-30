@@ -709,6 +709,10 @@
                             <span class="icon">💻</span>
                             <span>电脑版</span>
                         </button>
+                        <button class="big-btn" onclick="manualSync()" style="background:linear-gradient(135deg,#667eea,#764ba2)">
+                            <span class="icon">☁️</span>
+                            <span>云端同步</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -945,10 +949,12 @@
             initUsers();
             checkLogin();
             
-            // 初始化云端同步
+            // 显示同步状态
+            showSyncStatus('正在从云端获取最新数据...', 'info');
+            
+            // 立即从云端同步数据
             setTimeout(function() {
                 if (typeof window.CloudSync !== 'undefined') {
-                    // 从云端同步数据（静默模式，不刷新页面）
                     window.CloudSync.syncFromCloud(true).then(function() {
                         // 云端数据同步完成后，把电脑版数据转换成手机版格式
                         convertFromDesktopToMobile();
@@ -957,11 +963,70 @@
                         // 刷新当前页面显示
                         if (currentPage === 'home') showHome();
                         else if (currentPage === 'list') showStyleList();
+                        
+                        showSyncStatus('✅ 云端数据已更新', 'success');
+                        setTimeout(function() { hideSyncStatus(); }, 3000);
                     }).catch(function(e) {
                         console.error('云端同步失败:', e);
+                        showSyncStatus('⚠️ 云端同步失败，使用本地数据', 'error');
+                        setTimeout(function() { hideSyncStatus(); }, 3000);
                     });
+                } else {
+                    hideSyncStatus();
                 }
-            }, 2000);
+            }, 500);
+        }
+        
+        // 显示同步状态
+        function showSyncStatus(message, type) {
+            var statusEl = document.getElementById('syncStatusBar');
+            if (!statusEl) {
+                statusEl = document.createElement('div');
+                statusEl.id = 'syncStatusBar';
+                statusEl.style.cssText = 'position:fixed;top:0;left:0;right:0;padding:10px 16px;text-align:center;font-size:13px;font-weight:600;z-index:10000;transition:all 0.3s;';
+                document.body.appendChild(statusEl);
+            }
+            
+            var bgColor = type === 'success' ? '#22c55e' : type === 'error' ? '#ef4444' : '#4361ee';
+            statusEl.style.background = bgColor;
+            statusEl.style.color = 'white';
+            statusEl.textContent = message;
+            statusEl.style.display = 'block';
+            statusEl.style.transform = 'translateY(0)';
+        }
+        
+        // 隐藏同步状态
+        function hideSyncStatus() {
+            var statusEl = document.getElementById('syncStatusBar');
+            if (statusEl) {
+                statusEl.style.transform = 'translateY(-100%)';
+                setTimeout(function() { statusEl.style.display = 'none'; }, 300);
+            }
+        }
+        
+        // 手动同步数据
+        function manualSync() {
+            showSyncStatus('正在同步数据...', 'info');
+            
+            // 先把本地数据同步到云端
+            convertFromMobileToDesktop();
+            
+            window.CloudSync.syncToCloud().then(function() {
+                // 然后从云端获取最新数据
+                return window.CloudSync.syncFromCloud(true);
+            }).then(function() {
+                convertFromDesktopToMobile();
+                loadDB();
+                if (currentPage === 'home') showHome();
+                else if (currentPage === 'list') showStyleList();
+                
+                showSyncStatus('✅ 同步完成，数据已更新', 'success');
+                setTimeout(function() { hideSyncStatus(); }, 3000);
+            }).catch(function(e) {
+                console.error('手动同步失败:', e);
+                showSyncStatus('⚠️ 同步失败: ' + e.message, 'error');
+                setTimeout(function() { hideSyncStatus(); }, 5000);
+            });
         }
         
         // 把电脑版的分开存储数据转换成手机版的统一格式
