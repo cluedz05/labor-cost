@@ -976,15 +976,45 @@
                 if (!mobileDB.styles) mobileDB.styles = [];
                 if (!mobileDB.processes) mobileDB.processes = { pingche: [], zache: [], kanche: [] };
                 
-                // 读取电脑版的styles数据
-                const desktopStylesStr = localStorage.getItem('styles');
-                if (!desktopStylesStr) {
-                    addSyncLog('电脑版styles数据为空，跳过转换', 'warning');
+                // 【重要】优先从gf_cost_db读取数据（电脑版saveDB只保存gf_cost_db）
+                let desktopStyles = [];
+                let source = 'styles';
+                
+                // 先尝试从gf_cost_db读取
+                const gfCostDBStr = localStorage.getItem('gf_cost_db');
+                if (gfCostDBStr) {
+                    try {
+                        const gfCostDB = JSON.parse(gfCostDBStr);
+                        if (gfCostDB.styles && gfCostDB.styles.length > 0) {
+                            desktopStyles = gfCostDB.styles;
+                            source = 'gf_cost_db';
+                            addSyncLog('从gf_cost_db读取到 ' + desktopStyles.length + ' 个款式', 'info');
+                        }
+                    } catch(e) {
+                        addSyncLog('解析gf_cost_db失败：' + e.message, 'warning');
+                    }
+                }
+                
+                // 如果gf_cost_db没有数据，再从styles读取
+                if (desktopStyles.length === 0) {
+                    const desktopStylesStr = localStorage.getItem('styles');
+                    if (desktopStylesStr) {
+                        try {
+                            desktopStyles = JSON.parse(desktopStylesStr);
+                            source = 'styles';
+                            addSyncLog('从styles读取到 ' + desktopStyles.length + ' 个款式', 'info');
+                        } catch(e) {
+                            addSyncLog('解析styles失败：' + e.message, 'warning');
+                        }
+                    }
+                }
+                
+                if (desktopStyles.length === 0) {
+                    addSyncLog('电脑版款式数据为空，跳过转换', 'warning');
                     return false;
                 }
                 
-                const desktopStyles = JSON.parse(desktopStylesStr);
-                addSyncLog('电脑版有 ' + desktopStyles.length + ' 个款式', 'info');
+                addSyncLog('电脑版有 ' + desktopStyles.length + ' 个款式（来源：' + source + '）', 'info');
                 
                 let addedCount = 0;
                 let updatedCount = 0;
