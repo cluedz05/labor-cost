@@ -2744,21 +2744,29 @@ function saveDB() {
 
   try {
 
-    const str = JSON.stringify(DB);
-
-    try { localStorage.setItem('gf_cost_db', str); } catch(e) {
-
-      console.warn('localStorage保存失败', e);
-
-    }
-    
-    // 【重要】同时保存styles到localStorage，确保云端同步能读取到最新数据
+    // 【重要】第一步：先保存styles到localStorage（确保最新）
     try { 
       if (DB.styles) {
         localStorage.setItem('styles', JSON.stringify(DB.styles)); 
       }
     } catch(e) {
       console.warn('styles保存失败', e);
+    }
+    
+    // 【重要】第二步：从localStorage读取最新的styles，更新DB对象（确保DB.styles是最新的）
+    try {
+      const latestStylesStr = localStorage.getItem('styles');
+      if (latestStylesStr) {
+        DB.styles = JSON.parse(latestStylesStr);
+      }
+    } catch(e) {
+      console.warn('更新DB.styles失败', e);
+    }
+    
+    // 【重要】第三步：保存整个DB对象到gf_cost_db（确保包含最新的styles）
+    const str = JSON.stringify(DB);
+    try { localStorage.setItem('gf_cost_db', str); } catch(e) {
+      console.warn('localStorage保存失败', e);
     }
 
     idbSave(DB);
