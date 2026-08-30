@@ -947,8 +947,7 @@
             
             // 初始化云端同步
             setTimeout(function() {
-                if (typeof window.CloudSync !== 'undefined' && window.CloudSync.isConfigured()) {
-                    window.CloudSync.initSupabase();
+                if (typeof window.CloudSync !== 'undefined') {
                     // 从云端同步数据（静默模式，不刷新页面）
                     window.CloudSync.syncFromCloud(true).then(function() {
                         // 云端数据同步完成后，把电脑版数据转换成手机版格式
@@ -958,9 +957,11 @@
                         // 刷新当前页面显示
                         if (currentPage === 'home') showHome();
                         else if (currentPage === 'list') showStyleList();
+                    }).catch(function(e) {
+                        console.error('云端同步失败:', e);
                     });
                 }
-            }, 1000);
+            }, 2000);
         }
         
         // 把电脑版的分开存储数据转换成手机版的统一格式
@@ -1056,8 +1057,13 @@
                 convertFromMobileToDesktop();
                 
                 // 自动同步到云端（延迟5秒，避免频繁同步）
-                if (typeof window.CloudSync !== 'undefined' && window.CloudSync.isConfigured()) {
-                    window.CloudSync.scheduleAutoSync();
+                if (typeof window.CloudSync !== 'undefined') {
+                    if (window.mobileSyncTimer) clearTimeout(window.mobileSyncTimer);
+                    window.mobileSyncTimer = setTimeout(function() {
+                        window.CloudSync.syncToCloud().catch(function(e) {
+                            console.error('自动同步失败:', e);
+                        });
+                    }, 5000);
                 }
             } catch (e) {
                 console.error('保存数据失败:', e);
