@@ -758,6 +758,22 @@
                         <input type="file" id="newStyleImg" accept="image/*" multiple style="display:none" onchange="previewNewStyleImg(event)">
                         <div class="img-preview" id="newStyleImgPreview"></div>
                     </div>
+                    
+                    <!-- 工序列表 -->
+                    <div class="form-group">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                            <label style="margin-bottom:0">工序明细</label>
+                            <button onclick="showAddProcessModal()" style="padding:6px 12px;background:#16a34a;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">➕ 添加工序</button>
+                        </div>
+                        <div id="newStyleProcessList">
+                            <div style="text-align:center;padding:20px;color:#9ca3af;font-size:13px">暂无工序，点击上方按钮添加</div>
+                        </div>
+                        <div class="total-row" id="newStyleTotalRow" style="display:none">
+                            <span class="label">合计</span>
+                            <span class="value" id="newStyleTotal">¥0.00</span>
+                        </div>
+                    </div>
+                    
                     <div class="btn-group">
                         <button class="btn-cancel" onclick="showHome()">取消</button>
                         <button class="btn-save" onclick="saveNewStyle()">保存</button>
@@ -811,12 +827,47 @@
         </div>
     </div>
     
+    <!-- 添加工序弹窗 -->
+    <div class="modal-overlay" id="addProcessModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>➕ 添加工序</h2>
+                <button class="close-btn" onclick="closeAddProcessModal()">✕</button>
+            </div>
+            <div class="form-group">
+                <label>工序类型</label>
+                <select id="addProcessType">
+                    <option value="pingche">平车</option>
+                    <option value="zache">扎车</option>
+                    <option value="kanche">坎车</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>工序名称</label>
+                <input type="text" id="addProcessName" placeholder="请输入工序名称">
+            </div>
+            <div class="form-group">
+                <label>数量</label>
+                <input type="number" id="addProcessQty" value="1" min="1" placeholder="请输入数量">
+            </div>
+            <div class="form-group">
+                <label>单价（元）</label>
+                <input type="number" id="addProcessPrice" value="0.00" min="0" step="0.01" placeholder="请输入单价">
+            </div>
+            <div class="btn-group">
+                <button class="btn-cancel" onclick="closeAddProcessModal()">取消</button>
+                <button class="btn-save" onclick="confirmAddProcess()">确认添加</button>
+            </div>
+        </div>
+    </div>
+    
     <script>
         // 全局变量
         let currentUser = null;
         let DB = { processes: { pingche: [], zache: [], kanche: [] }, styles: [] };
         let currentPage = 'home';
         let newStyleImages = [];
+        let newStyleProcesses = [];
         let allStyles = [];
         
         // 存储key（和电脑版一致）
@@ -1040,7 +1091,95 @@
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('newStyleDate').value = today;
             newStyleImages = [];
+            newStyleProcesses = [];
             document.getElementById('newStyleImgPreview').innerHTML = '';
+            renderNewStyleProcessList();
+        }
+        
+        // 显示添加工序弹窗
+        function showAddProcessModal() {
+            document.getElementById('addProcessType').value = 'pingche';
+            document.getElementById('addProcessName').value = '';
+            document.getElementById('addProcessQty').value = '1';
+            document.getElementById('addProcessPrice').value = '0.00';
+            document.getElementById('addProcessModal').classList.add('show');
+        }
+        
+        // 关闭添加工序弹窗
+        function closeAddProcessModal() {
+            document.getElementById('addProcessModal').classList.remove('show');
+        }
+        
+        // 确认添加工序
+        function confirmAddProcess() {
+            const type = document.getElementById('addProcessType').value;
+            const name = document.getElementById('addProcessName').value.trim();
+            const qty = parseInt(document.getElementById('addProcessQty').value) || 1;
+            const price = parseFloat(document.getElementById('addProcessPrice').value) || 0;
+            
+            if (!name) {
+                showToast('请输入工序名称');
+                return;
+            }
+            
+            newStyleProcesses.push({
+                id: 'proc_' + Date.now(),
+                type: type,
+                name: name,
+                qty: qty,
+                price: price
+            });
+            
+            renderNewStyleProcessList();
+            closeAddProcessModal();
+            showToast('工序添加成功');
+        }
+        
+        // 渲染新增款式的工序列表
+        function renderNewStyleProcessList() {
+            const listArea = document.getElementById('newStyleProcessList');
+            const totalRow = document.getElementById('newStyleTotalRow');
+            const totalSpan = document.getElementById('newStyleTotal');
+            
+            if (newStyleProcesses.length === 0) {
+                listArea.innerHTML = '<div style="text-align:center;padding:20px;color:#9ca3af;font-size:13px">暂无工序，点击上方按钮添加</div>';
+                totalRow.style.display = 'none';
+                return;
+            }
+            
+            const typeNames = { pingche: '平车', zache: '扎车', kanche: '坎车' };
+            let total = 0;
+            
+            let html = '<table class="process-table"><thead><tr><th>工序</th><th>类型</th><th style="text-align:center">数量</th><th>单价</th><th>小计</th><th style="text-align:center">操作</th></tr></thead><tbody>';
+            
+            newStyleProcesses.forEach((p, idx) => {
+                const subtotal = p.price * p.qty;
+                total += subtotal;
+                html += `
+                    <tr>
+                        <td>${escapeHtml(p.name)}</td>
+                        <td>${typeNames[p.type] || p.type}</td>
+                        <td style="text-align:center">${p.qty}</td>
+                        <td>¥${p.price.toFixed(2)}</td>
+                        <td style="font-weight:600">¥${subtotal.toFixed(2)}</td>
+                        <td style="text-align:center">
+                            <button onclick="removeNewStyleProcess(${idx})" style="padding:4px 8px;background:#ef4444;color:#fff;border:none;border-radius:6px;font-size:12px;cursor:pointer">✕</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            listArea.innerHTML = html;
+            totalRow.style.display = 'flex';
+            totalSpan.textContent = '¥' + total.toFixed(2);
+        }
+        
+        // 删除新增款式的工序
+        function removeNewStyleProcess(idx) {
+            newStyleProcesses.splice(idx, 1);
+            renderNewStyleProcessList();
+            showToast('工序已删除');
         }
         
         // 显示以图搜款
@@ -1319,9 +1458,9 @@
                 date: date,
                 note: note,
                 imgs: newStyleImages,
-                selections: [],
+                selections: newStyleProcesses,
                 status: 'pending',
-                createdBy: currentUser ? { id: currentUser.id, username: currentUser.username } : null,
+                createdBy: currentUser ? { id: currentUser.uid || currentUser.id, username: currentUser.username } : null,
                 createdAt: new Date().toISOString()
             };
             
