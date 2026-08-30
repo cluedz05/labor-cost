@@ -943,6 +943,219 @@
         const USERS_KEY = 'app_users';
         const CURRENT_USER_KEY = 'app_current_user';
         
+        // ============================================
+        // 专业云端同步模块 - 确保双向同步可靠
+        // ============================================
+        
+        // 同步日志
+        function addSyncLog(message, type = 'info') {
+            try {
+                const logs = JSON.parse(localStorage.getItem('mobile_sync_log') || '[]');
+                logs.unshift({
+                    time: new Date().toLocaleString('zh-CN'),
+                    message: message,
+                    type: type
+                });
+                localStorage.setItem('mobile_sync_log', JSON.stringify(logs.slice(0, 50)));
+                console.log('[同步日志]', type, message);
+            } catch(e) {}
+        }
+        
+        // 把电脑版的分开存储数据转换成手机版的统一格式
+        function convertFromDesktopToMobile() {
+            try {
+                addSyncLog('开始转换：电脑版 → 手机版', 'info');
+                
+                // 从localStorage读取最新的手机版数据
+                let mobileDB = {};
+                try {
+                    mobileDB = JSON.parse(localStorage.getItem(DB_KEY) || '{}');
+                } catch(e) {
+                    mobileDB = {};
+                }
+                if (!mobileDB.styles) mobileDB.styles = [];
+                if (!mobileDB.processes) mobileDB.processes = { pingche: [], zache: [], kanche: [] };
+                
+                // 读取电脑版的styles数据
+                const desktopStylesStr = localStorage.getItem('styles');
+                if (!desktopStylesStr) {
+                    addSyncLog('电脑版styles数据为空，跳过转换', 'warning');
+                    return false;
+                }
+                
+                const desktopStyles = JSON.parse(desktopStylesStr);
+                addSyncLog('电脑版有 ' + desktopStyles.length + ' 个款式', 'info');
+                
+                let addedCount = 0;
+                let updatedCount = 0;
+                
+                desktopStyles.forEach(desktopStyle => {
+                    if (!desktopStyle || !desktopStyle.name) return;
+                    
+                    // 检查是否已存在（按id或name+date判断）
+                    const existingIdx = mobileDB.styles.findIndex(s => 
+                        (s.id && desktopStyle.id && s.id === desktopStyle.id) || 
+                        (s.name === desktopStyle.name && s.date === desktopStyle.date)
+                    );
+                    
+                    if (existingIdx >= 0) {
+                        // 更新已存在的款式（以云端数据为准）
+                        mobileDB.styles[existingIdx] = Object.assign({}, mobileDB.styles[existingIdx], desktopStyle);
+                        updatedCount++;
+                    } else {
+                        // 添加新款式
+                        mobileDB.styles.push(desktopStyle);
+                        addedCount++;
+                    }
+                });
+                
+                // 保存转换后的数据到localStorage
+                localStorage.setItem(DB_KEY, JSON.stringify(mobileDB));
+                // 同时更新全局变量DB
+                DB = mobileDB;
+                
+                addSyncLog('转换完成：新增 ' + addedCount + ' 个，更新 ' + updatedCount + ' 个，手机版现有 ' + mobileDB.styles.length + ' 个款式', 'success');
+                return true;
+            } catch(e) {
+                addSyncLog('转换失败：' + e.message, 'error');
+                console.error('电脑版转手机版数据失败:', e);
+                return false;
+            }
+        }
+        
+        // 把手机版的统一格式转换成电脑版的分开存储格式
+        function convertFromMobileToDesktop() {
+            try {
+                addSyncLog('开始转换：手机版 → 电脑版', 'info');
+                
+                // 从localStorage读取最新的手机版数据
+                let mobileDB = {};
+                try {
+                    mobileDB = JSON.parse(localStorage.getItem(DB_KEY) || '{}');
+                } catch(e) {
+                    mobileDB = {};
+                }
+                if (!mobileDB.styles) mobileDB.styles = [];
+                
+                addSyncLog('手机版有 ' + mobileDB.styles.length + ' 个款式', 'info');
+                
+                // 把手机版的styles数据转换成电脑版格式
+                if (mobileDB.styles.length > 0) {
+                    localStorage.setItem('styles', JSON.stringify(mobileDB.styles));
+                    addSyncLog('已同步 ' + mobileDB.styles.length + ' 个款式到电脑版styles', 'success');
+                } else {
+                    addSyncLog('手机版款式为空，跳过styles同步', 'warning');
+                }
+                
+                // 把手机版的用户数据转换成电脑版格式
+                const mobileUsers = localStorage.getItem(USERS_KEY);
+                if (mobileUsers) {
+                    localStorage.setItem('app_users', mobileUsers);
+                    addSyncLog('已同步用户数据到电脑版', 'success');
+                }
+                
+                // 把当前用户数据也同步
+                const currentUser = localStorage.getItem(CURRENT_USER_KEY);
+                if (currentUser) {
+                    localStorage.setItem('app_current_user', currentUser);
+                }
+                
+                return true;
+            } catch(e) {
+                addSyncLog('转换失败：' + e.message, 'error');
+                console.error('手机版转电脑版数据失败:', e);
+                return false;
+            }
+        }
+        
+        // 从云端同步数据到本地
+        async function syncFromCloudProfessional() {
+            try {
+                addSyncLog('开始从云端同步数据...', 'info');
+                
+                if (typeof window.CloudSync === 'undefined') {
+                    addSyncLog('CloudSync未加载', 'error');
+                    return false;
+                }
+                
+                // 从云端同步数据
+                await window.CloudSync.syncFromCloud(true);
+                addSyncLog('从云端下载数据完成', 'success');
+                
+                // 把电脑版数据转换成手机版格式
+                const convertResult = convertFromDesktopToMobile();
+                
+                // 重新加载本地数据
+                loadDB();
+                
+                addSyncLog('从云端同步完成', 'success');
+                return true;
+            } catch(e) {
+                addSyncLog('从云端同步失败：' + e.message, 'error');
+                console.error('从云端同步失败:', e);
+                return false;
+            }
+        }
+        
+        // 把本地数据同步到云端
+        async function syncToCloudProfessional() {
+            try {
+                addSyncLog('开始同步数据到云端...', 'info');
+                
+                if (typeof window.CloudSync === 'undefined') {
+                    addSyncLog('CloudSync未加载', 'error');
+                    return false;
+                }
+                
+                // 先把手机版数据转换成电脑版格式
+                const convertResult = convertFromMobileToDesktop();
+                
+                // 同步到云端
+                await window.CloudSync.syncToCloud();
+                addSyncLog('上传数据到云端完成', 'success');
+                
+                return true;
+            } catch(e) {
+                addSyncLog('同步到云端失败：' + e.message, 'error');
+                console.error('同步到云端失败:', e);
+                return false;
+            }
+        }
+        
+        // 完整双向同步
+        async function fullSync() {
+            try {
+                showSyncStatus('正在同步数据...', 'info');
+                addSyncLog('========== 开始完整双向同步 ==========', 'info');
+                
+                // 第一步：把本地数据同步到云端
+                const uploadResult = await syncToCloudProfessional();
+                
+                // 第二步：从云端获取最新数据
+                const downloadResult = await syncFromCloudProfessional();
+                
+                // 刷新页面显示
+                if (currentPage === 'home') showHome();
+                else if (currentPage === 'list') showStyleList();
+                
+                if (uploadResult && downloadResult) {
+                    showSyncStatus('✅ 同步完成，数据已更新', 'success');
+                    addSyncLog('========== 完整双向同步完成 ==========', 'success');
+                } else {
+                    showSyncStatus('⚠️ 同步部分失败，请查看日志', 'error');
+                    addSyncLog('========== 完整双向同步部分失败 ==========', 'error');
+                }
+                
+                setTimeout(function() { hideSyncStatus(); }, 3000);
+                return true;
+            } catch(e) {
+                showSyncStatus('⚠️ 同步失败: ' + e.message, 'error');
+                addSyncLog('完整同步失败：' + e.message, 'error');
+                setTimeout(function() { hideSyncStatus(); }, 5000);
+                return false;
+            }
+        }
+        
         // 初始化
         function init() {
             loadDB();
@@ -951,30 +1164,33 @@
             
             // 显示同步状态
             showSyncStatus('正在从云端获取最新数据...', 'info');
+            addSyncLog('页面加载，开始初始化同步', 'info');
             
             // 立即从云端同步数据
             setTimeout(function() {
-                if (typeof window.CloudSync !== 'undefined') {
-                    window.CloudSync.syncFromCloud(true).then(function() {
-                        // 云端数据同步完成后，把电脑版数据转换成手机版格式
-                        convertFromDesktopToMobile();
-                        // 重新加载本地数据
-                        loadDB();
-                        // 刷新当前页面显示
-                        if (currentPage === 'home') showHome();
-                        else if (currentPage === 'list') showStyleList();
-                        
+                syncFromCloudProfessional().then(function(success) {
+                    // 刷新当前页面显示
+                    if (currentPage === 'home') showHome();
+                    else if (currentPage === 'list') showStyleList();
+                    
+                    if (success) {
                         showSyncStatus('✅ 云端数据已更新', 'success');
-                        setTimeout(function() { hideSyncStatus(); }, 3000);
-                    }).catch(function(e) {
-                        console.error('云端同步失败:', e);
+                    } else {
                         showSyncStatus('⚠️ 云端同步失败，使用本地数据', 'error');
-                        setTimeout(function() { hideSyncStatus(); }, 3000);
-                    });
-                } else {
-                    hideSyncStatus();
-                }
-            }, 500);
+                    }
+                    setTimeout(function() { hideSyncStatus(); }, 3000);
+                });
+            }, 800);
+            
+            // 设置定期同步（每隔60秒从云端拉取最新数据）
+            setInterval(function() {
+                addSyncLog('定期同步：正在从云端获取最新数据...', 'info');
+                syncFromCloudProfessional().then(function(success) {
+                    if (success && currentPage === 'list') {
+                        showStyleList();
+                    }
+                });
+            }, 60000);
         }
         
         // 显示同步状态
@@ -1006,112 +1222,7 @@
         
         // 手动同步数据
         function manualSync() {
-            showSyncStatus('正在同步数据...', 'info');
-            
-            // 先把本地数据同步到云端
-            convertFromMobileToDesktop();
-            
-            window.CloudSync.syncToCloud().then(function() {
-                // 然后从云端获取最新数据
-                return window.CloudSync.syncFromCloud(true);
-            }).then(function() {
-                convertFromDesktopToMobile();
-                loadDB();
-                if (currentPage === 'home') showHome();
-                else if (currentPage === 'list') showStyleList();
-                
-                showSyncStatus('✅ 同步完成，数据已更新', 'success');
-                setTimeout(function() { hideSyncStatus(); }, 3000);
-            }).catch(function(e) {
-                console.error('手动同步失败:', e);
-                showSyncStatus('⚠️ 同步失败: ' + e.message, 'error');
-                setTimeout(function() { hideSyncStatus(); }, 5000);
-            });
-        }
-        
-        // 把电脑版的分开存储数据转换成手机版的统一格式
-        function convertFromDesktopToMobile() {
-            try {
-                // 从localStorage读取最新的手机版数据
-                let mobileDB = {};
-                try {
-                    mobileDB = JSON.parse(localStorage.getItem(DB_KEY) || '{}');
-                } catch(e) {
-                    mobileDB = {};
-                }
-                if (!mobileDB.styles) mobileDB.styles = [];
-                if (!mobileDB.processes) mobileDB.processes = { pingche: [], zache: [], kanche: [] };
-                
-                // 读取电脑版的styles数据
-                const desktopStyles = localStorage.getItem('styles');
-                if (desktopStyles) {
-                    const styles = JSON.parse(desktopStyles);
-                    
-                    styles.forEach(desktopStyle => {
-                        // 检查是否已存在（按id或name+date判断）
-                        const existingIdx = mobileDB.styles.findIndex(s => 
-                            s.id === desktopStyle.id || 
-                            (s.name === desktopStyle.name && s.date === desktopStyle.date)
-                        );
-                        
-                        if (existingIdx >= 0) {
-                            // 更新已存在的款式（以云端数据为准）
-                            mobileDB.styles[existingIdx] = Object.assign({}, mobileDB.styles[existingIdx], desktopStyle);
-                        } else {
-                            // 添加新款式
-                            mobileDB.styles.push(desktopStyle);
-                        }
-                    });
-                    
-                    // 保存转换后的数据到localStorage
-                    localStorage.setItem(DB_KEY, JSON.stringify(mobileDB));
-                    // 同时更新全局变量DB
-                    DB = mobileDB;
-                    console.log('已从电脑版同步 ' + styles.length + ' 个款式到手机版，手机版现有 ' + mobileDB.styles.length + ' 个款式');
-                }
-                
-                // 读取电脑版的用户数据
-                const desktopUsers = localStorage.getItem('app_users');
-                if (desktopUsers) {
-                    localStorage.setItem(USERS_KEY, desktopUsers);
-                }
-            } catch(e) {
-                console.error('电脑版转手机版数据失败:', e);
-            }
-        }
-        
-        // 把手机版的统一格式转换成电脑版的分开存储格式
-        function convertFromMobileToDesktop() {
-            try {
-                // 从localStorage读取最新的手机版数据
-                let mobileDB = {};
-                try {
-                    mobileDB = JSON.parse(localStorage.getItem(DB_KEY) || '{}');
-                } catch(e) {
-                    mobileDB = {};
-                }
-                if (!mobileDB.styles) mobileDB.styles = [];
-                
-                // 把手机版的styles数据转换成电脑版格式
-                if (mobileDB.styles.length > 0) {
-                    localStorage.setItem('styles', JSON.stringify(mobileDB.styles));
-                    console.log('已从手机版同步 ' + mobileDB.styles.length + ' 个款式到电脑版');
-                }
-                
-                // 把手机版的用户数据转换成电脑版格式
-                const mobileUsers = localStorage.getItem(USERS_KEY);
-                if (mobileUsers) {
-                    localStorage.setItem('app_users', mobileUsers);
-                }
-                
-                // 把当前用户数据也同步
-                const currentUser = localStorage.getItem(CURRENT_USER_KEY);
-                if (currentUser) {
-                    localStorage.setItem('app_current_user', currentUser);
-                }
-            } catch(e) {
-                console.error('手机版转电脑版数据失败:', e);
-            }
+            fullSync();
         }
         
         // 加载数据
@@ -1133,16 +1244,14 @@
         function saveDB() {
             try {
                 localStorage.setItem(DB_KEY, JSON.stringify(DB));
-                
-                // 把手机版数据转换成电脑版格式，同步到云端
-                convertFromMobileToDesktop();
+                addSyncLog('数据已保存到本地，款式数：' + (DB.styles ? DB.styles.length : 0), 'info');
                 
                 // 自动同步到云端（延迟5秒，避免频繁同步）
                 if (typeof window.CloudSync !== 'undefined') {
                     if (window.mobileSyncTimer) clearTimeout(window.mobileSyncTimer);
                     window.mobileSyncTimer = setTimeout(function() {
-                        window.CloudSync.syncToCloud().catch(function(e) {
-                            console.error('自动同步失败:', e);
+                        syncToCloudProfessional().catch(function(e) {
+                            addSyncLog('自动同步失败：' + e.message, 'error');
                         });
                     }, 5000);
                 }
