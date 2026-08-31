@@ -8,7 +8,7 @@
 
     // 配置
     const SUPABASE_URL = 'https://izzcqlydjnfumbzfepcx.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml6emNxbHlkam5mdW1iemZlcGN4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjU1MTQwNzAsImV4cCI6MjA0MTA5MDA3MH0.你的key';
+    const SUPABASE_KEY = 'sb_publishable_Vo_zxOAcU3j4y216VCx3qw_XygxDytX';
     
     const DATA_KEYS = ['gf_cost_db', 'styles', 'app_users', 'user_avatars', 'export_records', 'backup_versions', 'process_library', 'style_library'];
     const LAST_SYNC_KEY = 'cloud_sync_last_sync';
