@@ -10,7 +10,7 @@
     const SUPABASE_URL = 'https://izzcqlydjnfumbzfepcx.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_Vo_zxOAcU3j4y216VCx3qw_XygxDytX';
     
-    const DATA_KEYS = ['gf_cost_db', 'styles', 'app_users', 'user_avatars', 'export_records', 'backup_versions', 'process_library', 'style_library'];
+    const DATA_KEYS = ['gf_cost_db', 'gf_cost_config', 'gf_cost_users', 'gf_cost_backups', 'gf_cost_export_logs'];
     const LAST_SYNC_KEY = 'cloud_sync_last_sync';
     
     let supabaseClient = null;
