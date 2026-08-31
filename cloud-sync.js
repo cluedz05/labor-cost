@@ -1,597 +1,356 @@
 // ============================================
-// 云端同步模块 - Supabase
+// 多绮爱服饰 - 云端实时同步模块 v3.0
+// 真正的0延迟实时同步（Supabase Realtime）
 // ============================================
 
 (function() {
     'use strict';
 
-    // 配置存储key
-    const CONFIG_KEY = 'supabase_config';
-    const SYNC_LOG_KEY = 'sync_log';
-    const LAST_SYNC_KEY = 'last_sync_time';
-
-    // 需要同步的数据key列表
-    const DATA_KEYS = [
-        'style_library',      // 款式库
-        'styles',             // 历史款式
-        'currentStyle',       // 当前款式
-        'app_users',          // 用户列表
-        'app_current_user',   // 当前用户
-        'backups',            // 备份记录
-        'exportRecords',      // 导出记录
-        'approvals',          // 审批记录
-        'settings',           // 应用设置
-        'gf_cost_db'          // 手机版统一数据
-    ];
-
-    // Supabase客户端
+    // 配置
+    const SUPABASE_URL = 'https://izzcqlydjnfumbzfepcx.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml6emNxbHlkam5mdW1iemZlcGN4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjU1MTQwNzAsImV4cCI6MjA0MTA5MDA3MH0.你的key';
+    
+    const DATA_KEYS = ['gf_cost_db', 'styles', 'app_users', 'user_avatars', 'export_records', 'backup_versions', 'process_library', 'style_library'];
+    const LAST_SYNC_KEY = 'cloud_sync_last_sync';
+    
     let supabaseClient = null;
-    let isSyncing = false;
+    let realtimeChannel = null;
     let syncTimer = null;
-
-    // 默认配置（硬编码，所有浏览器自动配置）
-    const DEFAULT_CONFIG = {
-        url: 'https://izzcqlydjnfumbzfepcx.supabase.co',
-        anonKey: 'sb_publishable_Vo_zxOAcU3j4y216VCx3qw_XygxDytX',
-        table: 'app_data'
-    };
+    let isSyncing = false;
+    let justSyncedFromCloud = false;
+    let justSyncedTimer = null;
+    let pageLoadTime = Date.now();
+    let lastDataHash = '';
 
     // ============================================
-    // 配置管理
+    // 初始化Supabase
     // ============================================
-
-    function getConfig() {
-        try {
-            const userConfig = JSON.parse(localStorage.getItem(CONFIG_KEY) || '{}');
-            // 合并默认配置和用户配置
-            return Object.assign({}, DEFAULT_CONFIG, userConfig);
-        } catch(e) {
-            return DEFAULT_CONFIG;
-        }
-    }
-
-    function saveConfig(config) {
-        localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
-    }
-
-    function isConfigured() {
-        const config = getConfig();
-        return config.url && config.anonKey && config.table;
-    }
-
     function initSupabase() {
-        const config = getConfig();
-        if (!config.url || !config.anonKey) {
-            return false;
-        }
-        try {
-            supabaseClient = window.supabase.createClient(config.url, config.anonKey);
-            return true;
-        } catch(e) {
-            console.error('Supabase初始化失败:', e);
-            return false;
+        if (typeof window.supabase !== 'undefined') {
+            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            console.log('✅ Supabase客户端已初始化');
+            initRealtime(); // 启动实时同步
         }
     }
 
     // ============================================
-    // 同步日志
+    // 【核心】真正的实时同步 - 订阅数据库变化
     // ============================================
-
-    function addSyncLog(message, type = 'info') {
-        try {
-            const logs = JSON.parse(localStorage.getItem(SYNC_LOG_KEY) || '[]');
-            logs.unshift({
-                time: new Date().toLocaleString('zh-CN'),
-                message: message,
-                type: type
-            });
-            // 只保留最近50条
-            localStorage.setItem(SYNC_LOG_KEY, JSON.stringify(logs.slice(0, 50)));
-        } catch(e) {}
-    }
-
-    function getSyncLogs() {
-        try {
-            return JSON.parse(localStorage.getItem(SYNC_LOG_KEY) || '[]');
-        } catch(e) {
-            return [];
-        }
-    }
-
-    // ============================================
-    // 云端数据操作
-    // ============================================
-
-    // 上传数据到云端
-    async function uploadData(key, data) {
-        if (!supabaseClient || !isConfigured()) return false;
+    function initRealtime() {
+        if (!supabaseClient) return;
         
-        const config = getConfig();
         try {
-            // 检查记录是否存在
-            const { data: existing } = await supabaseClient
-                .from(config.table)
-                .select('*')
-                .eq('data_key', key)
-                .single();
+            // 移除旧的订阅
+            if (realtimeChannel) {
+                supabaseClient.removeChannel(realtimeChannel);
+            }
+            
+            // 创建实时订阅频道
+            realtimeChannel = supabaseClient
+                .channel('app_data_changes')
+                .on('postgres_changes', 
+                    { 
+                        event: '*',  // 监听所有变化（INSERT/UPDATE/DELETE）
+                        schema: 'public', 
+                        table: 'app_data' 
+                    }, 
+                    (payload) => {
+                        console.log('🔴 收到实时数据变化:', payload);
+                        handleRealtimeChange(payload);
+                    }
+                )
+                .subscribe((status) => {
+                    console.log('📡 Realtime订阅状态:', status);
+                    if (status === 'SUBSCRIBED') {
+                        showToast('📡 实时同步已连接');
+                    }
+                });
+                
+            console.log('✅ 实时同步已启动，数据库变化将立即推送！');
+            
+        } catch(e) {
+            console.error('❌ 实时同步启动失败:', e);
+            // 降级为5秒轮询
+            startFallbackPolling();
+        }
+    }
 
-            const payload = {
-                data_key: key,
-                data: data,
-                updated_at: new Date().toISOString()
-            };
+    // ============================================
+    // 处理实时数据变化
+    // ============================================
+    function handleRealtimeChange(payload) {
+        // 避免自己触发的变化导致循环
+        if (justSyncedFromCloud) {
+            console.log('⏭️  跳过本次变化（刚从云端同步）');
+            return;
+        }
+        
+        const record = payload.new || payload.old;
+        if (!record || !record.key) return;
+        
+        console.log(`📥 收到数据变化: ${record.key}, 事件: ${payload.eventType}`);
+        
+        // 立即更新本地数据
+        if (payload.eventType === 'DELETE') {
+            localStorage.removeItem(record.key);
+        } else {
+            localStorage.setItem(record.key, record.value);
+        }
+        
+        // 触发数据更新事件，刷新页面
+        window.dispatchEvent(new CustomEvent('cloudDataUpdated', { 
+            detail: { key: record.key, event: payload.eventType, realtime: true }
+        }));
+        
+        showToast(`📡 数据已实时更新: ${record.key}`);
+    }
 
-            if (existing) {
-                // 更新
-                const { error } = await supabaseClient
-                    .from(config.table)
-                    .update(payload)
-                    .eq('data_key', key);
-                if (error) throw error;
-            } else {
-                // 插入
-                const { error } = await supabaseClient
-                    .from(config.table)
-                    .insert(payload);
-                if (error) throw error;
+    // ============================================
+    // 降级方案：5秒轮询（如果Realtime不可用）
+    // ============================================
+    function startFallbackPolling() {
+        console.log('⚠️  使用降级方案：5秒轮询同步');
+        setInterval(() => {
+            if (!justSyncedFromCloud && !isSyncing) {
+                syncFromCloud(true);
+            }
+        }, 5000);
+    }
+
+    // ============================================
+    // 上传数据到云端
+    // ============================================
+    async function uploadData(key, value) {
+        if (!supabaseClient) return false;
+        
+        try {
+            const { data, error } = await supabaseClient
+                .from('app_data')
+                .upsert({ 
+                    key: key, 
+                    value: value, 
+                    updated_at: new Date().toISOString() 
+                }, { onConflict: 'key' });
+                
+            if (error) {
+                console.error(`上传失败 ${key}:`, error);
+                return false;
             }
             return true;
         } catch(e) {
-            console.error('上传数据失败:', key, e);
-            addSyncLog('上传失败: ' + key + ' - ' + e.message, 'error');
+            console.error(`上传异常 ${key}:`, e);
             return false;
         }
     }
 
+    // ============================================
     // 从云端下载数据
+    // ============================================
     async function downloadData(key) {
-        if (!supabaseClient || !isConfigured()) return null;
+        if (!supabaseClient) return null;
         
-        const config = getConfig();
         try {
             const { data, error } = await supabaseClient
-                .from(config.table)
-                .select('*')
-                .eq('data_key', key)
+                .from('app_data')
+                .select('value')
+                .eq('key', key)
                 .single();
-
-            if (error) throw error;
-            return data ? data.data : null;
+                
+            if (error) {
+                if (error.code !== 'PGRST116') { // 不是"未找到"错误
+                    console.error(`下载失败 ${key}:`, error);
+                }
+                return null;
+            }
+            return data ? data.value : null;
         } catch(e) {
-            console.error('下载数据失败:', key, e);
+            console.error(`下载异常 ${key}:`, e);
             return null;
         }
     }
 
     // ============================================
-    // 同步操作
+    // 同步所有数据到云端（用户修改后2秒自动调用）
     // ============================================
-    
-    // 同步队列，确保每次同步都能执行
-    let syncQueue = [];
-    let isProcessingQueue = false;
-    
-    // 【重要】数据保护标志：刚从云端同步后，暂时不要同步到云端，避免旧数据覆盖新数据
-    let justSyncedFromCloud = false;
-    let justSyncedTimer = null;
-    
-    // 处理同步队列
-    async function processSyncQueue() {
-        if (isProcessingQueue || syncQueue.length === 0) return;
-        isProcessingQueue = true;
-        
-        while (syncQueue.length > 0) {
-            const task = syncQueue.shift();
-            try {
-                await task();
-            } catch(e) {
-                console.error('同步队列任务执行失败:', e);
-            }
-        }
-        
-        isProcessingQueue = false;
-    }
-    
-    // 添加同步任务到队列
-    function addSyncTask(task) {
-        syncQueue.push(task);
-        processSyncQueue();
-    }
-
-    // 同步所有数据到云端
     async function syncToCloud() {
-        if (!isConfigured()) return;
+        if (!supabaseClient || isSyncing) return;
         
-        // 【重要】如果刚从云端同步过，暂时不要同步到云端，避免旧数据覆盖新数据
+        // 数据保护：刚从云端同步后，不要立即同步回去
         if (justSyncedFromCloud) {
-            console.log('刚从云端同步过，跳过本次同步到云端，避免覆盖新数据');
+            console.log('⏭️  跳过同步到云端（刚从云端同步）');
             return;
         }
         
-        // 添加到同步队列，确保不会被跳过
-        return new Promise((resolve) => {
-            addSyncTask(async () => {
-                try {
-                    addSyncLog('开始同步到云端...', 'info');
-                    
-                    let successCount = 0;
-                    for (const key of DATA_KEYS) {
-                        const data = localStorage.getItem(key);
-                        if (data !== null) {
-                            const success = await uploadData(key, data);
-                            if (success) successCount++;
-                        }
-                    }
-                    
-                    localStorage.setItem(LAST_SYNC_KEY, new Date().toISOString());
-                    addSyncLog(`同步完成，成功上传 ${successCount}/${DATA_KEYS.length} 项数据`, 'success');
-                    showToast(`☁️ 云端同步完成 (${successCount}项)`);
-                    resolve();
-                } catch(e) {
-                    console.error('同步到云端失败:', e);
-                    addSyncLog('同步到云端失败: ' + e.message, 'error');
-                    resolve();
-                }
-            });
-        });
-    }
-
-    // 从云端同步所有数据
-    async function syncFromCloud(silent = false) {
-        if (!isConfigured()) return;
+        isSyncing = true;
+        console.log('☁️ 开始同步到云端...');
         
-        // 添加到同步队列，确保不会被跳过
-        return new Promise((resolve) => {
-            addSyncTask(async () => {
-                try {
-                    if (!silent) {
-                        addSyncLog('开始从云端同步...', 'info');
-                    }
-                    
-                    let successCount = 0;
-                    for (const key of DATA_KEYS) {
-                        const data = await downloadData(key);
-                        if (data !== null) {
-                            localStorage.setItem(key, data);
-                            successCount++;
-                        }
-                    }
-                    
-                    localStorage.setItem(LAST_SYNC_KEY, new Date().toISOString());
-                    
-                    // 【重要】设置数据保护标志，10秒内不要同步到云端，避免旧数据覆盖新数据
-                    justSyncedFromCloud = true;
-                    if (justSyncedTimer) clearTimeout(justSyncedTimer);
-                    justSyncedTimer = setTimeout(function() {
-                        justSyncedFromCloud = false;
-                        console.log('数据保护期结束，可以同步到云端了');
-                    }, 10000);
-                    
-                    // 【重要】同步完成后触发自定义事件，通知页面数据已更新（无论是手动同步还是静默同步）
-                    window.dispatchEvent(new CustomEvent('cloudDataUpdated'));
-                    
-                    if (!silent) {
-                        addSyncLog(`同步完成，成功下载 ${successCount}/${DATA_KEYS.length} 项数据`, 'success');
-                        showToast(`☁️ 云端数据已恢复 (${successCount}项)`);
-                        
-                        // 刷新页面以应用新数据（仅手动同步时刷新）
-                        setTimeout(() => location.reload(), 1000);
-                    } else {
-                        addSyncLog(`同步完成，更新 ${successCount}/${DATA_KEYS.length} 项数据`, 'success');
-                    }
-                    resolve();
-                } catch(e) {
-                    console.error('从云端同步失败:', e);
-                    addSyncLog('从云端同步失败: ' + e.message, 'error');
-                    resolve();
-                }
-            });
-        });
+        let successCount = 0;
+        for (const key of DATA_KEYS) {
+            const data = localStorage.getItem(key);
+            if (data !== null) {
+                const success = await uploadData(key, data);
+                if (success) successCount++;
+            }
+        }
+        
+        localStorage.setItem(LAST_SYNC_KEY, new Date().toISOString());
+        isSyncing = false;
+        
+        console.log(`✅ 同步完成，成功上传 ${successCount}/${DATA_KEYS.length} 项`);
+        showToast(`☁️ 已同步到云端 (${successCount}项)`);
     }
 
-    // 自动同步（延迟执行，避免频繁同步）
+    // ============================================
+    // 从云端同步所有数据（手动/页面加载时调用）
+    // ============================================
+    async function syncFromCloud(silent = false) {
+        if (!supabaseClient || isSyncing) return;
+        
+        isSyncing = true;
+        
+        if (!silent) {
+            console.log('📥 开始从云端同步...');
+        }
+        
+        let successCount = 0;
+        for (const key of DATA_KEYS) {
+            const data = await downloadData(key);
+            if (data !== null) {
+                localStorage.setItem(key, data);
+                successCount++;
+            }
+        }
+        
+        localStorage.setItem(LAST_SYNC_KEY, new Date().toISOString());
+        
+        // 设置数据保护标志，10秒内不要同步回去
+        justSyncedFromCloud = true;
+        if (justSyncedTimer) clearTimeout(justSyncedTimer);
+        justSyncedTimer = setTimeout(() => {
+            justSyncedFromCloud = false;
+        }, 10000);
+        
+        isSyncing = false;
+        
+        if (!silent) {
+            console.log(`✅ 同步完成，成功下载 ${successCount}/${DATA_KEYS.length} 项`);
+            showToast(`📥 已从云端恢复 (${successCount}项)`);
+        }
+        
+        // 触发数据更新事件
+        window.dispatchEvent(new CustomEvent('cloudDataUpdated', { detail: { silent: silent } }));
+        
+        return true;
+    }
+
+    // ============================================
+    // 自动同步（用户修改数据后2秒自动同步到云端）
+    // ============================================
     function scheduleAutoSync() {
-        if (!isConfigured()) return;
         if (syncTimer) clearTimeout(syncTimer);
         syncTimer = setTimeout(() => {
             syncToCloud();
-        }, 2000); // 2秒后自动同步（用户修改数据后快速同步到云端）
+        }, 2000); // 2秒后自动同步
     }
-    
-    // 【重要】页面聚焦时立即从云端同步（实现准实时同步）
-    function initFocusSync() {
-        window.addEventListener('focus', function() {
-            console.log('页面聚焦，立即从云端同步最新数据...');
-            if (typeof syncFromCloud === 'function') {
-                syncFromCloud(true).then(function() {
-                    console.log('页面聚焦同步完成');
-                    // 触发自定义事件，通知页面数据已更新
-                    window.dispatchEvent(new CustomEvent('cloudDataUpdated'));
-                });
+
+    // ============================================
+    // 监听本地数据变化
+    // ============================================
+    function setupAutoSync() {
+        // 监听其他标签页的变化
+        window.addEventListener('storage', (e) => {
+            if (DATA_KEYS.includes(e.key)) {
+                scheduleAutoSync();
             }
         });
         
-        // 页面可见性变化时同步
-        document.addEventListener('visibilitychange', function() {
+        // 重写setItem监听当前页面的变化
+        const originalSetItem = localStorage.setItem.bind(localStorage);
+        localStorage.setItem = function(key, value) {
+            originalSetItem(key, value);
+            if (DATA_KEYS.includes(key) && supabaseClient) {
+                scheduleAutoSync();
+            }
+        };
+    }
+
+    // ============================================
+    // 页面聚焦时立即同步
+    // ============================================
+    function initFocusSync() {
+        window.addEventListener('focus', () => {
+            console.log('👁️ 页面聚焦，检查云端最新数据...');
+            if (supabaseClient && !isSyncing) {
+                syncFromCloud(true);
+            }
+        });
+        
+        document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'visible') {
-                console.log('页面可见，立即从云端同步最新数据...');
-                if (typeof syncFromCloud === 'function') {
-                    syncFromCloud(true).then(function() {
-                        window.dispatchEvent(new CustomEvent('cloudDataUpdated'));
-                    });
+                console.log('👁️ 页面可见，检查云端最新数据...');
+                if (supabaseClient && !isSyncing) {
+                    syncFromCloud(true);
                 }
             }
         });
-    }
-    
-    // 【重要】定期从云端同步（每隔1分钟，确保数据最终一致，不会太频繁）
-    function startPeriodicSync() {
-        setInterval(function() {
-            if (!justSyncedFromCloud) {
-                console.log('定期从云端同步最新数据...');
-                syncFromCloud(true).then(function() {
-                    window.dispatchEvent(new CustomEvent('cloudDataUpdated'));
-                });
-            }
-        }, 60000); // 每隔60秒（1分钟）从云端同步
-    }
-
-    // ============================================
-    // UI - 设置面板
-    // ============================================
-
-    function createSettingsModal() {
-        const config = getConfig();
-        const logs = getSyncLogs();
-        const lastSync = localStorage.getItem(LAST_SYNC_KEY);
-
-        let logsHtml = '';
-        if (logs.length > 0) {
-            logsHtml = logs.slice(0, 10).map(log => {
-                const color = log.type === 'error' ? '#ef4444' : log.type === 'success' ? '#22c55e' : '#6b7280';
-                return `<div style="padding:4px 0;border-bottom:1px solid #f0f0f0;font-size:12px;color:${color}">
-                    <span style="color:#999">${log.time}</span> ${log.message}
-                </div>`;
-            }).join('');
-        } else {
-            logsHtml = '<div style="color:#999;text-align:center;padding:20px">暂无同步记录</div>';
-        }
-
-        const modal = document.createElement('div');
-        modal.id = 'cloudSyncModal';
-        modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:10000;display:flex;align-items:center;justify-content:center';
-        modal.innerHTML = `
-            <div style="background:white;border-radius:16px;padding:24px;width:90%;max-width:500px;max-height:90vh;overflow-y:auto">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-                    <h2 style="margin:0;font-size:20px">☁️ 云端同步设置</h2>
-                    <button onclick="document.getElementById('cloudSyncModal').remove()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#999">&times;</button>
-                </div>
-
-                <div style="margin-bottom:16px">
-                    <label style="display:block;margin-bottom:6px;font-weight:600">Supabase Project URL</label>
-                    <input id="sbUrl" type="text" placeholder="https://xxxx.supabase.co" value="${config.url || ''}" 
-                        style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;box-sizing:border-box">
-                </div>
-
-                <div style="margin-bottom:16px">
-                    <label style="display:block;margin-bottom:6px;font-weight:600">anon public key</label>
-                    <input id="sbAnonKey" type="text" placeholder="你的anon public key" value="${config.anonKey || ''}" 
-                        style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;box-sizing:border-box">
-                </div>
-
-                <div style="margin-bottom:16px">
-                    <label style="display:block;margin-bottom:6px;font-weight:600">数据表名</label>
-                    <input id="sbTable" type="text" placeholder="app_data" value="${config.table || 'app_data'}" 
-                        style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;box-sizing:border-box">
-                </div>
-
-                <div style="display:flex;gap:10px;margin-bottom:20px">
-                    <button id="saveConfigBtn" style="flex:1;padding:12px;background:#4361ee;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:600">
-                        💾 保存配置
-                    </button>
-                    <button id="testConnBtn" style="padding:12px 20px;background:#f0f0f0;border:none;border-radius:8px;cursor:pointer">
-                        🔌 测试连接
-                    </button>
-                </div>
-
-                <div style="background:#f9fafb;border-radius:10px;padding:16px;margin-bottom:16px">
-                    <div style="font-weight:600;margin-bottom:10px">同步操作</div>
-                    <div style="display:flex;gap:10px">
-                        <button id="syncUpBtn" style="flex:1;padding:10px;background:#22c55e;color:white;border:none;border-radius:8px;cursor:pointer">
-                            ⬆️ 上传到云端
-                        </button>
-                        <button id="syncDownBtn" style="flex:1;padding:10px;background:#f59e0b;color:white;border:none;border-radius:8px;cursor:pointer">
-                            ⬇️ 从云端恢复
-                        </button>
-                    </div>
-                    <div style="margin-top:10px;font-size:12px;color:#666">
-                        上次同步: ${lastSync ? new Date(lastSync).toLocaleString('zh-CN') : '从未同步'}
-                    </div>
-                </div>
-
-                <div style="background:#f9fafb;border-radius:10px;padding:16px">
-                    <div style="font-weight:600;margin-bottom:10px">同步记录</div>
-                    <div style="max-height:150px;overflow-y:auto">
-                        ${logsHtml}
-                    </div>
-                </div>
-
-                <div style="margin-top:16px;padding:12px;background:#fffbeb;border-radius:8px;font-size:12px;color:#92400e">
-                    <strong>使用说明：</strong><br>
-                    1. 注册 <a href="https://supabase.com" target="_blank">Supabase</a> 账号并创建项目<br>
-                    2. 在SQL编辑器中执行建表语句（见下方）<br>
-                    3. 填入Project URL和anon key<br>
-                    4. 保存配置后，数据修改会自动同步到云端
-                </div>
-            </div>
-        `;
-
-        document.body.appendChild(modal);
-
-        // 绑定事件
-        document.getElementById('saveConfigBtn').onclick = function() {
-            const url = document.getElementById('sbUrl').value.trim();
-            const anonKey = document.getElementById('sbAnonKey').value.trim();
-            const table = document.getElementById('sbTable').value.trim() || 'app_data';
-
-            if (!url || !anonKey) {
-                alert('请填写URL和anon key');
-                return;
-            }
-
-            saveConfig({ url, anonKey, table });
-            initSupabase();
-            showToast('✅ 配置已保存');
-            addSyncLog('配置已保存', 'success');
-        };
-
-        document.getElementById('testConnBtn').onclick = async function() {
-            if (!initSupabase()) {
-                alert('初始化失败，请检查配置');
-                return;
-            }
-            try {
-                const config = getConfig();
-                const { data, error } = await supabaseClient
-                    .from(config.table)
-                    .select('count')
-                    .limit(1);
-                if (error) throw error;
-                alert('✅ 连接成功！');
-                addSyncLog('连接测试成功', 'success');
-            } catch(e) {
-                alert('❌ 连接失败: ' + e.message + '\n\n请确保已在Supabase中创建数据表');
-                addSyncLog('连接测试失败: ' + e.message, 'error');
-            }
-        };
-
-        document.getElementById('syncUpBtn').onclick = syncToCloud;
-        document.getElementById('syncDownBtn').onclick = syncFromCloud;
     }
 
     // ============================================
     // Toast提示
     // ============================================
-
     function showToast(message) {
-        // 如果页面已有toast函数，使用它
-        if (typeof window.toast === 'function') {
-            window.toast(message);
-            return;
-        }
-        // 否则创建简单的toast
+        const existing = document.getElementById('realtimeToast');
+        if (existing) existing.remove();
+        
         const toast = document.createElement('div');
-        toast.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#333;color:white;padding:12px 24px;border-radius:8px;z-index:10001;box-shadow:0 4px 12px rgba(0,0,0,0.2)';
+        toast.id = 'realtimeToast';
         toast.textContent = message;
+        toast.style.cssText = 'position:fixed;top:20px;right:20px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;padding:12px 20px;border-radius:10px;font-size:14px;z-index:99999;box-shadow:0 4px 12px rgba(0,0,0,0.15);';
         document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
-    }
-
-    // ============================================
-    // 自动同步监听
-    // ============================================
-
-    function setupAutoSync() {
-        // 监听localStorage变化（其他标签页）
-        window.addEventListener('storage', function(e) {
-            if (DATA_KEYS.includes(e.key)) {
-                scheduleAutoSync();
-            }
-        });
-
-        // 重写localStorage.setItem以监听当前页面的变化
-        const originalSetItem = localStorage.setItem.bind(localStorage);
-        localStorage.setItem = function(key, value) {
-            originalSetItem(key, value);
-            if (DATA_KEYS.includes(key) && isConfigured()) {
-                scheduleAutoSync();
-            }
-        };
-    }
-
-    // ============================================
-    // 添加设置按钮到页面
-    // ============================================
-
-    function addSettingsButton() {
-        // 等待页面加载完成
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', addSettingsButton);
-            return;
-        }
-
-        // 检查是否已添加
-        if (document.getElementById('cloudSyncBtn')) return;
-
-        // 创建设置按钮
-        const btn = document.createElement('button');
-        btn.id = 'cloudSyncBtn';
-        btn.innerHTML = '☁️';
-        btn.title = '云端同步设置';
-        btn.style.cssText = 'position:fixed;bottom:20px;right:20px;width:50px;height:50px;border-radius:50%;background:#4361ee;color:white;border:none;font-size:24px;cursor:pointer;box-shadow:0 4px 12px rgba(67,97,238,0.4);z-index:9999;display:flex;align-items:center;justify-content:center';
-        btn.onclick = createSettingsModal;
-        document.body.appendChild(btn);
-
-        // 如果已配置，显示同步状态指示器
-        if (isConfigured()) {
-            const indicator = document.createElement('div');
-            indicator.id = 'syncIndicator';
-            indicator.style.cssText = 'position:fixed;bottom:80px;right:20px;background:#22c55e;color:white;padding:4px 10px;border-radius:12px;font-size:11px;z-index:9998';
-            indicator.textContent = '☁️ 已同步';
-            document.body.appendChild(indicator);
-        }
+        
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transition = 'opacity 0.3s';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
     }
 
     // ============================================
     // 初始化
     // ============================================
-
     function init() {
-        // 初始化Supabase
-        if (isConfigured()) {
-            initSupabase();
-            addSyncLog('云端同步已启用', 'success');
-        }
-
-        // 设置自动同步
-        setupAutoSync();
-
-        // 添加设置按钮
-        addSettingsButton();
-
-        // 页面加载时从云端同步（如果已配置）
-        if (isConfigured()) {
-            // 延迟同步，避免影响页面加载
-            setTimeout(() => {
-                // 页面加载时使用静默同步（不刷新页面）
-                addSyncLog('正在从云端获取最新数据...', 'info');
-                syncFromCloud(true).then(function() {
-                    // 同步完成后触发自定义事件，通知页面数据已更新
-                    window.dispatchEvent(new CustomEvent('cloudDataUpdated'));
-                });
-            }, 2000);
-        }
+        console.log('🚀 多绮爱服饰云端实时同步模块 v3.0 启动...');
         
-        // 【重要】初始化页面聚焦同步（切换到页面时立即同步）
-        initFocusSync();
+        // 等待supabase-js加载完成
+        const waitForSupabase = setInterval(() => {
+            if (typeof window.supabase !== 'undefined') {
+                clearInterval(waitForSupabase);
+                initSupabase();
+                setupAutoSync();
+                initFocusSync();
+                
+                // 页面加载时从云端同步一次
+                setTimeout(() => {
+                    syncFromCloud(true);
+                }, 1000);
+            }
+        }, 100);
         
-        // 【重要】启动准实时定期同步（每隔10秒从云端同步）
-        startPeriodicSync();
-
-        console.log('☁️ 云端同步模块已加载（自动在线更新已启用，准实时同步）');
+        // 10秒超时
+        setTimeout(() => {
+            clearInterval(waitForSupabase);
+            if (!supabaseClient) {
+                console.error('❌ Supabase加载超时');
+            }
+        }, 10000);
     }
 
     // 暴露全局函数
     window.CloudSync = {
         init: init,
-        openSettings: createSettingsModal,
         syncToCloud: syncToCloud,
         syncFromCloud: syncFromCloud,
-        isConfigured: isConfigured,
-        initSupabase: initSupabase,
-        scheduleAutoSync: scheduleAutoSync,
-        initFocusSync: initFocusSync,
-        startPeriodicSync: startPeriodicSync
+        getRealtimeStatus: () => realtimeChannel ? '已连接' : '未连接'
     };
 
     // 自动初始化
