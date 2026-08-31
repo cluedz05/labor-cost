@@ -243,12 +243,6 @@
     async function syncToCloud() {
         if (!supabaseClient || isSyncing) return;
         
-        // 数据保护：刚从云端同步后，不要立即同步回去
-        if (justSyncedFromCloud) {
-            console.log('⏭️  跳过同步到云端（刚从云端同步）');
-            return;
-        }
-        
         isSyncing = true;
         console.log('☁️ 开始同步到云端...');
         
@@ -310,12 +304,12 @@
             isApplyingCloudChange = false;
         }, 100);
         
-        // 设置数据保护标志，10秒内不要同步回去
+        // 设置数据保护标志，3秒内不要同步回去（避免循环同步）
         justSyncedFromCloud = true;
         if (justSyncedTimer) clearTimeout(justSyncedTimer);
         justSyncedTimer = setTimeout(() => {
             justSyncedFromCloud = false;
-        }, 10000);
+        }, 3000);
         
         isSyncing = false;
         
@@ -347,6 +341,7 @@
         // 监听其他标签页的变化
         window.addEventListener('storage', (e) => {
             if (DATA_KEYS.includes(e.key) && !isApplyingCloudChange) {
+                console.log('📥 检测到其他标签页的数据变化，触发自动同步');
                 scheduleAutoSync();
             }
         });
@@ -355,32 +350,21 @@
         const originalSetItem = localStorage.setItem.bind(localStorage);
         localStorage.setItem = function(key, value) {
             originalSetItem(key, value);
-            // 如果是正在应用云端变化，或者刚从云端同步，就不要触发自动同步
-            if (DATA_KEYS.includes(key) && supabaseClient && !isApplyingCloudChange && !justSyncedFromCloud) {
+            // 只要是DATA_KEYS，且不是正在应用云端变化，就触发自动同步
+            if (DATA_KEYS.includes(key) && supabaseClient && !isApplyingCloudChange) {
+                console.log('📝 检测到本地数据变化，触发自动同步:', key);
                 scheduleAutoSync();
             }
         };
     }
 
     // ============================================
-    // 页面聚焦时立即同步
+    // 页面聚焦时检查云端最新数据（但不自动同步，避免覆盖本地数据）
     // ============================================
     function initFocusSync() {
-        window.addEventListener('focus', () => {
-            console.log('👁️ 页面聚焦，检查云端最新数据...');
-            if (supabaseClient && !isSyncing) {
-                syncFromCloud(true);
-            }
-        });
-        
-        document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'visible') {
-                console.log('👁️ 页面可见，检查云端最新数据...');
-                if (supabaseClient && !isSyncing) {
-                    syncFromCloud(true);
-                }
-            }
-        });
+        // 页面聚焦时不自动同步，避免覆盖本地数据
+        // 用户可以手动点击同步按钮
+        console.log('👁️ 页面聚焦同步已禁用，避免覆盖本地数据');
     }
 
     // ============================================
