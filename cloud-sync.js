@@ -94,11 +94,20 @@
         // 设置标志：正在应用云端变化，避免触发自动同步
         isApplyingCloudChange = true;
         
-        // 立即更新本地数据
+        // 立即更新本地数据（智能合并）
         if (payload.eventType === 'DELETE') {
             localStorage.removeItem(record.key);
         } else {
-            localStorage.setItem(record.key, record.value);
+            const localData = localStorage.getItem(record.key);
+            if (localData !== null && localData !== record.value) {
+                // 本地有数据，且与云端不同，需要合并
+                console.log(`🔄 合并实时数据: ${record.key}`);
+                const mergedData = mergeData(record.key, localData, record.value);
+                localStorage.setItem(record.key, mergedData);
+            } else {
+                // 本地没有数据，或者与云端相同，直接使用云端数据
+                localStorage.setItem(record.key, record.value);
+            }
         }
         
         // 清除标志
@@ -179,7 +188,66 @@
     }
 
     // ============================================
+    // 智能合并数据（避免数据冲突和数据丢失）
+    // ============================================
+    function mergeData(key, localData, cloudData) {
+        // 如果是款式数据，按款式ID合并，取并集
+        if (key === 'gf_cost_db') {
+            try {
+                const local = JSON.parse(localData);
+                const cloud = JSON.parse(cloudData);
+                
+                if (!local.styles) local.styles = [];
+                if (!cloud.styles) cloud.styles = [];
+                
+                // 按款式ID合并，取并集
+                const styleMap = new Map();
+                
+                // 先添加云端的款式
+                for (const style of cloud.styles) {
+                    if (style && style.id) {
+                        styleMap.set(style.id, style);
+                    }
+                }
+                
+                // 再添加本地的款式（如果有冲突，取更新时间较新的）
+                for (const style of local.styles) {
+                    if (style && style.id) {
+                        if (styleMap.has(style.id)) {
+                            // 有冲突，比较更新时间，取最新的
+                            const existing = styleMap.get(style.id);
+                            const localTime = style.updateTime || style.createDate || 0;
+                            const cloudTime = existing.updateTime || existing.createDate || 0;
+                            if (new Date(localTime) > new Date(cloudTime)) {
+                                styleMap.set(style.id, style);
+                            }
+                        } else {
+                            // 没有冲突，直接添加
+                            styleMap.set(style.id, style);
+                        }
+                    }
+                }
+                
+                // 转换回数组
+                local.styles = Array.from(styleMap.values());
+                
+                console.log(`🔄 合并款式数据：本地${local.styles.length}个，云端${cloud.styles.length}个，合并后${local.styles.length}个`);
+                
+                return JSON.stringify(local);
+            } catch(e) {
+                console.error('合并款式数据失败:', e);
+                // 合并失败，取数据量较大的
+                return localData.length >= cloudData.length ? localData : cloudData;
+            }
+        }
+        
+        // 其他数据，取数据量较大的
+        return localData.length >= cloudData.length ? localData : cloudData;
+    }
+
+    // ============================================
     // 同步所有数据到云端（用户修改后2秒自动调用）
+    // 智能合并：先从云端获取最新数据，合并后再上传
     // ============================================
     async function syncToCloud() {
         if (!supabaseClient || isSyncing) return;
@@ -191,14 +259,40 @@
         }
         
         isSyncing = true;
-        console.log('☁️ 开始同步到云端...');
+        console.log('☁️ 开始同步到云端（智能合并模式）...');
         
         let successCount = 0;
         for (const key of DATA_KEYS) {
-            const data = localStorage.getItem(key);
-            if (data !== null) {
-                const success = await uploadData(key, data);
-                if (success) successCount++;
+            const localData = localStorage.getItem(key);
+            if (localData !== null) {
+                try {
+                    // 先从云端获取最新数据
+                    const cloudData = await downloadData(key);
+                    
+                    if (cloudData !== null && cloudData !== localData) {
+                        // 云端有数据，且与本地不同，需要合并
+                        console.log(`🔄 合并数据: ${key}`);
+                        const mergedData = mergeData(key, localData, cloudData);
+                        
+                        // 设置标志：正在应用合并后的数据，避免触发自动同步
+                        isApplyingCloudChange = true;
+                        localStorage.setItem(key, mergedData);
+                        setTimeout(() => { isApplyingCloudChange = false; }, 100);
+                        
+                        // 上传合并后的数据到云端
+                        const success = await uploadData(key, mergedData);
+                        if (success) successCount++;
+                    } else {
+                        // 云端没有数据，或者与本地相同，直接上传
+                        const success = await uploadData(key, localData);
+                        if (success) successCount++;
+                    }
+                } catch(e) {
+                    console.error(`同步失败 ${key}:`, e);
+                    // 出错时直接上传本地数据
+                    const success = await uploadData(key, localData);
+                    if (success) successCount++;
+                }
             }
         }
         
@@ -211,6 +305,7 @@
 
     // ============================================
     // 从云端同步所有数据（手动/页面加载时调用）
+    // 智能合并：合并云端数据和本地数据，避免数据丢失
     // ============================================
     async function syncFromCloud(silent = false) {
         if (!supabaseClient || isSyncing) return;
@@ -218,7 +313,7 @@
         isSyncing = true;
         
         if (!silent) {
-            console.log('📥 开始从云端同步...');
+            console.log('📥 开始从云端同步（智能合并模式）...');
         }
         
         // 设置标志：正在应用云端变化，避免触发自动同步
@@ -226,9 +321,19 @@
         
         let successCount = 0;
         for (const key of DATA_KEYS) {
-            const data = await downloadData(key);
-            if (data !== null) {
-                localStorage.setItem(key, data);
+            const cloudData = await downloadData(key);
+            if (cloudData !== null) {
+                const localData = localStorage.getItem(key);
+                
+                if (localData !== null && localData !== cloudData) {
+                    // 本地有数据，且与云端不同，需要合并
+                    console.log(`🔄 合并数据: ${key}`);
+                    const mergedData = mergeData(key, localData, cloudData);
+                    localStorage.setItem(key, mergedData);
+                } else {
+                    // 本地没有数据，或者与云端相同，直接使用云端数据
+                    localStorage.setItem(key, cloudData);
+                }
                 successCount++;
             }
         }
