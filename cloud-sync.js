@@ -94,20 +94,11 @@
         // 设置标志：正在应用云端变化，避免触发自动同步
         isApplyingCloudChange = true;
         
-        // 立即更新本地数据（智能合并）
+        // 立即更新本地数据（直接应用云端数据）
         if (payload.eventType === 'DELETE') {
             localStorage.removeItem(record.key);
         } else {
-            const localData = localStorage.getItem(record.key);
-            if (localData !== null && localData !== record.value) {
-                // 本地有数据，且与云端不同，需要合并
-                console.log(`🔄 合并实时数据: ${record.key}`);
-                const mergedData = mergeData(record.key, localData, record.value);
-                localStorage.setItem(record.key, mergedData);
-            } else {
-                // 本地没有数据，或者与云端相同，直接使用云端数据
-                localStorage.setItem(record.key, record.value);
-            }
+            localStorage.setItem(record.key, record.value);
         }
         
         // 清除标志
@@ -247,7 +238,7 @@
 
     // ============================================
     // 同步所有数据到云端（用户修改后2秒自动调用）
-    // 智能合并：先从云端获取最新数据，合并后再上传
+    // 简化版：直接上传本地数据，确保数据能同步到云端
     // ============================================
     async function syncToCloud() {
         if (!supabaseClient || isSyncing) return;
@@ -259,39 +250,23 @@
         }
         
         isSyncing = true;
-        console.log('☁️ 开始同步到云端（智能合并模式）...');
+        console.log('☁️ 开始同步到云端...');
         
         let successCount = 0;
         for (const key of DATA_KEYS) {
             const localData = localStorage.getItem(key);
             if (localData !== null) {
                 try {
-                    // 先从云端获取最新数据
-                    const cloudData = await downloadData(key);
-                    
-                    if (cloudData !== null && cloudData !== localData) {
-                        // 云端有数据，且与本地不同，需要合并
-                        console.log(`🔄 合并数据: ${key}`);
-                        const mergedData = mergeData(key, localData, cloudData);
-                        
-                        // 设置标志：正在应用合并后的数据，避免触发自动同步
-                        isApplyingCloudChange = true;
-                        localStorage.setItem(key, mergedData);
-                        setTimeout(() => { isApplyingCloudChange = false; }, 100);
-                        
-                        // 上传合并后的数据到云端
-                        const success = await uploadData(key, mergedData);
-                        if (success) successCount++;
+                    // 直接上传本地数据
+                    const success = await uploadData(key, localData);
+                    if (success) {
+                        successCount++;
+                        console.log(`✅ 上传成功: ${key}`);
                     } else {
-                        // 云端没有数据，或者与本地相同，直接上传
-                        const success = await uploadData(key, localData);
-                        if (success) successCount++;
+                        console.error(`❌ 上传失败: ${key}`);
                     }
                 } catch(e) {
-                    console.error(`同步失败 ${key}:`, e);
-                    // 出错时直接上传本地数据
-                    const success = await uploadData(key, localData);
-                    if (success) successCount++;
+                    console.error(`上传异常 ${key}:`, e);
                 }
             }
         }
@@ -305,7 +280,7 @@
 
     // ============================================
     // 从云端同步所有数据（手动/页面加载时调用）
-    // 智能合并：合并云端数据和本地数据，避免数据丢失
+    // 简化版：直接下载云端数据覆盖本地，确保数据能同步下来
     // ============================================
     async function syncFromCloud(silent = false) {
         if (!supabaseClient || isSyncing) return;
@@ -313,7 +288,7 @@
         isSyncing = true;
         
         if (!silent) {
-            console.log('📥 开始从云端同步（智能合并模式）...');
+            console.log('📥 开始从云端同步...');
         }
         
         // 设置标志：正在应用云端变化，避免触发自动同步
@@ -321,19 +296,9 @@
         
         let successCount = 0;
         for (const key of DATA_KEYS) {
-            const cloudData = await downloadData(key);
-            if (cloudData !== null) {
-                const localData = localStorage.getItem(key);
-                
-                if (localData !== null && localData !== cloudData) {
-                    // 本地有数据，且与云端不同，需要合并
-                    console.log(`🔄 合并数据: ${key}`);
-                    const mergedData = mergeData(key, localData, cloudData);
-                    localStorage.setItem(key, mergedData);
-                } else {
-                    // 本地没有数据，或者与云端相同，直接使用云端数据
-                    localStorage.setItem(key, cloudData);
-                }
+            const data = await downloadData(key);
+            if (data !== null) {
+                localStorage.setItem(key, data);
                 successCount++;
             }
         }
