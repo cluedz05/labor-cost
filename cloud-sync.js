@@ -21,6 +21,7 @@
     let justSyncedTimer = null;
     let pageLoadTime = Date.now();
     let lastDataHash = '';
+    let isApplyingCloudChange = false; // 标志：正在应用云端变化，避免触发自动同步
 
     // ============================================
     // 初始化Supabase
@@ -90,12 +91,20 @@
         
         console.log(`📥 收到数据变化: ${record.key}, 事件: ${payload.eventType}`);
         
+        // 设置标志：正在应用云端变化，避免触发自动同步
+        isApplyingCloudChange = true;
+        
         // 立即更新本地数据
         if (payload.eventType === 'DELETE') {
             localStorage.removeItem(record.key);
         } else {
             localStorage.setItem(record.key, record.value);
         }
+        
+        // 清除标志
+        setTimeout(() => {
+            isApplyingCloudChange = false;
+        }, 100);
         
         // 触发数据更新事件，刷新页面
         window.dispatchEvent(new CustomEvent('cloudDataUpdated', { 
@@ -212,6 +221,9 @@
             console.log('📥 开始从云端同步...');
         }
         
+        // 设置标志：正在应用云端变化，避免触发自动同步
+        isApplyingCloudChange = true;
+        
         let successCount = 0;
         for (const key of DATA_KEYS) {
             const data = await downloadData(key);
@@ -222,6 +234,11 @@
         }
         
         localStorage.setItem(LAST_SYNC_KEY, new Date().toISOString());
+        
+        // 清除标志
+        setTimeout(() => {
+            isApplyingCloudChange = false;
+        }, 100);
         
         // 设置数据保护标志，10秒内不要同步回去
         justSyncedFromCloud = true;
@@ -259,7 +276,7 @@
     function setupAutoSync() {
         // 监听其他标签页的变化
         window.addEventListener('storage', (e) => {
-            if (DATA_KEYS.includes(e.key)) {
+            if (DATA_KEYS.includes(e.key) && !isApplyingCloudChange) {
                 scheduleAutoSync();
             }
         });
@@ -268,7 +285,8 @@
         const originalSetItem = localStorage.setItem.bind(localStorage);
         localStorage.setItem = function(key, value) {
             originalSetItem(key, value);
-            if (DATA_KEYS.includes(key) && supabaseClient) {
+            // 如果是正在应用云端变化，或者刚从云端同步，就不要触发自动同步
+            if (DATA_KEYS.includes(key) && supabaseClient && !isApplyingCloudChange && !justSyncedFromCloud) {
                 scheduleAutoSync();
             }
         };
