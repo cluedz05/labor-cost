@@ -390,7 +390,42 @@ button:empty {
         margin-top: 60px;
     }
 }
-</style></head>
+</style>
+<!-- 自动版本检查：确保用户总是使用最新版本 -->
+<script>
+(function() {
+    var CURRENT_VERSION = 'v4.5.0'; // 每次更新时修改这个版本号
+    var STORAGE_KEY = 'app_version';
+    
+    try {
+        var savedVersion = localStorage.getItem(STORAGE_KEY);
+        
+        if (savedVersion !== CURRENT_VERSION) {
+            console.log('🔄 检测到版本更新:', savedVersion, '->', CURRENT_VERSION);
+            
+            // 清除可能缓存的旧数据（但保留用户数据）
+            // 只清除版本相关的缓存，不清除用户数据
+            
+            // 保存新版本号
+            localStorage.setItem(STORAGE_KEY, CURRENT_VERSION);
+            
+            // 如果是第一次访问或者版本不匹配，强制刷新一次（带nocache参数）
+            if (!savedVersion || savedVersion < CURRENT_VERSION) {
+                console.log('🔄 强制刷新以加载最新版本...');
+                // 防止无限刷新
+                if (!sessionStorage.getItem('version_refreshed')) {
+                    sessionStorage.setItem('version_refreshed', 'true');
+                    window.location.href = window.location.pathname + '?nocache=' + Date.now();
+                }
+            }
+        }
+    } catch(e) {
+        console.error('版本检查失败:', e);
+    }
+})();
+</script>
+
+</head>
 
 <body>
 
