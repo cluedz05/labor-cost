@@ -14,7 +14,19 @@
     const SUPABASE_URL = 'https://izzcqlydjnfumbzfepcx.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_Vo_zxOAcU3j4y216VCx3qw_XygxDytX';
     
-    const DATA_KEYS = ['gf_cost_db', 'gf_cost_config', 'gf_cost_users', 'gf_cost_backups', 'gf_cost_export_logs'];
+    const DATA_KEYS = [
+        'gf_cost_db',           // 主要数据（款式、工序、回收站）
+        'gf_cost_config',       // 配置
+        'gf_cost_users',        // 用户
+        'gf_cost_backups',      // 备份
+        'gf_cost_export_logs',  // 导出记录
+        'styles',               // 旧版本款式数据（兼容）
+        'style_library',        // 款式库
+        'app_users',            // 应用用户
+        'app_current_user',     // 当前用户
+        'backups',              // 备份数据
+        'app_auto_backups'      // 自动备份
+    ];
     const LAST_SYNC_KEY = 'cloud_sync_last_sync';
     
     let supabaseClient = null;
