@@ -415,10 +415,8 @@
                     syncFromCloud(true);
                 }, 1000);
                 
-                // 启动5秒轮询降级方案（确保即使Realtime不工作也能同步）
-                setTimeout(() => {
-                    startFallbackPolling();
-                }, 5000);
+                // 注意：不启动5秒轮询，因为轮询会覆盖本地新添加的数据
+                // 只依赖Realtime实时同步，如果Realtime不工作，用户可以手动点击同步按钮
             }
         }, 100);
         
