@@ -80,16 +80,10 @@
     // 处理实时数据变化
     // ============================================
     function handleRealtimeChange(payload) {
-        // 避免自己触发的变化导致循环
-        if (justSyncedFromCloud) {
-            console.log('⏭️  跳过本次变化（刚从云端同步）');
-            return;
-        }
-        
         const record = payload.new || payload.old;
         if (!record || !record.key) return;
         
-        console.log(`📥 收到数据变化: ${record.key}, 事件: ${payload.eventType}`);
+        console.log(`📥 收到实时数据变化: ${record.key}, 事件: ${payload.eventType}`);
         
         // 设置标志：正在应用云端变化，避免触发自动同步
         isApplyingCloudChange = true;
@@ -112,6 +106,21 @@
         }));
         
         showToast(`📡 数据已实时更新: ${record.key}`);
+    }
+    
+    // ============================================
+    // 降级方案：5秒轮询（确保即使Realtime不工作也能同步）
+    // ============================================
+    let pollingTimer = null;
+    function startFallbackPolling() {
+        if (pollingTimer) clearInterval(pollingTimer);
+        console.log('🔄 启动5秒轮询降级方案...');
+        pollingTimer = setInterval(() => {
+            if (!isSyncing && supabaseClient) {
+                console.log('🔄 轮询：检查云端最新数据...');
+                syncFromCloud(true);
+            }
+        }, 5000);
     }
 
     // ============================================
@@ -405,6 +414,11 @@
                 setTimeout(() => {
                     syncFromCloud(true);
                 }, 1000);
+                
+                // 启动5秒轮询降级方案（确保即使Realtime不工作也能同步）
+                setTimeout(() => {
+                    startFallbackPolling();
+                }, 5000);
             }
         }, 100);
         
