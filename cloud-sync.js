@@ -1,10 +1,14 @@
 // ============================================
-// 多绮爱服饰 - 云端实时同步模块 v3.0
+// 多绮爱服饰 - 云端实时同步模块 v4.5
 // 真正的0延迟实时同步（Supabase Realtime）
 // ============================================
 
 (function() {
     'use strict';
+
+    // 版本号
+    const CLOUD_SYNC_VERSION = 'v4.5';
+    console.log('📦 cloud-sync.js 版本:', CLOUD_SYNC_VERSION);
 
     // 配置
     const SUPABASE_URL = 'https://izzcqlydjnfumbzfepcx.supabase.co';
@@ -434,7 +438,8 @@
         init: init,
         syncToCloud: syncToCloud,
         syncFromCloud: syncFromCloud,
-        getRealtimeStatus: () => realtimeChannel ? '已连接' : '未连接'
+        getRealtimeStatus: () => realtimeChannel ? '已连接' : '未连接',
+        version: CLOUD_SYNC_VERSION
     };
 
     // 自动初始化
