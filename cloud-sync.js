@@ -1,5 +1,5 @@
 // ============================================
-// 多绮爱服饰 - 云端实时同步模块 v5.4
+// 多绮爱服饰 - 云端实时同步模块 v5.5
 // 真正的0延迟实时同步（Supabase Realtime）
 // ============================================
 
@@ -7,7 +7,7 @@
     'use strict';
 
     // 版本号
-    const CLOUD_SYNC_VERSION = 'v5.4';
+    const CLOUD_SYNC_VERSION = 'v5.5';
     console.log('📦 cloud-sync.js 版本:', CLOUD_SYNC_VERSION);
 
     // 配置
@@ -165,7 +165,7 @@
                     if (typeof window.updateUI === 'function') window.updateUI();
                 } catch(e) {}
                 
-                // 方法4：最后手段，重新加载页面（只在关键数据变化时）
+                // 方法4：最后手段，重新加载页面（只在关键数据变化时，且至少间隔10秒）
                 if (record.key === 'gf_cost_db' || record.key === 'styles') {
                     // 检查页面是否已经更新（通过比较时间戳）
                     try {
@@ -174,15 +174,20 @@
                             // 如果页面显示的时间戳和最新时间戳不一致，重新加载
                             if (!window._lastShownUpdatedAt || window._lastShownUpdatedAt !== db._updatedAt) {
                                 window._lastShownUpdatedAt = db._updatedAt;
-                                // 不立即重新加载，先等一下看看应用是否响应事件
-                                setTimeout(() => {
-                                    // 如果页面还是没有更新，重新加载
-                                    window.location.reload();
-                                }, 2000);
+                                // 避免频繁刷新（至少间隔10秒）
+                                var now = Date.now();
+                                if (!window._lastPageReload || now - window._lastPageReload > 10000) {
+                                    window._lastPageReload = now;
+                                    // 不立即重新加载，先等一下看看应用是否响应事件
+                                    setTimeout(() => {
+                                        // 如果页面还是没有更新，重新加载
+                                        window.location.reload();
+                                    }, 3000);
+                                }
                             }
                         }
                     } catch(e) {
-                        window.location.reload();
+                        // 忽略错误，不重新加载页面
                     }
                 }
             }, 100);
@@ -190,18 +195,50 @@
     }
     
     // ============================================
-    // 降级方案：5秒轮询（确保即使Realtime不工作也能同步）
+    // 降级方案：30秒轮询（确保即使Realtime不工作也能同步）
+    // 优化：只在云端数据更新时才下载，避免覆盖本地数据
     // ============================================
     let pollingTimer = null;
     function startFallbackPolling() {
         if (pollingTimer) clearInterval(pollingTimer);
-        console.log('🔄 启动5秒轮询降级方案...');
+        console.log('🔄 启动30秒轮询降级方案...');
         pollingTimer = setInterval(() => {
-            if (!isSyncing && supabaseClient && !justSyncedFromCloud) {
+            if (!isSyncing && supabaseClient && !justSyncedFromCloud && !isApplyingCloudChange) {
                 console.log('🔄 轮询：检查云端最新数据...');
+                // 只检查gf_cost_db的更新时间，不直接下载
+                checkCloudUpdateTime();
+            }
+        }, 30000); // 30秒轮询一次，避免频繁同步
+    }
+    
+    // 检查云端数据更新时间，如果云端更新则下载
+    async function checkCloudUpdateTime() {
+        try {
+            const { data, error } = await supabaseClient
+                .from('app_data')
+                .select('key, updated_at')
+                .in('key', DATA_KEYS);
+                
+            if (error) return;
+            
+            // 比较本地和云端的更新时间
+            const lastSync = localStorage.getItem(LAST_SYNC_KEY);
+            let needSync = false;
+            
+            for (const item of data) {
+                if (item.updated_at && (!lastSync || new Date(item.updated_at) > new Date(lastSync))) {
+                    needSync = true;
+                    break;
+                }
+            }
+            
+            if (needSync) {
+                console.log('🔄 轮询：云端数据已更新，开始同步...');
                 syncFromCloud(true);
             }
-        }, 5000);
+        } catch(e) {
+            // 忽略错误
+        }
     }
 
     // ============================================
