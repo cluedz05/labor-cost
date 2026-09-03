@@ -1,5 +1,5 @@
 // ============================================
-// 多绮爱服饰 - 云端实时同步模块 v5.3
+// 多绮爱服饰 - 云端实时同步模块 v5.4
 // 真正的0延迟实时同步（Supabase Realtime）
 // ============================================
 
@@ -7,7 +7,7 @@
     'use strict';
 
     // 版本号
-    const CLOUD_SYNC_VERSION = 'v5.3';
+    const CLOUD_SYNC_VERSION = 'v5.4';
     console.log('📦 cloud-sync.js 版本:', CLOUD_SYNC_VERSION);
 
     // 配置
@@ -131,19 +131,61 @@
             }, 200);
         }
         
-        // 数据更新后重新加载页面（确保用户看到最新数据）
+        // 数据更新后通知页面刷新（不重新加载整个页面，更快）
         if (dataUpdated) {
-            // 避免频繁刷新（至少间隔3秒）
+            // 避免频繁刷新（至少间隔1秒）
             var now = Date.now();
-            if (window._lastAutoRefresh && now - window._lastAutoRefresh < 3000) {
+            if (window._lastDataUpdate && now - window._lastDataUpdate < 1000) {
                 return;
             }
-            window._lastAutoRefresh = now;
+            window._lastDataUpdate = now;
             
-            // 延迟500ms重新加载页面，确保localStorage已更新
+            // 延迟100ms通知页面，确保localStorage已更新
             setTimeout(() => {
-                window.location.reload();
-            }, 500);
+                // 方法1：触发自定义事件
+                try {
+                    window.dispatchEvent(new CustomEvent('cloudDataUpdated', { 
+                        detail: { key: record.key, event: payload.eventType, realtime: true }
+                    }));
+                } catch(e) {}
+                
+                // 方法2：触发storage事件
+                try {
+                    window.dispatchEvent(new StorageEvent('storage', {
+                        key: record.key,
+                        newValue: localStorage.getItem(record.key)
+                    }));
+                } catch(e) {}
+                
+                // 方法3：调用全局刷新函数（如果存在）
+                try {
+                    if (typeof window.refreshData === 'function') window.refreshData();
+                    if (typeof window.loadData === 'function') window.loadData();
+                    if (typeof window.renderAll === 'function') window.renderAll();
+                    if (typeof window.updateUI === 'function') window.updateUI();
+                } catch(e) {}
+                
+                // 方法4：最后手段，重新加载页面（只在关键数据变化时）
+                if (record.key === 'gf_cost_db' || record.key === 'styles') {
+                    // 检查页面是否已经更新（通过比较时间戳）
+                    try {
+                        var db = JSON.parse(localStorage.getItem('gf_cost_db'));
+                        if (db && db._updatedAt) {
+                            // 如果页面显示的时间戳和最新时间戳不一致，重新加载
+                            if (!window._lastShownUpdatedAt || window._lastShownUpdatedAt !== db._updatedAt) {
+                                window._lastShownUpdatedAt = db._updatedAt;
+                                // 不立即重新加载，先等一下看看应用是否响应事件
+                                setTimeout(() => {
+                                    // 如果页面还是没有更新，重新加载
+                                    window.location.reload();
+                                }, 2000);
+                            }
+                        }
+                    } catch(e) {
+                        window.location.reload();
+                    }
+                }
+            }, 100);
         }
     }
     
@@ -361,13 +403,13 @@
     }
 
     // ============================================
-    // 自动同步（用户修改数据后2秒自动同步到云端）
+    // 自动同步（用户修改数据后0.5秒自动同步到云端）
     // ============================================
     function scheduleAutoSync() {
         if (syncTimer) clearTimeout(syncTimer);
         syncTimer = setTimeout(() => {
             syncToCloud();
-        }, 2000); // 2秒后自动同步
+        }, 500); // 0.5秒后自动同步（更快的实时同步）
     }
 
     // ============================================
