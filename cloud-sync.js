@@ -1,13 +1,13 @@
 // ============================================
-// 多绮爱服饰 - 云端实时同步模块 v5.5
-// 真正的0延迟实时同步（Supabase Realtime）
+// 多绮爱服饰 - 云端实时同步模块 v6.0
+// 真正的在线版本：直接从云端读取数据，不依赖本地localStorage
 // ============================================
 
 (function() {
     'use strict';
 
     // 版本号
-    const CLOUD_SYNC_VERSION = 'v5.5';
+    const CLOUD_SYNC_VERSION = 'v6.0';
     console.log('📦 cloud-sync.js 版本:', CLOUD_SYNC_VERSION);
 
     // 配置
@@ -93,37 +93,30 @@
     }
 
     // ============================================
-    // 处理实时数据变化
+    // 处理实时数据变化（真正的在线版本：立即从云端重新读取并刷新页面）
     // ============================================
     async function handleRealtimeChange(payload) {
         const record = payload.new || payload.old;
         if (!record || !record.key) return;
         
+        console.log('🔴 收到实时数据变化:', record.key, payload.eventType);
+        
         // 设置标志：正在应用云端变化，避免触发自动同步
         isApplyingCloudChange = true;
         
-        let dataUpdated = false;
-        
         try {
-            if (payload.eventType === 'DELETE') {
-                localStorage.removeItem(record.key);
-                dataUpdated = true;
-            } else {
-                // 直接使用Realtime返回的数据
-                if (record.value) {
-                    localStorage.setItem(record.key, record.value);
-                    dataUpdated = true;
-                } else {
-                    // 如果Realtime没有返回value，再从云端下载
-                    const fullData = await downloadData(record.key);
-                    if (fullData !== null) {
-                        localStorage.setItem(record.key, fullData);
-                        dataUpdated = true;
-                    }
-                }
+            // 真正的在线版本：立即从云端重新读取完整数据
+            const fullData = await downloadData(record.key);
+            if (fullData !== null) {
+                localStorage.setItem(record.key, fullData);
+                console.log('✅ 已从云端重新读取数据:', record.key, fullData.length, '字节');
             }
         } catch(e) {
-            // 忽略错误
+            console.error('从云端重新读取数据失败:', e);
+            // 如果从云端读取失败，使用Realtime返回的数据
+            if (record.value) {
+                localStorage.setItem(record.key, record.value);
+            }
         } finally {
             // 异步操作完成后再清除标志
             setTimeout(() => {
@@ -131,67 +124,43 @@
             }, 200);
         }
         
-        // 数据更新后通知页面刷新（不重新加载整个页面，更快）
-        if (dataUpdated) {
-            // 避免频繁刷新（至少间隔1秒）
-            var now = Date.now();
-            if (window._lastDataUpdate && now - window._lastDataUpdate < 1000) {
-                return;
-            }
-            window._lastDataUpdate = now;
+        // 立即刷新页面，确保用户看到最新数据
+        setTimeout(() => {
+            // 触发自定义事件，让应用刷新页面
+            try {
+                window.dispatchEvent(new CustomEvent('cloudDataUpdated', { 
+                    detail: { key: record.key, event: payload.eventType, realtime: true }
+                }));
+            } catch(e) {}
             
-            // 延迟100ms通知页面，确保localStorage已更新
-            setTimeout(() => {
-                // 方法1：触发自定义事件
-                try {
-                    window.dispatchEvent(new CustomEvent('cloudDataUpdated', { 
-                        detail: { key: record.key, event: payload.eventType, realtime: true }
-                    }));
-                } catch(e) {}
-                
-                // 方法2：触发storage事件
-                try {
-                    window.dispatchEvent(new StorageEvent('storage', {
-                        key: record.key,
-                        newValue: localStorage.getItem(record.key)
-                    }));
-                } catch(e) {}
-                
-                // 方法3：调用全局刷新函数（如果存在）
-                try {
-                    if (typeof window.refreshData === 'function') window.refreshData();
-                    if (typeof window.loadData === 'function') window.loadData();
-                    if (typeof window.renderAll === 'function') window.renderAll();
-                    if (typeof window.updateUI === 'function') window.updateUI();
-                } catch(e) {}
-                
-                // 方法4：最后手段，重新加载页面（只在关键数据变化时，且至少间隔10秒）
-                if (record.key === 'gf_cost_db' || record.key === 'styles') {
-                    // 检查页面是否已经更新（通过比较时间戳）
-                    try {
-                        var db = JSON.parse(localStorage.getItem('gf_cost_db'));
-                        if (db && db._updatedAt) {
-                            // 如果页面显示的时间戳和最新时间戳不一致，重新加载
-                            if (!window._lastShownUpdatedAt || window._lastShownUpdatedAt !== db._updatedAt) {
-                                window._lastShownUpdatedAt = db._updatedAt;
-                                // 避免频繁刷新（至少间隔10秒）
-                                var now = Date.now();
-                                if (!window._lastPageReload || now - window._lastPageReload > 10000) {
-                                    window._lastPageReload = now;
-                                    // 不立即重新加载，先等一下看看应用是否响应事件
-                                    setTimeout(() => {
-                                        // 如果页面还是没有更新，重新加载
-                                        window.location.reload();
-                                    }, 3000);
-                                }
-                            }
-                        }
-                    } catch(e) {
-                        // 忽略错误，不重新加载页面
-                    }
+            // 触发storage事件
+            try {
+                window.dispatchEvent(new StorageEvent('storage', {
+                    key: record.key,
+                    newValue: localStorage.getItem(record.key)
+                }));
+            } catch(e) {}
+            
+            // 调用全局刷新函数
+            try {
+                if (typeof window.refreshData === 'function') window.refreshData();
+                if (typeof window.loadData === 'function') window.loadData();
+                if (typeof window.renderAll === 'function') window.renderAll();
+                if (typeof window.updateUI === 'function') window.updateUI();
+            } catch(e) {}
+            
+            // 最后手段：重新加载页面（只在关键数据变化时，且至少间隔10秒）
+            if (record.key === 'gf_cost_db' || record.key === 'styles') {
+                var now = Date.now();
+                if (!window._lastPageReload || now - window._lastPageReload > 10000) {
+                    window._lastPageReload = now;
+                    // 延迟1秒重新加载，确保应用有机会响应事件
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
                 }
-            }, 100);
-        }
+            }
+        }, 100);
     }
     
     // ============================================
@@ -440,13 +409,13 @@
     }
 
     // ============================================
-    // 自动同步（用户修改数据后0.5秒自动同步到云端）
+    // 自动同步（用户修改数据后立即同步到云端，真正的在线版本）
     // ============================================
     function scheduleAutoSync() {
         if (syncTimer) clearTimeout(syncTimer);
         syncTimer = setTimeout(() => {
             syncToCloud();
-        }, 500); // 0.5秒后自动同步（更快的实时同步）
+        }, 100); // 0.1秒后自动同步（几乎立即，真正的在线版本）
     }
 
     // ============================================
@@ -506,7 +475,7 @@
     // 初始化
     // ============================================
     function init() {
-        console.log('🚀 多绮爱服饰云端实时同步模块 v3.0 启动...');
+        console.log('🚀 多绮爱服饰云端实时同步模块 v6.0 启动（真正的在线版本）...');
         
         // 等待supabase-js加载完成
         const waitForSupabase = setInterval(() => {
@@ -516,10 +485,10 @@
                 setupAutoSync();
                 initFocusSync();
                 
-                // 页面加载时从云端同步一次
+                // 页面加载时立即从云端同步（真正的在线版本，不延迟）
                 setTimeout(() => {
                     syncFromCloud(true);
-                }, 1000);
+                }, 100); // 0.1秒后立即从云端同步
                 
                 // 注意：不启动5秒轮询，因为轮询会覆盖本地新添加的数据
                 // 只依赖Realtime实时同步，如果Realtime不工作，用户可以手动点击同步按钮
