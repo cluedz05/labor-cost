@@ -1,5 +1,5 @@
 // ============================================
-// 多绮爱服饰 - 云端实时同步模块 v4.6
+// 多绮爱服饰 - 云端实时同步模块 v4.7
 // 真正的0延迟实时同步（Supabase Realtime）
 // ============================================
 
@@ -7,7 +7,7 @@
     'use strict';
 
     // 版本号
-    const CLOUD_SYNC_VERSION = 'v4.6';
+    const CLOUD_SYNC_VERSION = 'v4.7';
     console.log('📦 cloud-sync.js 版本:', CLOUD_SYNC_VERSION);
 
     // 配置
@@ -95,7 +95,7 @@
     // ============================================
     // 处理实时数据变化
     // ============================================
-    function handleRealtimeChange(payload) {
+    async function handleRealtimeChange(payload) {
         const record = payload.new || payload.old;
         if (!record || !record.key) return;
         
@@ -104,11 +104,28 @@
         // 设置标志：正在应用云端变化，避免触发自动同步
         isApplyingCloudChange = true;
         
-        // 立即更新本地数据（直接应用云端数据）
-        if (payload.eventType === 'DELETE') {
-            localStorage.removeItem(record.key);
-        } else {
-            localStorage.setItem(record.key, record.value);
+        try {
+            if (payload.eventType === 'DELETE') {
+                localStorage.removeItem(record.key);
+                console.log(`🗑️ 已删除本地数据: ${record.key}`);
+            } else {
+                // 重新从云端获取完整数据，确保value字段完整
+                const fullData = await downloadData(record.key);
+                if (fullData !== null) {
+                    localStorage.setItem(record.key, fullData);
+                    console.log(`✅ 已更新本地数据: ${record.key} (${fullData.length} 字节)`);
+                } else if (record.value) {
+                    // 如果下载失败，使用Realtime返回的数据
+                    localStorage.setItem(record.key, record.value);
+                    console.log(`⚠️ 使用Realtime数据更新: ${record.key}`);
+                }
+            }
+        } catch(e) {
+            console.error(`处理实时数据变化失败: ${record.key}`, e);
+            // 出错时尝试使用Realtime返回的数据
+            if (record.value) {
+                localStorage.setItem(record.key, record.value);
+            }
         }
         
         // 清除标志
@@ -119,6 +136,12 @@
         // 触发数据更新事件，刷新页面
         window.dispatchEvent(new CustomEvent('cloudDataUpdated', { 
             detail: { key: record.key, event: payload.eventType, realtime: true }
+        }));
+        
+        // 额外触发storage事件，确保当前页面也能检测到变化
+        window.dispatchEvent(new StorageEvent('storage', {
+            key: record.key,
+            newValue: localStorage.getItem(record.key)
         }));
         
         showToast(`📡 数据已实时更新: ${record.key}`);
@@ -132,20 +155,8 @@
         if (pollingTimer) clearInterval(pollingTimer);
         console.log('🔄 启动5秒轮询降级方案...');
         pollingTimer = setInterval(() => {
-            if (!isSyncing && supabaseClient) {
+            if (!isSyncing && supabaseClient && !justSyncedFromCloud) {
                 console.log('🔄 轮询：检查云端最新数据...');
-                syncFromCloud(true);
-            }
-        }, 5000);
-    }
-
-    // ============================================
-    // 降级方案：5秒轮询（如果Realtime不可用）
-    // ============================================
-    function startFallbackPolling() {
-        console.log('⚠️  使用降级方案：5秒轮询同步');
-        setInterval(() => {
-            if (!justSyncedFromCloud && !isSyncing) {
                 syncFromCloud(true);
             }
         }, 5000);
