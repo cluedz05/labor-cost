@@ -1,5 +1,5 @@
 // ============================================
-// 多绮爱服饰 - 云端实时同步模块 v4.8
+// 多绮爱服饰 - 云端实时同步模块 v4.9
 // 真正的0延迟实时同步（Supabase Realtime）
 // ============================================
 
@@ -7,7 +7,7 @@
     'use strict';
 
     // 版本号
-    const CLOUD_SYNC_VERSION = 'v4.8';
+    const CLOUD_SYNC_VERSION = 'v4.9';
     console.log('📦 cloud-sync.js 版本:', CLOUD_SYNC_VERSION);
 
     // 配置
@@ -104,21 +104,26 @@
         // 设置标志：正在应用云端变化，避免触发自动同步
         isApplyingCloudChange = true;
         
+        let dataUpdated = false;
+        
         try {
             if (payload.eventType === 'DELETE') {
                 localStorage.removeItem(record.key);
                 console.log(`🗑️ 已删除本地数据: ${record.key}`);
+                dataUpdated = true;
             } else {
                 // 直接使用Realtime返回的数据（避免额外的网络请求导致卡顿）
                 if (record.value) {
                     localStorage.setItem(record.key, record.value);
                     console.log(`✅ 已更新本地数据: ${record.key} (${record.value.length} 字节)`);
+                    dataUpdated = true;
                 } else {
                     // 如果Realtime没有返回value，再从云端下载
                     const fullData = await downloadData(record.key);
                     if (fullData !== null) {
                         localStorage.setItem(record.key, fullData);
                         console.log(`✅ 从云端下载完整数据: ${record.key} (${fullData.length} 字节)`);
+                        dataUpdated = true;
                     }
                 }
             }
@@ -131,12 +136,17 @@
             }, 200);
         }
         
-        // 触发数据更新事件，刷新页面
-        window.dispatchEvent(new CustomEvent('cloudDataUpdated', { 
-            detail: { key: record.key, event: payload.eventType, realtime: true }
-        }));
-        
-        showToast(`📡 数据已实时更新: ${record.key}`);
+        // 数据更新后触发事件，刷新页面（延迟确保localStorage已更新）
+        if (dataUpdated) {
+            setTimeout(() => {
+                window.dispatchEvent(new CustomEvent('cloudDataUpdated', { 
+                    detail: { key: record.key, event: payload.eventType, realtime: true }
+                }));
+                console.log(`🔔 已触发cloudDataUpdated事件: ${record.key}`);
+            }, 100);
+            
+            showToast(`📡 数据已实时更新: ${record.key}`);
+        }
     }
     
     // ============================================
