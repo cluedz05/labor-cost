@@ -1,5 +1,5 @@
 // ============================================
-// 多绮爱服饰 - 云端实时同步模块 v4.7
+// 多绮爱服饰 - 云端实时同步模块 v4.8
 // 真正的0延迟实时同步（Supabase Realtime）
 // ============================================
 
@@ -7,7 +7,7 @@
     'use strict';
 
     // 版本号
-    const CLOUD_SYNC_VERSION = 'v4.7';
+    const CLOUD_SYNC_VERSION = 'v4.8';
     console.log('📦 cloud-sync.js 版本:', CLOUD_SYNC_VERSION);
 
     // 配置
@@ -109,39 +109,31 @@
                 localStorage.removeItem(record.key);
                 console.log(`🗑️ 已删除本地数据: ${record.key}`);
             } else {
-                // 重新从云端获取完整数据，确保value字段完整
-                const fullData = await downloadData(record.key);
-                if (fullData !== null) {
-                    localStorage.setItem(record.key, fullData);
-                    console.log(`✅ 已更新本地数据: ${record.key} (${fullData.length} 字节)`);
-                } else if (record.value) {
-                    // 如果下载失败，使用Realtime返回的数据
+                // 直接使用Realtime返回的数据（避免额外的网络请求导致卡顿）
+                if (record.value) {
                     localStorage.setItem(record.key, record.value);
-                    console.log(`⚠️ 使用Realtime数据更新: ${record.key}`);
+                    console.log(`✅ 已更新本地数据: ${record.key} (${record.value.length} 字节)`);
+                } else {
+                    // 如果Realtime没有返回value，再从云端下载
+                    const fullData = await downloadData(record.key);
+                    if (fullData !== null) {
+                        localStorage.setItem(record.key, fullData);
+                        console.log(`✅ 从云端下载完整数据: ${record.key} (${fullData.length} 字节)`);
+                    }
                 }
             }
         } catch(e) {
             console.error(`处理实时数据变化失败: ${record.key}`, e);
-            // 出错时尝试使用Realtime返回的数据
-            if (record.value) {
-                localStorage.setItem(record.key, record.value);
-            }
+        } finally {
+            // 异步操作完成后再清除标志
+            setTimeout(() => {
+                isApplyingCloudChange = false;
+            }, 200);
         }
-        
-        // 清除标志
-        setTimeout(() => {
-            isApplyingCloudChange = false;
-        }, 100);
         
         // 触发数据更新事件，刷新页面
         window.dispatchEvent(new CustomEvent('cloudDataUpdated', { 
             detail: { key: record.key, event: payload.eventType, realtime: true }
-        }));
-        
-        // 额外触发storage事件，确保当前页面也能检测到变化
-        window.dispatchEvent(new StorageEvent('storage', {
-            key: record.key,
-            newValue: localStorage.getItem(record.key)
         }));
         
         showToast(`📡 数据已实时更新: ${record.key}`);
