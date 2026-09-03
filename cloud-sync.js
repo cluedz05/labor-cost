@@ -1,5 +1,5 @@
 // ============================================
-// 多绮爱服饰 - 云端实时同步模块 v4.9
+// 多绮爱服饰 - 云端实时同步模块 v5.0
 // 真正的0延迟实时同步（Supabase Realtime）
 // ============================================
 
@@ -7,7 +7,7 @@
     'use strict';
 
     // 版本号
-    const CLOUD_SYNC_VERSION = 'v4.9';
+    const CLOUD_SYNC_VERSION = 'v5.0';
     console.log('📦 cloud-sync.js 版本:', CLOUD_SYNC_VERSION);
 
     // 配置
@@ -100,6 +100,7 @@
         if (!record || !record.key) return;
         
         console.log(`📥 收到实时数据变化: ${record.key}, 事件: ${payload.eventType}`);
+        console.log(`📥 record.value长度: ${record.value ? record.value.length : 'null'}`);
         
         // 设置标志：正在应用云端变化，避免触发自动同步
         isApplyingCloudChange = true;
@@ -112,18 +113,21 @@
                 console.log(`🗑️ 已删除本地数据: ${record.key}`);
                 dataUpdated = true;
             } else {
-                // 直接使用Realtime返回的数据（避免额外的网络请求导致卡顿）
+                // 直接使用Realtime返回的数据
                 if (record.value) {
                     localStorage.setItem(record.key, record.value);
                     console.log(`✅ 已更新本地数据: ${record.key} (${record.value.length} 字节)`);
                     dataUpdated = true;
                 } else {
                     // 如果Realtime没有返回value，再从云端下载
+                    console.log(`⚠️ Realtime没有返回value，从云端下载...`);
                     const fullData = await downloadData(record.key);
                     if (fullData !== null) {
                         localStorage.setItem(record.key, fullData);
                         console.log(`✅ 从云端下载完整数据: ${record.key} (${fullData.length} 字节)`);
                         dataUpdated = true;
+                    } else {
+                        console.log(`❌ 从云端下载失败: ${record.key}`);
                     }
                 }
             }
@@ -136,14 +140,32 @@
             }, 200);
         }
         
-        // 数据更新后触发事件，刷新页面（延迟确保localStorage已更新）
+        console.log(`📊 dataUpdated标志: ${dataUpdated}`);
+        
+        // 数据更新后触发事件，刷新页面
         if (dataUpdated) {
-            setTimeout(() => {
+            // 立即触发事件（不延迟，确保页面能及时刷新）
+            try {
                 window.dispatchEvent(new CustomEvent('cloudDataUpdated', { 
                     detail: { key: record.key, event: payload.eventType, realtime: true }
                 }));
                 console.log(`🔔 已触发cloudDataUpdated事件: ${record.key}`);
-            }, 100);
+            } catch(e) {
+                console.error(`触发cloudDataUpdated事件失败:`, e);
+            }
+            
+            // 同时触发storage事件（确保当前页面也能检测到变化）
+            try {
+                window.dispatchEvent(new StorageEvent('storage', {
+                    key: record.key,
+                    newValue: localStorage.getItem(record.key),
+                    oldValue: null,
+                    url: window.location.href
+                }));
+                console.log(`🔔 已触发storage事件: ${record.key}`);
+            } catch(e) {
+                console.error(`触发storage事件失败:`, e);
+            }
             
             showToast(`📡 数据已实时更新: ${record.key}`);
         }
