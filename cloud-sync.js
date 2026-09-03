@@ -1,5 +1,5 @@
 // ============================================
-// 多绮爱服饰 - 云端实时同步模块 v5.2
+// 多绮爱服饰 - 云端实时同步模块 v5.3
 // 真正的0延迟实时同步（Supabase Realtime）
 // ============================================
 
@@ -7,7 +7,7 @@
     'use strict';
 
     // 版本号
-    const CLOUD_SYNC_VERSION = 'v5.2';
+    const CLOUD_SYNC_VERSION = 'v5.3';
     console.log('📦 cloud-sync.js 版本:', CLOUD_SYNC_VERSION);
 
     // 配置
@@ -131,68 +131,19 @@
             }, 200);
         }
         
-        // 数据更新后刷新页面（确保用户看到最新数据）
+        // 数据更新后重新加载页面（确保用户看到最新数据）
         if (dataUpdated) {
-            // 延迟刷新，确保localStorage已更新
+            // 避免频繁刷新（至少间隔3秒）
+            var now = Date.now();
+            if (window._lastAutoRefresh && now - window._lastAutoRefresh < 3000) {
+                return;
+            }
+            window._lastAutoRefresh = now;
+            
+            // 延迟500ms重新加载页面，确保localStorage已更新
             setTimeout(() => {
-                // 避免频繁刷新（至少间隔5秒）
-                var now = Date.now();
-                if (window._lastAutoRefresh && now - window._lastAutoRefresh < 5000) {
-                    return;
-                }
-                window._lastAutoRefresh = now;
-                
-                // 方法1：尝试触发自定义事件
-                try {
-                    var event = new CustomEvent('cloudDataUpdated', { 
-                        detail: { key: record.key, event: payload.eventType, realtime: true }
-                    });
-                    window.dispatchEvent(event);
-                } catch(e) {}
-                
-                // 方法2：尝试触发storage事件
-                try {
-                    var storageEvent = new StorageEvent('storage', {
-                        key: record.key,
-                        newValue: localStorage.getItem(record.key)
-                    });
-                    window.dispatchEvent(storageEvent);
-                } catch(e) {}
-                
-                // 方法3：如果应用有全局刷新函数，调用它
-                try {
-                    if (typeof window.refreshData === 'function') {
-                        window.refreshData();
-                    }
-                    if (typeof window.loadData === 'function') {
-                        window.loadData();
-                    }
-                    if (typeof window.renderPage === 'function') {
-                        window.renderPage();
-                    }
-                } catch(e) {}
-                
-                // 方法4：最后手段，重新加载页面
-                // 只在关键数据变化时才重新加载
-                if (record.key === 'gf_cost_db' || record.key === 'styles') {
-                    // 不立即重新加载，先等一下看看应用是否响应事件
-                    setTimeout(() => {
-                        // 检查页面是否已经更新（通过比较时间戳）
-                        try {
-                            var db = JSON.parse(localStorage.getItem('gf_cost_db'));
-                            if (db && db._updatedAt && window._lastShownUpdatedAt !== db._updatedAt) {
-                                window._lastShownUpdatedAt = db._updatedAt;
-                                // 页面数据已更新，不需要重新加载
-                            } else {
-                                // 页面数据可能没有更新，重新加载
-                                window.location.reload();
-                            }
-                        } catch(e) {
-                            window.location.reload();
-                        }
-                    }, 1000);
-                }
-            }, 100);
+                window.location.reload();
+            }, 500);
         }
     }
     
