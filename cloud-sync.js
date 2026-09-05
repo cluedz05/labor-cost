@@ -8,8 +8,8 @@
     'use strict';
 
     // 版本号
-    const CLOUD_SYNC_VERSION = 'v7.1';
-    console.log('📦 cloud-sync.js 版本:', CLOUD_SYNC_VERSION, '(GitHub Gist版本)');
+    const CLOUD_SYNC_VERSION = 'v7.1.1';
+    console.log('📦 cloud-sync.js 版本:', CLOUD_SYNC_VERSION, '(GitHub Gist版本 - 优化版)');
 
     // ============================================
     // 配置
@@ -29,17 +29,21 @@
     // 数据文件名（存储在Gist中的文件名）
     const DATA_FILENAME = 'labor-cost-data.json';
     
-    // 数据key列表（保持和之前一致）
+    // 数据key列表（排除备份数据，避免超过Gist大小限制）
     const DATA_KEYS = [
         'gf_cost_db',           // 主要数据（款式、工序、回收站）
         'gf_cost_config',       // 配置
         'gf_cost_users',        // 用户
-        'gf_cost_backups',      // 备份
         'gf_cost_export_logs',  // 导出记录
         'styles',               // 旧版本款式数据（兼容）
         'style_library',        // 款式库
         'app_users',            // 应用用户
         'app_current_user',     // 当前用户
+    ];
+    
+    // 备份数据key（不同步到云端，只存在本地）
+    const BACKUP_KEYS = [
+        'gf_cost_backups',      // 备份
         'backups',              // 备份数据
         'app_auto_backups'      // 自动备份
     ];
