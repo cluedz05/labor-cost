@@ -88,6 +88,58 @@
         }
     }
     
+    // 分块编码base64，避免大文件栈溢出
+    function base64Encode(bytes) {
+        let binary = '';
+        const chunkSize = 0x8000; // 32KB分块
+        for (let i = 0; i < bytes.length; i += chunkSize) {
+            const chunk = bytes.subarray(i, i + chunkSize);
+            binary += String.fromCharCode.apply(null, chunk);
+        }
+        return btoa(binary);
+    }
+    
+    // 修复数据格式（styles从对象转换为数组）
+    function fixDataFormat(data) {
+        if (!data || typeof data !== 'object') return data;
+        
+        // 修复styles格式
+        if (data.styles && !Array.isArray(data.styles) && typeof data.styles === 'object') {
+            console.log('🔧 检测到styles格式问题，正在修复...');
+            // 检查是否是{value: [...], Count: N}格式
+            if (data.styles.value && Array.isArray(data.styles.value)) {
+                data.styles = data.styles.value;
+                console.log('🔧 styles已从{value: [...]}格式修复为数组，数量:', data.styles.length);
+            } else {
+                // 尝试把对象的值合并成数组
+                let mergedArray = [];
+                for (const key of Object.keys(data.styles)) {
+                    const value = data.styles[key];
+                    if (Array.isArray(value)) {
+                        mergedArray = mergedArray.concat(value);
+                    } else if (typeof value === 'object' && value !== null) {
+                        mergedArray.push(value);
+                    }
+                }
+                if (mergedArray.length > 0) {
+                    data.styles = mergedArray;
+                    console.log('🔧 styles已从对象合并为数组，数量:', mergedArray.length);
+                }
+            }
+        }
+        
+        // 修复style_library格式
+        if (data.style_library && !Array.isArray(data.style_library) && typeof data.style_library === 'object') {
+            console.log('🔧 检测到style_library格式问题，正在修复...');
+            if (data.style_library.value && Array.isArray(data.style_library.value)) {
+                data.style_library = data.style_library.value;
+                console.log('🔧 style_library已修复为数组，数量:', data.style_library.length);
+            }
+        }
+        
+        return data;
+    }
+    
     // ============================================
     // GitHub API
     // ============================================
@@ -132,7 +184,10 @@
                 content = atob(fileData.content);
             }
             
-            const data = safeParseJSON(content);
+            let data = safeParseJSON(content);
+            
+            // 自动修复数据格式
+            data = fixDataFormat(data);
             
             return {
                 success: true,
@@ -155,9 +210,16 @@
                 await getRemoteData();
             }
             
+            // 修复数据格式
+            data = fixDataFormat(data);
+            
             const content = JSON.stringify(data, null, 2);
             const bytes = new TextEncoder().encode(content);
-            const base64Content = btoa(String.fromCharCode(...bytes));
+            console.log('📦 正在编码数据，大小:', bytes.length, '字节');
+            
+            // 使用分块编码base64，避免大文件栈溢出
+            const base64Content = base64Encode(bytes);
+            console.log('📦 数据编码完成，base64大小:', base64Content.length, '字符');
             
             const url = `${GITHUB_API}/repos/${GITHUB_REPO}/contents/${DATA_FILE_PATH}`;
             
@@ -186,6 +248,8 @@
             // 更新文件的SHA
             remoteFileSha = result.content.sha;
             
+            console.log('✅ 远程数据更新成功，提交SHA:', result.commit.sha);
+            
             return {
                 success: true,
                 sha: result.content.sha,
@@ -212,7 +276,9 @@
         }
         // 添加更新时间戳
         data._lastUpdated = new Date().toISOString();
-        return data;
+        
+        // 自动修复数据格式
+        return fixDataFormat(data);
     }
     
     // 从远程同步数据到本地
