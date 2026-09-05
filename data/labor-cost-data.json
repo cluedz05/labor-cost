@@ -1,0 +1,36 @@
+{
+    "style_library":  [
+
+                      ],
+    "app_current_user":  null,
+    "gf_cost_export_logs":  {
+                                "logs":  [
+
+                                         ]
+                            },
+    "gf_cost_db":  {
+                       "styles":  [
+
+                                  ],
+                       "nextId":  1,
+                       "processes":  [
+
+                                     ],
+                       "recycleBin":  [
+
+                                      ]
+                   },
+    "styles":  [
+
+               ],
+    "gf_cost_config":  {
+                           "version":  "1.0",
+                           "companyName":  "多绮爱服饰"
+                       },
+    "_lastUpdated":  "2026-09-05T14:08:13Z",
+    "gf_cost_users":  {
+                          "users":  [
+
+                                    ]
+                      }
+}
