@@ -8,20 +8,23 @@
     'use strict';
 
     // 版本号
-    const CLOUD_SYNC_VERSION = 'v7.1.4';
-    console.log('📦 cloud-sync.js 版本:', CLOUD_SYNC_VERSION, '(GitHub Gist版本 - 同步修复版)');
+    const CLOUD_SYNC_VERSION = 'v7.1.5';
+    console.log('📦 cloud-sync.js 版本:', CLOUD_SYNC_VERSION, '(GitHub Gist版本 - 自动配置版)');
 
     // ============================================
     // 配置
     // ============================================
     
-    // GitHub Gist ID（需要用户创建一个Gist来存储数据）
-    // 可以在管理后台配置，也可以直接修改这里
-    let GIST_ID = localStorage.getItem('cloud_gist_id') || '';
+    // 默认配置（硬编码，所有用户自动同步，不需要手动配置）
+    const DEFAULT_GIST_ID = '54ab1c3e2a24b571ba0a28915fb57dc4';
+    const DEFAULT_GITHUB_TOKEN = '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';
     
-    // GitHub Personal Access Token（需要用户创建，有gist权限）
-    // 注意：这个token只存在浏览器本地，不会上传到任何地方
-    let GITHUB_TOKEN = localStorage.getItem('cloud_github_token') || '';
+    // GitHub Gist ID（优先使用localStorage中的配置，没有则使用默认配置）
+    let GIST_ID = localStorage.getItem('cloud_gist_id') || DEFAULT_GIST_ID;
+    
+    // GitHub Personal Access Token（优先使用localStorage中的配置，没有则使用默认配置）
+    // 注意：这个token硬编码在代码中，所有用户共享同一个Gist
+    let GITHUB_TOKEN = localStorage.getItem('cloud_github_token') || DEFAULT_GITHUB_TOKEN;
     
     // GitHub API基础地址
     const GITHUB_API = 'https://api.github.com';
