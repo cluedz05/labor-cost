@@ -17376,6 +17376,13 @@
       "styleNo": "TEST-1788619712994",
       "createdAt": "2026-09-05T14:48:32.994Z",
       "updatedAt": "2026-09-05T14:48:32.994Z"
+    },
+    {
+      "id": "test-final-1788619956419",
+      "name": "最终测试款",
+      "styleNo": "FINAL-1788619956419",
+      "createdAt": "2026-09-05T14:52:36.419Z",
+      "updatedAt": "2026-09-05T14:52:36.419Z"
     }
   ],
   "style_library": [
@@ -22442,5 +22449,5 @@
     "isAdmin": true,
     "uid": "admin_001"
   },
-  "_lastUpdated": "2026-09-05T14:50:04.309Z"
+  "_lastUpdated": "2026-09-05T14:52:40.421Z"
 }
