@@ -359,14 +359,17 @@
         console.log('📤 同步本地数据到远程...');
         
         try {
-            // 先获取远程数据
+            console.log('📤 步骤1: 获取远程数据...');
             const remoteResult = await getRemoteData();
             const remoteData = remoteResult.data;
+            console.log('📤 步骤1完成: 远程数据获取成功，styles数量:', remoteData.styles ? remoteData.styles.length : 0);
             
             // 检查本地数据是否有更新
+            console.log('📤 步骤2: 计算哈希...');
             const localData = collectLocalData();
             const localHash = getDataHash(localData);
             const remoteHash = getDataHash(remoteData);
+            console.log('📤 步骤2完成: 本地哈希:', localHash, '远程哈希:', remoteHash);
             
             lastRemoteHash = remoteHash;
             lastLocalHash = localHash;
@@ -375,14 +378,19 @@
                 console.log('✅ 本地数据与远程数据一致，无需同步');
                 lastRemoteUpdate = remoteResult.updated_at;
                 lastLocalUpdate = new Date().toISOString();
+                isSyncing = false;
                 return true;
             }
             
             // 合并数据（以本地数据为主，但是保留远程新增的key）
+            console.log('📤 步骤3: 合并数据...');
             const mergedData = { ...remoteData, ...localData };
+            console.log('📤 步骤3完成: 数据合并完成，styles数量:', mergedData.styles ? mergedData.styles.length : 0);
             
             // 更新远程数据
+            console.log('📤 步骤4: 更新远程数据...');
             await updateRemoteData(mergedData);
+            console.log('📤 步骤4完成: 远程数据更新成功');
             
             lastLocalUpdate = new Date().toISOString();
             lastRemoteUpdate = new Date().toISOString();
@@ -394,12 +402,13 @@
                 detail: { source: 'local', time: new Date() }
             }));
             
+            isSyncing = false;
             return true;
         } catch (error) {
             console.error('❌ 同步本地数据到远程失败:', error);
-            return false;
-        } finally {
+            console.error('❌ 错误堆栈:', error.stack);
             isSyncing = false;
+            return false;
         }
     }
     
