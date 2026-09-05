@@ -394,7 +394,7 @@ button:empty {
 <!-- 自动版本检查：确保用户总是使用最新版本 -->
 <script>
 (function() {
-    var CURRENT_VERSION = 'v7.1.5';
+    var CURRENT_VERSION = 'v7.1.6';
     var STORAGE_KEY = 'app_version';
     
     try {
@@ -404,10 +404,7 @@ button:empty {
             console.log('版本更新:', savedVersion, '->', CURRENT_VERSION);
             localStorage.setItem(STORAGE_KEY, CURRENT_VERSION);
             
-            if (!sessionStorage.getItem('version_refreshed')) {
-                sessionStorage.setItem('version_refreshed', 'true');
-                window.location.href = window.location.pathname + '?nocache=' + Date.now();
-            }
+            // 移除自动刷新，避免循环刷新
         }
     } catch(e) {
         console.error('版本检查失败:', e);
@@ -1737,3 +1734,4 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 </body></html>
+
