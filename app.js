@@ -630,7 +630,7 @@ async function init() {
 
     storageOK = true;
 
-    // startSyncPolling() // 已禁用，避免页面频繁刷新;
+    // // startSyncPolling() // 已禁用，避免页面频繁刷新 // 已禁用，避免页面频繁刷新;
 
   } else {
 
@@ -3170,7 +3170,7 @@ function mergeServerData(fresh, byWho) {
 
 
 
-function // startSyncPolling() // 已禁用，避免页面频繁刷新 {
+function // // startSyncPolling() // 已禁用，避免页面频繁刷新 // 已禁用，避免页面频繁刷新 {
 
   if (!useAPI) { console.log('[同步] 未启用 - 非HTTP协议'); return; }
 
@@ -8867,6 +8867,7 @@ function doAIColorSearch(btn) {
     console.log('AI搜索完成，找到', results.length, '个相似款式');
   });
 }
+
 
 
 
