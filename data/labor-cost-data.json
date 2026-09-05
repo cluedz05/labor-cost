@@ -17369,6 +17369,13 @@
         "uid": "mryo7f1ljzw5",
         "username": "19820311682"
       }
+    },
+    {
+      "id": "test-sync-1788619712994",
+      "name": "测试同步款",
+      "styleNo": "TEST-1788619712994",
+      "createdAt": "2026-09-05T14:48:32.994Z",
+      "updatedAt": "2026-09-05T14:48:32.994Z"
     }
   ],
   "style_library": [
@@ -22435,5 +22442,5 @@
     "isAdmin": true,
     "uid": "admin_001"
   },
-  "_lastUpdated": "2026-09-05T14:38:07.570Z"
+  "_lastUpdated": "2026-09-05T14:48:39.223Z"
 }
