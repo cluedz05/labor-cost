@@ -290,13 +290,17 @@
         console.log('📥 从远程同步数据...');
         
         try {
+            console.log('📥 步骤1: 获取远程数据...');
             const remoteResult = await getRemoteData();
             const remoteData = remoteResult.data;
+            console.log('📥 步骤1完成: 远程数据获取成功，styles数量:', remoteData.styles ? remoteData.styles.length : 0);
             
             // 检查远程数据是否有更新
+            console.log('📥 步骤2: 计算哈希...');
             const remoteHash = getDataHash(remoteData);
             const localData = collectLocalData();
             const localHash = getDataHash(localData);
+            console.log('📥 步骤2完成: 远程哈希:', remoteHash, '本地哈希:', localHash);
             
             lastRemoteHash = remoteHash;
             lastLocalHash = localHash;
@@ -305,10 +309,12 @@
                 console.log('✅ 远程数据与本地数据一致，无需同步');
                 lastRemoteUpdate = remoteResult.updated_at;
                 lastLocalUpdate = new Date().toISOString();
+                isSyncing = false;
                 return true;
             }
             
             // 保存远程数据到本地
+            console.log('📥 步骤3: 保存远程数据到本地...');
             let updatedCount = 0;
             for (const key of DATA_KEYS) {
                 if (remoteData[key] !== undefined && remoteData[key] !== null) {
@@ -317,8 +323,10 @@
                         : JSON.stringify(remoteData[key]);
                     localStorage.setItem(key, value);
                     updatedCount++;
+                    console.log('📥 已保存:', key, '大小:', value.length);
                 }
             }
+            console.log('📥 步骤3完成: 保存了', updatedCount, '个数据项');
             
             lastRemoteUpdate = remoteResult.updated_at;
             lastLocalUpdate = new Date().toISOString();
@@ -330,12 +338,13 @@
                 detail: { source: 'remote', time: new Date(), updatedCount: updatedCount }
             }));
             
+            isSyncing = false;
             return true;
         } catch (error) {
             console.error('❌ 从远程同步失败:', error);
-            return false;
-        } finally {
+            console.error('❌ 错误堆栈:', error.stack);
             isSyncing = false;
+            return false;
         }
     }
     
