@@ -168,12 +168,10 @@
             // 处理大文件（超过1MB时，GitHub API返回encoding: "none"，content为空）
             let content;
             if (fileData.encoding === 'none' || !fileData.content) {
-                console.log('📦 检测到大文件，使用download_url下载...');
-                const downloadResponse = await fetch(fileData.download_url, {
-                    headers: {
-                        'Authorization': `token ${GITHUB_TOKEN}`
-                    }
-                });
+                console.log('📦 检测到大文件，使用raw.githubusercontent.com下载...');
+                // 使用raw.githubusercontent.com的URL来下载文件内容，避免CORS问题
+                const rawUrl = `https://raw.githubusercontent.com/${GITHUB_REPO}/${GITHUB_BRANCH}/${DATA_FILE_PATH}?t=${Date.now()}`;
+                const downloadResponse = await fetch(rawUrl);
                 if (!downloadResponse.ok) {
                     throw new Error(`下载大文件失败: ${downloadResponse.status} ${downloadResponse.statusText}`);
                 }
