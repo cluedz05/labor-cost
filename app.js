@@ -2,7 +2,7 @@
 
 // ===== 应用版本号（每次更新递增）=====
 
-const APP_VERSION = '1.9.56';
+const APP_VERSION = 'v7.1.9';
 
 const VERSION_KEY = 'app_version';
 
@@ -8867,6 +8867,7 @@ function doAIColorSearch(btn) {
     console.log('AI搜索完成，找到', results.length, '个相似款式');
   });
 }
+
 
 
 
