@@ -448,7 +448,7 @@
     // ============================================
     // 轮询同步（每10秒检查一次云端更新）
     // ============================================
-    function startPolling() {
+    function startPolling() { console.log('🔄 云端轮询已禁用，避免页面频繁刷新'); return;
         if (pollingTimer) clearInterval(pollingTimer);
         console.log('🔄 启动云端轮询（每10秒检查一次）...');
         pollingTimer = setInterval(() => {
@@ -572,7 +572,7 @@
             initFocusSync();
             
             // 启动轮询
-            startPolling();
+            // startPolling(); // 已禁用，避免页面频繁刷新
             
             // 页面加载时从云端同步一次
             setTimeout(() => {
@@ -606,3 +606,4 @@
     }
 
 })();
+
