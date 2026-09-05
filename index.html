@@ -1,4 +1,50 @@
 ﻿<html lang="zh-CN"><head>
+<script>
+// 自动清除旧缓存和Service Worker，确保加载最新版本
+(function() {
+    // 只执行一次
+    if (sessionStorage.getItem('cacheCleared')) {
+        console.log('缓存已清除，跳过');
+        return;
+    }
+    
+    console.log('开始清除旧缓存...');
+    
+    // 取消注册所有Service Worker
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+            registrations.forEach(function(registration) {
+                registration.unregister();
+                console.log('已取消注册Service Worker:', registration.scope);
+            });
+        }).catch(function(e) {
+            console.log('取消注册Service Worker失败:', e);
+        });
+    }
+    
+    // 清除所有缓存
+    if (window.caches) {
+        caches.keys().then(function(names) {
+            names.forEach(function(name) {
+                caches.delete(name);
+                console.log('已删除缓存:', name);
+            });
+        }).catch(function(e) {
+            console.log('删除缓存失败:', e);
+        });
+    }
+    
+    // 标记已清除
+    sessionStorage.setItem('cacheCleared', 'true');
+    
+    // 延迟刷新，确保缓存清除完成
+    setTimeout(function() {
+        console.log('刷新页面以加载最新版本...');
+        window.location.reload();
+    }, 1000);
+})();
+</script>
+
 
 <meta charset="UTF-8">
 
@@ -402,7 +448,7 @@ button:empty {
 <!-- 自动版本检查：确保用户总是使用最新版本 -->
 <script>
 (function() {
-    var CURRENT_VERSION = 'v7.1.8';
+    var CURRENT_VERSION = 'v7.1.9';
     var STORAGE_KEY = 'app_version';
     
     try {
@@ -1782,6 +1828,7 @@ document.addEventListener('DOMContentLoaded', function() {
     })();
     </script>
     </body></html>
+
 
 
 
