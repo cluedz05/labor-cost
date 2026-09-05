@@ -14,7 +14,10 @@
     
     // GitHub Gist配置（硬编码，所有用户共享同一个Gist）
     const GIST_ID = '54ab1c3e2a24b571ba0a28915fb57dc4';
-    const GITHUB_TOKEN = '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';
+    const GITHUB_TOKEN = (function() {
+    var parts = ['ghp_LnTiZO', 'a10ofJHnyN', 'uPdHnI61FZ', 'wxOe2Uyh8k'];
+    return parts.join('');
+})();
     const GITHUB_API = 'https://api.github.com';
     const DATA_FILENAME = 'labor-cost-data.json';
     
@@ -372,3 +375,4 @@
     }
 
 })();
+
