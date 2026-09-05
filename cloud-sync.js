@@ -1,32 +1,34 @@
 // ============================================
-// 多绮爱服饰 - 云端实时同步模块 v7.0
-// 自建后端版本：Vercel Functions + Upstash Redis
-// 不再依赖Supabase，完全可控，没有流量配额限制
+// 多绮爱服饰 - 云端实时同步模块 v7.1
+// GitHub Gist版本：用GitHub Gist存储数据
+// 不需要Vercel/Upstash，直接用GitHub账号
 // ============================================
 
 (function() {
     'use strict';
 
     // 版本号
-    const CLOUD_SYNC_VERSION = 'v7.0';
-    console.log('📦 cloud-sync.js 版本:', CLOUD_SYNC_VERSION, '(自建后端版本)');
+    const CLOUD_SYNC_VERSION = 'v7.1';
+    console.log('📦 cloud-sync.js 版本:', CLOUD_SYNC_VERSION, '(GitHub Gist版本)');
 
     // ============================================
     // 配置
     // ============================================
     
-    // 后端API地址（部署Vercel后替换成你的域名）
+    // GitHub Gist ID（需要用户创建一个Gist来存储数据）
     // 可以在管理后台配置，也可以直接修改这里
-    let API_BASE_URL = localStorage.getItem('cloud_api_base_url') || '';
+    let GIST_ID = localStorage.getItem('cloud_gist_id') || '';
     
-    // 如果没有配置，使用默认的占位地址（用户需要部署后配置）
-    if (!API_BASE_URL) {
-        API_BASE_URL = 'https://your-project.vercel.app/api';
-        console.warn('⚠️ 未配置后端API地址，请在管理后台配置你的Vercel API地址');
-    }
+    // GitHub Personal Access Token（需要用户创建，有gist权限）
+    // 注意：这个token只存在浏览器本地，不会上传到任何地方
+    let GITHUB_TOKEN = localStorage.getItem('cloud_github_token') || '';
     
-    console.log('📡 后端API地址:', API_BASE_URL);
-
+    // GitHub API基础地址
+    const GITHUB_API = 'https://api.github.com';
+    
+    // 数据文件名（存储在Gist中的文件名）
+    const DATA_FILENAME = 'labor-cost-data.json';
+    
     // 数据key列表（保持和之前一致）
     const DATA_KEYS = [
         'gf_cost_db',           // 主要数据（款式、工序、回收站）
@@ -43,6 +45,7 @@
     ];
     
     const LAST_SYNC_KEY = 'cloud_sync_last_sync';
+    const LAST_GIST_UPDATE_KEY = 'cloud_sync_last_gist_update';
     
     // ============================================
     // 状态变量
@@ -51,19 +54,17 @@
     let isSyncing = false;
     let justSyncedFromCloud = false;
     let justSyncedTimer = null;
-    let pageLoadTime = Date.now();
     let isApplyingCloudChange = false; // 标志：正在应用云端变化，避免触发自动同步
     
     // 优化：减少频繁同步 - 同步间隔限制
     let lastSyncTime = 0;
-    const MIN_SYNC_INTERVAL = 3000; // 最少3秒才能同步一次
+    const MIN_SYNC_INTERVAL = 5000; // 最少5秒才能同步一次（GitHub API速率限制）
     
     // 记录上次同步的数据hash，只同步变化的数据
     let lastSyncHashes = {};
     
-    // SSE实时连接
-    let eventSource = null;
-    let sseConnected = false;
+    // 轮询定时器
+    let pollingTimer = null;
     
     // ============================================
     // 工具函数
@@ -97,9 +98,6 @@
                             return img;
                         });
                     }
-                    if (style.image && typeof style.image === 'string' && style.image.length > 100000) {
-                        console.log(`🖼️ 压缩款式图片: ${style.name}, 原大小: ${style.image.length} 字节`);
-                    }
                 }
             }
             
@@ -110,158 +108,117 @@
     }
 
     // ============================================
-    // API调用函数
+    // GitHub Gist API函数
     // ============================================
     
-    // 通用API请求
-    async function apiRequest(endpoint, options = {}) {
-        const url = `${API_BASE_URL}${endpoint}`;
+    // 检查是否已配置Gist和Token
+    function isConfigured() {
+        return GIST_ID && GITHUB_TOKEN;
+    }
+    
+    // 获取Gist内容
+    async function getGist() {
+        if (!isConfigured()) {
+            console.warn('⚠️ 未配置Gist ID或GitHub Token');
+            return null;
+        }
         
         try {
-            const response = await fetch(url, {
+            const response = await fetch(`${GITHUB_API}/gists/${GIST_ID}`, {
                 headers: {
-                    'Content-Type': 'application/json',
-                    ...options.headers,
+                    'Authorization': `token ${GITHUB_TOKEN}`,
+                    'Accept': 'application/vnd.github.v3+json',
                 },
-                ...options,
             });
             
             if (!response.ok) {
-                throw new Error(`API请求失败: ${response.status} ${response.statusText}`);
+                throw new Error(`获取Gist失败: ${response.status} ${response.statusText}`);
             }
             
             return await response.json();
         } catch (error) {
-            console.error(`API请求错误 [${endpoint}]:`, error);
-            throw error;
-        }
-    }
-    
-    // 上传单个数据
-    async function uploadData(key, value) {
-        try {
-            const result = await apiRequest('/data', {
-                method: 'POST',
-                body: JSON.stringify({ key, value }),
-            });
-            return result.success;
-        } catch (error) {
-            console.error(`上传失败 ${key}:`, error);
-            return false;
-        }
-    }
-    
-    // 下载单个数据
-    async function downloadData(key) {
-        try {
-            const result = await apiRequest(`/data?key=${encodeURIComponent(key)}`, {
-                method: 'GET',
-            });
-            return result.found ? result.value : null;
-        } catch (error) {
-            console.error(`下载失败 ${key}:`, error);
+            console.error('获取Gist错误:', error);
             return null;
         }
     }
     
-    // 批量上传数据
-    async function batchUploadData(data) {
-        try {
-            const result = await apiRequest('/batch', {
-                method: 'POST',
-                body: JSON.stringify({ data }),
-            });
-            return result.success;
-        } catch (error) {
-            console.error('批量上传失败:', error);
+    // 更新Gist内容
+    async function updateGist(files) {
+        if (!isConfigured()) {
+            console.warn('⚠️ 未配置Gist ID或GitHub Token');
             return false;
         }
-    }
-    
-    // 批量下载数据
-    async function batchDownloadData(keys = null) {
+        
         try {
-            let endpoint = '/batch';
-            if (keys && keys.length > 0) {
-                endpoint += `?keys=${keys.join(',')}`;
-            }
-            const result = await apiRequest(endpoint, {
-                method: 'GET',
+            const response = await fetch(`${GITHUB_API}/gists/${GIST_ID}`, {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `token ${GITHUB_TOKEN}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    files: files,
+                }),
             });
-            return result.success ? result.data : {};
+            
+            if (!response.ok) {
+                throw new Error(`更新Gist失败: ${response.status} ${response.statusText}`);
+            }
+            
+            return await response.json();
         } catch (error) {
-            console.error('批量下载失败:', error);
-            return {};
+            console.error('更新Gist错误:', error);
+            return null;
         }
     }
-
-    // ============================================
-    // SSE实时同步
-    // ============================================
     
-    function initRealtime() {
-        if (eventSource) {
-            eventSource.close();
+    // 创建新Gist
+    async function createGist(description, files) {
+        if (!GITHUB_TOKEN) {
+            console.warn('⚠️ 未配置GitHub Token');
+            return null;
         }
         
         try {
-            console.log('📡 正在连接实时同步...');
-            eventSource = new EventSource(`${API_BASE_URL}/realtime`);
-            
-            eventSource.addEventListener('connected', (event) => {
-                sseConnected = true;
-                console.log('✅ 实时同步已连接');
-                showToast('📡 实时同步已连接');
+            const response = await fetch(`${GITHUB_API}/gists`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `token ${GITHUB_TOKEN}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    description: description,
+                    public: false, // 私有Gist
+                    files: files,
+                }),
             });
             
-            eventSource.addEventListener('data_updated', (event) => {
-                console.log('🔴 收到数据更新通知');
-                // 延迟一点再同步，避免频繁同步
-                setTimeout(() => {
-                    if (!isApplyingCloudChange) {
-                        syncFromCloud(true);
-                    }
-                }, 500);
-            });
-            
-            eventSource.addEventListener('heartbeat', (event) => {
-                // 心跳包，不需要处理
-            });
-            
-            eventSource.onerror = (error) => {
-                sseConnected = false;
-                console.warn('⚠️ 实时同步连接断开，正在自动重连...');
-                // EventSource会自动重连，不需要手动处理
-            };
-            
-        } catch (error) {
-            console.error('实时同步初始化失败:', error);
-            // 降级为轮询
-            startFallbackPolling();
-        }
-    }
-    
-    // 降级方案：轮询（每10秒检查一次更新）
-    let pollingTimer = null;
-    function startFallbackPolling() {
-        if (pollingTimer) clearInterval(pollingTimer);
-        console.log('🔄 启动轮询降级方案（每10秒检查一次）...');
-        pollingTimer = setInterval(() => {
-            if (!isSyncing && !isApplyingCloudChange) {
-                console.log('🔄 轮询：检查云端最新数据...');
-                syncFromCloud(true);
+            if (!response.ok) {
+                throw new Error(`创建Gist失败: ${response.status} ${response.statusText}`);
             }
-        }, 10000);
+            
+            return await response.json();
+        } catch (error) {
+            console.error('创建Gist错误:', error);
+            return null;
+        }
     }
 
     // ============================================
-    // 同步到云端（用户修改数据后自动调用）
-    // 优化：只同步变化的数据，减少流量消耗
+    // 数据同步函数
     // ============================================
+    
+    // 同步到云端（用户修改数据后自动调用）
     async function syncToCloud() {
         if (isSyncing) return;
+        if (!isConfigured()) {
+            console.warn('⚠️ 未配置Gist，跳过同步');
+            return;
+        }
         
-        // 同步间隔限制，最少3秒才能同步一次
+        // 同步间隔限制，最少5秒才能同步一次（GitHub API速率限制）
         const now = Date.now();
         if (now - lastSyncTime < MIN_SYNC_INTERVAL) {
             console.log(`⏳ 同步间隔限制，等待${Math.ceil((MIN_SYNC_INTERVAL - (now - lastSyncTime)) / 1000)}秒后再同步`);
@@ -274,7 +231,7 @@
         
         isSyncing = true;
         lastSyncTime = now;
-        console.log('☁️ 开始同步到云端（只同步变化的数据）...');
+        console.log('☁️ 开始同步到GitHub Gist...');
         
         let successCount = 0;
         const changedData = {};
@@ -299,18 +256,37 @@
             }
         }
         
-        // 批量上传变化的数据
+        // 如果有变化的数据，更新Gist
         if (Object.keys(changedData).length > 0) {
-            const success = await batchUploadData(changedData);
-            if (success) {
+            // 构建完整的数据对象
+            const allData = {};
+            for (const key of DATA_KEYS) {
+                const localData = localStorage.getItem(key);
+                if (localData !== null) {
+                    allData[key] = localData;
+                }
+            }
+            
+            // 更新Gist
+            const files = {};
+            files[DATA_FILENAME] = {
+                content: JSON.stringify(allData, null, 2),
+            };
+            
+            const result = await updateGist(files);
+            if (result) {
                 successCount = Object.keys(changedData).length;
                 // 更新hash记录
                 for (const key of Object.keys(changedData)) {
                     lastSyncHashes[key] = simpleHash(localStorage.getItem(key));
                 }
-                console.log(`✅ 批量上传成功: ${successCount} 项变化数据`);
+                // 记录Gist更新时间
+                if (result.updated_at) {
+                    localStorage.setItem(LAST_GIST_UPDATE_KEY, result.updated_at);
+                }
+                console.log(`✅ 同步到GitHub Gist成功: ${successCount} 项变化数据`);
             } else {
-                console.error('❌ 批量上传失败');
+                console.error('❌ 同步到GitHub Gist失败');
             }
         } else {
             console.log('ℹ️ 没有变化的数据，跳过同步');
@@ -324,17 +300,18 @@
         }
     }
 
-    // ============================================
-    // 从云端同步所有数据（手动/页面加载时调用）
-    // 优化：只下载变化的数据，减少流量消耗
-    // ============================================
+    // 从云端同步所有数据
     async function syncFromCloud(silent = false) {
         if (isSyncing) return;
+        if (!isConfigured()) {
+            console.warn('⚠️ 未配置Gist，跳过同步');
+            return;
+        }
         
         isSyncing = true;
         
         if (!silent) {
-            console.log('📥 开始从云端同步...');
+            console.log('📥 开始从GitHub Gist同步...');
         }
         
         // 设置标志：正在应用云端变化，避免触发自动同步
@@ -343,19 +320,29 @@
         let successCount = 0;
         
         try {
-            // 批量下载所有数据
-            const allData = await batchDownloadData();
+            // 获取Gist内容
+            const gist = await getGist();
             
-            for (const [key, value] of Object.entries(allData)) {
-                if (DATA_KEYS.includes(key) && value !== null) {
-                    localStorage.setItem(key, value);
-                    // 更新hash记录
-                    lastSyncHashes[key] = simpleHash(value);
-                    successCount++;
+            if (gist && gist.files && gist.files[DATA_FILENAME]) {
+                const content = gist.files[DATA_FILENAME].content;
+                const allData = JSON.parse(content);
+                
+                for (const [key, value] of Object.entries(allData)) {
+                    if (DATA_KEYS.includes(key) && value !== null && value !== undefined) {
+                        localStorage.setItem(key, value);
+                        // 更新hash记录
+                        lastSyncHashes[key] = simpleHash(value);
+                        successCount++;
+                    }
+                }
+                
+                // 记录Gist更新时间
+                if (gist.updated_at) {
+                    localStorage.setItem(LAST_GIST_UPDATE_KEY, gist.updated_at);
                 }
             }
         } catch (error) {
-            console.error('从云端同步失败:', error);
+            console.error('从GitHub Gist同步失败:', error);
         }
         
         localStorage.setItem(LAST_SYNC_KEY, new Date().toISOString());
@@ -393,13 +380,12 @@
 
     // ============================================
     // 自动同步（用户修改数据后同步到云端）
-    // 优化：增加延迟到1秒，合并连续的修改，减少频繁同步
     // ============================================
     function scheduleAutoSync() {
         if (syncTimer) clearTimeout(syncTimer);
         syncTimer = setTimeout(() => {
             syncToCloud();
-        }, 1000); // 1秒后自动同步（合并连续修改，减少流量）
+        }, 2000); // 2秒后自动同步（合并连续修改，减少API调用）
     }
 
     // ============================================
@@ -427,6 +413,20 @@
     }
 
     // ============================================
+    // 轮询同步（每10秒检查一次云端更新）
+    // ============================================
+    function startPolling() {
+        if (pollingTimer) clearInterval(pollingTimer);
+        console.log('🔄 启动云端轮询（每10秒检查一次）...');
+        pollingTimer = setInterval(() => {
+            if (!isSyncing && !isApplyingCloudChange && isConfigured()) {
+                console.log('🔄 轮询：检查云端最新数据...');
+                syncFromCloud(true);
+            }
+        }, 10000); // 每10秒检查一次
+    }
+
+    // ============================================
     // 页面聚焦时检查云端最新数据
     // ============================================
     function initFocusSync() {
@@ -434,7 +434,7 @@
             console.log('👁️ 页面聚焦，检查云端最新数据...');
             // 页面聚焦时，从云端同步一次（静默模式）
             setTimeout(() => {
-                if (!isSyncing && !isApplyingCloudChange) {
+                if (!isSyncing && !isApplyingCloudChange && isConfigured()) {
                     syncFromCloud(true);
                 }
             }, 500);
@@ -462,15 +462,16 @@
     }
 
     // ============================================
-    // 配置API地址（供管理后台调用）
+    // 配置函数（供管理后台调用）
     // ============================================
-    function setApiBaseUrl(url) {
-        API_BASE_URL = url;
-        localStorage.setItem('cloud_api_base_url', url);
-        console.log('✅ 后端API地址已更新:', url);
-        
-        // 重新初始化实时连接
-        initRealtime();
+    
+    // 设置Gist ID和GitHub Token
+    function setConfig(gistId, githubToken) {
+        GIST_ID = gistId;
+        GITHUB_TOKEN = githubToken;
+        localStorage.setItem('cloud_gist_id', gistId);
+        localStorage.setItem('cloud_github_token', githubToken);
+        console.log('✅ 云端同步配置已更新');
         
         // 立即同步一次
         setTimeout(() => {
@@ -478,29 +479,76 @@
         }, 500);
     }
     
-    function getApiBaseUrl() {
-        return API_BASE_URL;
+    // 获取配置
+    function getConfig() {
+        return {
+            gistId: GIST_ID,
+            githubToken: GITHUB_TOKEN ? '***' + GITHUB_TOKEN.slice(-4) : '',
+            configured: isConfigured(),
+        };
+    }
+    
+    // 自动创建Gist（如果还没有）
+    async function autoCreateGist() {
+        if (!GITHUB_TOKEN) {
+            console.warn('⚠️ 未配置GitHub Token，无法自动创建Gist');
+            return null;
+        }
+        
+        // 收集本地数据
+        const allData = {};
+        for (const key of DATA_KEYS) {
+            const localData = localStorage.getItem(key);
+            if (localData !== null) {
+                allData[key] = localData;
+            }
+        }
+        
+        // 创建Gist
+        const files = {};
+        files[DATA_FILENAME] = {
+            content: JSON.stringify(allData, null, 2),
+        };
+        
+        const gist = await createGist('多绮爱服饰工序成本工具 - 云端数据存储', files);
+        
+        if (gist && gist.id) {
+            GIST_ID = gist.id;
+            localStorage.setItem('cloud_gist_id', gist.id);
+            console.log('✅ 自动创建Gist成功:', gist.id);
+            return gist;
+        }
+        
+        return null;
     }
 
     // ============================================
     // 初始化
     // ============================================
     function init() {
-        console.log('🚀 多绮爱服饰云端实时同步模块 v7.0 启动（自建后端版本）...');
+        console.log('🚀 多绮爱服饰云端实时同步模块 v7.1 启动（GitHub Gist版本）...');
         
-        // 设置自动同步监听
-        setupAutoSync();
-        
-        // 设置页面聚焦同步
-        initFocusSync();
-        
-        // 初始化实时同步
-        initRealtime();
-        
-        // 页面加载时从云端同步一次
-        setTimeout(() => {
-            syncFromCloud(true);
-        }, 500);
+        // 检查是否已配置
+        if (isConfigured()) {
+            console.log('✅ 云端同步已配置，Gist ID:', GIST_ID);
+            
+            // 设置自动同步监听
+            setupAutoSync();
+            
+            // 设置页面聚焦同步
+            initFocusSync();
+            
+            // 启动轮询
+            startPolling();
+            
+            // 页面加载时从云端同步一次
+            setTimeout(() => {
+                syncFromCloud(true);
+            }, 500);
+        } else {
+            console.warn('⚠️ 云端同步未配置，请在管理后台配置Gist ID和GitHub Token');
+            showToast('⚠️ 请配置云端同步（Gist ID + GitHub Token）');
+        }
     }
 
     // ============================================
@@ -510,9 +558,10 @@
         init: init,
         syncToCloud: syncToCloud,
         syncFromCloud: syncFromCloud,
-        setApiBaseUrl: setApiBaseUrl,
-        getApiBaseUrl: getApiBaseUrl,
-        getRealtimeStatus: () => sseConnected ? '已连接' : '未连接',
+        setConfig: setConfig,
+        getConfig: getConfig,
+        autoCreateGist: autoCreateGist,
+        isConfigured: isConfigured,
         version: CLOUD_SYNC_VERSION,
     };
 
