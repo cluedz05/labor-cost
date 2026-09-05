@@ -402,7 +402,7 @@ button:empty {
 <!-- 自动版本检查：确保用户总是使用最新版本 -->
 <script>
 (function() {
-    var CURRENT_VERSION = 'v7.1.7';
+    var CURRENT_VERSION = 'v7.1.8';
     var STORAGE_KEY = 'app_version';
     
     try {
@@ -1749,6 +1749,39 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-</body></html>
+    
+    <!-- 自动关闭更新提示条，避免挡住点击 -->
+    <script>
+    (function() {
+        // 页面加载后5秒自动关闭syncBar
+        setTimeout(function() {
+            var syncBar = document.getElementById('syncBar');
+            if (syncBar) {
+                syncBar.style.display = 'none';
+            }
+        }, 5000);
+        
+        // 监听syncBar的显示，一旦显示就5秒后自动关闭
+        var observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                    var syncBar = document.getElementById('syncBar');
+                    if (syncBar && syncBar.style.display !== 'none') {
+                        setTimeout(function() {
+                            syncBar.style.display = 'none';
+                        }, 5000);
+                    }
+                }
+            });
+        });
+        
+        var syncBar = document.getElementById('syncBar');
+        if (syncBar) {
+            observer.observe(syncBar, { attributes: true, attributeFilter: ['style'] });
+        }
+    })();
+    </script>
+    </body></html>
+
 
 
