@@ -8,8 +8,8 @@
     'use strict';
 
     // 版本号
-    const CLOUD_SYNC_VERSION = 'v7.1.3';
-    console.log('📦 cloud-sync.js 版本:', CLOUD_SYNC_VERSION, '(GitHub Gist版本 - 大数据优化版)');
+    const CLOUD_SYNC_VERSION = 'v7.1.4';
+    console.log('📦 cloud-sync.js 版本:', CLOUD_SYNC_VERSION, '(GitHub Gist版本 - 同步修复版)');
 
     // ============================================
     // 配置
@@ -320,8 +320,12 @@
     }
 
     // 从云端同步所有数据
-    async function syncFromCloud(silent = false) {
-        if (isSyncing) return;
+    // force: 是否强制同步（不检查isSyncing）
+    async function syncFromCloud(silent = false, force = false) {
+        if (isSyncing && !force) {
+            console.log('⏳ 正在同步中，跳过本次从云端同步');
+            return;
+        }
         if (!isConfigured()) {
             console.warn('⚠️ 未配置Gist，跳过同步');
             return;
@@ -330,7 +334,7 @@
         isSyncing = true;
         
         if (!silent) {
-            console.log('📥 开始从GitHub Gist同步...');
+            console.log('📥 开始从GitHub Gist同步...', force ? '(强制同步)' : '(正常同步)');
         }
         
         // 设置标志：正在应用云端变化，避免触发自动同步
@@ -346,6 +350,8 @@
                 const content = gist.files[DATA_FILENAME].content;
                 const allData = JSON.parse(content);
                 
+                console.log(`📦 从云端获取到 ${Object.keys(allData).length} 个数据项`);
+                
                 for (const [key, value] of Object.entries(allData)) {
                     if (DATA_KEYS.includes(key) && value !== null && value !== undefined) {
                         localStorage.setItem(key, value);
@@ -359,26 +365,31 @@
                 if (gist.updated_at) {
                     localStorage.setItem(LAST_GIST_UPDATE_KEY, gist.updated_at);
                 }
+                
+                console.log(`✅ 成功保存 ${successCount} 个数据项到本地`);
+            } else {
+                console.warn('⚠️ Gist中没有数据文件');
             }
         } catch (error) {
-            console.error('从GitHub Gist同步失败:', error);
+            console.error('❌ 从GitHub Gist同步失败:', error);
+        } finally {
+            localStorage.setItem(LAST_SYNC_KEY, new Date().toISOString());
+            
+            // 清除标志
+            setTimeout(() => {
+                isApplyingCloudChange = false;
+            }, 100);
+            
+            // 设置数据保护标志，3秒内不要同步回去（避免循环同步）
+            justSyncedFromCloud = true;
+            if (justSyncedTimer) clearTimeout(justSyncedTimer);
+            justSyncedTimer = setTimeout(() => {
+                justSyncedFromCloud = false;
+            }, 3000);
+            
+            isSyncing = false;
+            console.log('🔄 从云端同步完成，isSyncing已清除');
         }
-        
-        localStorage.setItem(LAST_SYNC_KEY, new Date().toISOString());
-        
-        // 清除标志
-        setTimeout(() => {
-            isApplyingCloudChange = false;
-        }, 100);
-        
-        // 设置数据保护标志，3秒内不要同步回去（避免循环同步）
-        justSyncedFromCloud = true;
-        if (justSyncedTimer) clearTimeout(justSyncedTimer);
-        justSyncedTimer = setTimeout(() => {
-            justSyncedFromCloud = false;
-        }, 3000);
-        
-        isSyncing = false;
         
         if (!silent) {
             console.log(`✅ 同步完成，成功下载 ${successCount} 项数据`);
