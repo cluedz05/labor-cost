@@ -390,11 +390,19 @@ button:empty {
         margin-top: 60px;
     }
 }
-</style>
+    
+    /* 确保模态框默认隐藏 */
+    .modal {
+        display: none !important;
+    }
+    .modal.show, .modal.active {
+        display: block !important;
+    }
+    </style>
 <!-- 自动版本检查：确保用户总是使用最新版本 -->
 <script>
 (function() {
-    var CURRENT_VERSION = 'v7.1.6';
+    var CURRENT_VERSION = 'v7.1.7';
     var STORAGE_KEY = 'app_version';
     
     try {
@@ -1421,7 +1429,15 @@ button:empty {
 
 @keyframes wbSlideIn{from{opacity:0;transform:translateY(-20px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
 
-</style>
+    
+    /* 确保模态框默认隐藏 */
+    .modal {
+        display: none !important;
+    }
+    .modal.show, .modal.active {
+        display: block !important;
+    }
+    </style>
 
 
 
@@ -1734,4 +1750,5 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 </body></html>
+
 
