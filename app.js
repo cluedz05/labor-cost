@@ -630,7 +630,7 @@ async function init() {
 
     storageOK = true;
 
-    startSyncPolling();
+    // startSyncPolling() // 已禁用，避免页面频繁刷新;
 
   } else {
 
@@ -3170,7 +3170,7 @@ function mergeServerData(fresh, byWho) {
 
 
 
-function startSyncPolling() {
+function // startSyncPolling() // 已禁用，避免页面频繁刷新 {
 
   if (!useAPI) { console.log('[同步] 未启用 - 非HTTP协议'); return; }
 
@@ -3178,9 +3178,9 @@ function startSyncPolling() {
 
   lastSyncedAt = DB._updatedAt || null;
 
-  syncPollingTimer = setInterval(syncFromServer, 3000);
+  // syncPollingTimer = setInterval(syncFromServer, 60000) // 已禁用，避免页面频繁刷新;
 
-  console.log('[同步] 已启动 - 每3秒轮询');
+  console.log('[同步] 已禁用轮询，避免页面频繁刷新');
 
 }
 
@@ -8867,4 +8867,6 @@ function doAIColorSearch(btn) {
     console.log('AI搜索完成，找到', results.length, '个相似款式');
   });
 }
+
+
 
