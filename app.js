@@ -204,7 +204,7 @@ function reloadForUpdate() {
 
   // 刷新页面加载新版本，数据保存在localStorage中不会丢失
 
-  window.location.reload();
+  window.console.log('🔄 数据已同步，跳过页面刷新（已禁用自动刷新）');
 
 }
 
@@ -280,7 +280,7 @@ function logout() {
 
   document.cookie = 'token=; path=/; max-age=0';
 
-  window.location.reload();
+  window.console.log('🔄 数据已同步，跳过页面刷新（已禁用自动刷新）');
 
 }
 
@@ -2088,7 +2088,7 @@ function resetToDefaultData() {
 
   toast('✅ 已重置，页面即将刷新...');
 
-  setTimeout(function() { location.reload(); }, 1000);
+  setTimeout(function() { console.log('🔄 数据已同步，跳过页面刷新（已禁用自动刷新）'); }, 1000);
 
 }
 
@@ -2106,7 +2106,7 @@ function clearAllData() {
 
   toast('✅ 已清空所有数据，页面即将刷新...');
 
-  setTimeout(function() { location.reload(); }, 1000);
+  setTimeout(function() { console.log('🔄 数据已同步，跳过页面刷新（已禁用自动刷新）'); }, 1000);
 
 }
 
@@ -8375,7 +8375,7 @@ if (document.readyState === 'loading') {
       }
       // 延迟刷新，确保数据已经写入localStorage
       setTimeout(function() {
-        location.reload();
+        console.log('🔄 数据已同步，跳过页面刷新（已禁用自动刷新）');
       }, 500);
     });
   });
@@ -8440,7 +8440,7 @@ if (document.readyState === 'loading') {
     }
     // 延迟刷新，确保数据已经写入localStorage
     setTimeout(function() {
-      location.reload();
+      console.log('🔄 数据已同步，跳过页面刷新（已禁用自动刷新）');
     }, 500);
   });
 }
@@ -8867,6 +8867,7 @@ function doAIColorSearch(btn) {
     console.log('AI搜索完成，找到', results.length, '个相似款式');
   });
 }
+
 
 
 
