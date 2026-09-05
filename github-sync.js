@@ -113,8 +113,25 @@
             // 保存文件的SHA，用于后续更新
             remoteFileSha = fileData.sha;
             
-            // 解码base64内容
-            const content = atob(fileData.content);
+            // 处理大文件（超过1MB时，GitHub API返回encoding: "none"，content为空）
+            let content;
+            if (fileData.encoding === 'none' || !fileData.content) {
+                console.log('📦 检测到大文件，使用download_url下载...');
+                const downloadResponse = await fetch(fileData.download_url, {
+                    headers: {
+                        'Authorization': `token ${GITHUB_TOKEN}`
+                    }
+                });
+                if (!downloadResponse.ok) {
+                    throw new Error(`下载大文件失败: ${downloadResponse.status} ${downloadResponse.statusText}`);
+                }
+                content = await downloadResponse.text();
+                console.log('📦 大文件下载完成，大小:', content.length, '字符');
+            } else {
+                // 解码base64内容
+                content = atob(fileData.content);
+            }
+            
             const data = safeParseJSON(content);
             
             return {
