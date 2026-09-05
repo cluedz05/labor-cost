@@ -3239,91 +3239,34 @@ function storageAvailable() {
 
 
 // ===== Tab 切换 =====
-
-// 桌面端 Tab 切换（同时更新手机底部导航）
-
-document.querySelectorAll('.tab-btn').forEach(function(btn){
-
-  btn.addEventListener('click',function(){
-
-    var tab=btn.dataset.tab;
-
-    document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active')});
-
-    btn.classList.add('active');
-
-    document.querySelectorAll('.tab-content').forEach(function(cc){cc.classList.remove('active')});
-
-    document.getElementById('tab-'+tab).classList.add('active');
-
-    document.querySelectorAll('.mnav-btn').forEach(function(b){b.classList.remove('active')});
-
-    var mnav=document.querySelector('.mnav-btn[data-tab="'+tab+'"]');
-
-    if(mnav)mnav.classList.add('active');
-
-    if(tab==='manage')renderManageList();
-
-    if(tab==='history')renderHistory();
-
-    if(tab==='recycle')renderRecycleBin();
-
-    if(tab==='logs')loadLogs();
-
+// 确保DOM加载完成后再绑定事件
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', function() {
+    initTabSwitch();
   });
-
-});
-
-
-
-// 手机底部导航切换
-
-function mobileSwitchTab(tab){
-
-  // viewer 不能切到新款开发/工序管理（已被 init 隐藏）
-
-  if (currentUser && currentUser.role === 'viewer') {
-
-    if (tab === 'dev' || tab === 'manage') {
-
-      var viewerDefaultTab = document.querySelector('.mnav-btn[data-tab="history"]:not([style*="none"])');
-
-      if (viewerDefaultTab) mobileSwitchTab('history');
-
-      return;
-
-    }
-
-  }
-
-  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active')});
-
-  document.querySelectorAll('.tab-content').forEach(function(cc){cc.classList.remove('active')});
-
-  document.querySelectorAll('.mnav-btn').forEach(function(b){b.classList.remove('active')});
-
-  var dt=document.querySelector('.tab-btn[data-tab="'+tab+'"]');
-
-  if(dt)dt.classList.add('active');
-
-  var mn=document.querySelector('.mnav-btn[data-tab="'+tab+'"]');
-
-  if(mn)mn.classList.add('active');
-
-  document.getElementById('tab-'+tab).classList.add('active');
-
-  if(tab==='manage')renderManageList();
-
-  if(tab==='history')renderHistory();
-
-  if(tab==='recycle')renderRecycleBin();
-
-  if(tab==='logs')loadLogs();
-
+} else {
+  initTabSwitch();
 }
 
-
-
+function initTabSwitch() {
+  // 桌面端 Tab 切换（同时更新手机底部导航）
+  document.querySelectorAll('.tab-btn').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var tab=btn.dataset.tab;
+      document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active')});
+      btn.classList.add('active');
+      document.querySelectorAll('.tab-content').forEach(function(cc){cc.classList.remove('active')});
+      document.getElementById('tab-'+tab).classList.add('active');
+      document.querySelectorAll('.mnav-btn').forEach(function(b){b.classList.remove('active')});
+      var mnav=document.querySelector('.mnav-btn[data-tab="'+tab+'"]');
+      if(mnav)mnav.classList.add('active');
+      if(tab==='manage')renderManageList();
+      if(tab==='history')renderHistory();
+      if(tab==='recycle')renderRecycleBin();
+      if(tab==='logs')loadLogs();
+    });
+  });
+}
 // ===== 工序管理 =====
 
 function switchMachine(type) {
@@ -8924,3 +8867,4 @@ function doAIColorSearch(btn) {
     console.log('AI搜索完成，找到', results.length, '个相似款式');
   });
 }
+
