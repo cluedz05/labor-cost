@@ -8,8 +8,8 @@
     'use strict';
 
     // 版本号
-    const CLOUD_SYNC_VERSION = 'v7.1.1';
-    console.log('📦 cloud-sync.js 版本:', CLOUD_SYNC_VERSION, '(GitHub Gist版本 - 优化版)');
+    const CLOUD_SYNC_VERSION = 'v7.1.2';
+    console.log('📦 cloud-sync.js 版本:', CLOUD_SYNC_VERSION, '(GitHub Gist版本 - 修复版)');
 
     // ============================================
     // 配置
@@ -215,8 +215,12 @@
     // ============================================
     
     // 同步到云端（用户修改数据后自动调用）
-    async function syncToCloud() {
-        if (isSyncing) return;
+    // force: 是否强制同步（不检查hash变化）
+    async function syncToCloud(force = false) {
+        if (isSyncing) {
+            console.log('⏳ 正在同步中，跳过本次同步');
+            return;
+        }
         if (!isConfigured()) {
             console.warn('⚠️ 未配置Gist，跳过同步');
             return;
@@ -224,80 +228,91 @@
         
         // 同步间隔限制，最少5秒才能同步一次（GitHub API速率限制）
         const now = Date.now();
-        if (now - lastSyncTime < MIN_SYNC_INTERVAL) {
+        if (!force && now - lastSyncTime < MIN_SYNC_INTERVAL) {
             console.log(`⏳ 同步间隔限制，等待${Math.ceil((MIN_SYNC_INTERVAL - (now - lastSyncTime)) / 1000)}秒后再同步`);
             if (syncTimer) clearTimeout(syncTimer);
             syncTimer = setTimeout(() => {
-                syncToCloud();
+                syncToCloud(force);
             }, MIN_SYNC_INTERVAL - (now - lastSyncTime));
             return;
         }
         
         isSyncing = true;
         lastSyncTime = now;
-        console.log('☁️ 开始同步到GitHub Gist...');
+        console.log('☁️ 开始同步到GitHub Gist...', force ? '(强制同步)' : '(正常同步)');
         
         let successCount = 0;
         const changedData = {};
         
-        for (const key of DATA_KEYS) {
-            const localData = localStorage.getItem(key);
-            if (localData !== null) {
-                // 计算数据hash，只同步变化的数据
-                const dataHash = simpleHash(localData);
-                if (lastSyncHashes[key] === dataHash) {
-                    // 数据没有变化，跳过同步
-                    continue;
-                }
-                
-                // 压缩款式图片
-                let dataToUpload = localData;
-                if (key === 'gf_cost_db') {
-                    dataToUpload = compressImagesInData(localData);
-                }
-                
-                changedData[key] = dataToUpload;
-            }
-        }
-        
-        // 如果有变化的数据，更新Gist
-        if (Object.keys(changedData).length > 0) {
-            // 构建完整的数据对象
-            const allData = {};
+        try {
             for (const key of DATA_KEYS) {
                 const localData = localStorage.getItem(key);
                 if (localData !== null) {
-                    allData[key] = localData;
+                    // 如果不是强制同步，计算数据hash，只同步变化的数据
+                    if (!force) {
+                        const dataHash = simpleHash(localData);
+                        if (lastSyncHashes[key] === dataHash) {
+                            // 数据没有变化，跳过同步
+                            continue;
+                        }
+                    }
+                    
+                    // 压缩款式图片
+                    let dataToUpload = localData;
+                    if (key === 'gf_cost_db') {
+                        dataToUpload = compressImagesInData(localData);
+                    }
+                    
+                    changedData[key] = dataToUpload;
                 }
             }
             
-            // 更新Gist
-            const files = {};
-            files[DATA_FILENAME] = {
-                content: JSON.stringify(allData, null, 2),
-            };
+            console.log(`📊 需要同步的数据项: ${Object.keys(changedData).length}`);
             
-            const result = await updateGist(files);
-            if (result) {
-                successCount = Object.keys(changedData).length;
-                // 更新hash记录
-                for (const key of Object.keys(changedData)) {
-                    lastSyncHashes[key] = simpleHash(localStorage.getItem(key));
+            // 如果有变化的数据，更新Gist
+            if (Object.keys(changedData).length > 0) {
+                // 构建完整的数据对象
+                const allData = {};
+                for (const key of DATA_KEYS) {
+                    const localData = localStorage.getItem(key);
+                    if (localData !== null) {
+                        allData[key] = localData;
+                    }
                 }
-                // 记录Gist更新时间
-                if (result.updated_at) {
-                    localStorage.setItem(LAST_GIST_UPDATE_KEY, result.updated_at);
+                
+                console.log(`📦 数据总大小: ${JSON.stringify(allData).length} 字节`);
+                
+                // 更新Gist
+                const files = {};
+                files[DATA_FILENAME] = {
+                    content: JSON.stringify(allData, null, 2),
+                };
+                
+                const result = await updateGist(files);
+                if (result) {
+                    successCount = Object.keys(changedData).length;
+                    // 更新hash记录
+                    for (const key of Object.keys(changedData)) {
+                        lastSyncHashes[key] = simpleHash(localStorage.getItem(key));
+                    }
+                    // 记录Gist更新时间
+                    if (result.updated_at) {
+                        localStorage.setItem(LAST_GIST_UPDATE_KEY, result.updated_at);
+                    }
+                    console.log(`✅ 同步到GitHub Gist成功: ${successCount} 项变化数据`);
+                } else {
+                    console.error('❌ 同步到GitHub Gist失败: updateGist返回null');
                 }
-                console.log(`✅ 同步到GitHub Gist成功: ${successCount} 项变化数据`);
             } else {
-                console.error('❌ 同步到GitHub Gist失败');
+                console.log('ℹ️ 没有变化的数据，跳过同步');
             }
-        } else {
-            console.log('ℹ️ 没有变化的数据，跳过同步');
+        } catch (error) {
+            console.error('❌ 同步过程中发生错误:', error);
+        } finally {
+            localStorage.setItem(LAST_SYNC_KEY, new Date().toISOString());
+            isSyncing = false;
+            console.log('🔄 同步完成，isSyncing已清除');
         }
-        
-        localStorage.setItem(LAST_SYNC_KEY, new Date().toISOString());
-        isSyncing = false;
         
         if (successCount > 0) {
             showToast(`☁️ 已同步到云端 (${successCount}项)`);
