@@ -1,13 +1,13 @@
 // ============================================
-// 多绮爱服饰 - 云端实时同步模块 v6.0
-// 真正的在线版本：直接从云端读取数据，不依赖本地localStorage
+// 多绮爱服饰 - 云端实时同步模块 v6.1
+// 真正的在线版本：用户修改数据时才同步（新建款/删除款/修改款），不使用定时轮询
 // ============================================
 
 (function() {
     'use strict';
 
     // 版本号
-    const CLOUD_SYNC_VERSION = 'v6.0';
+    const CLOUD_SYNC_VERSION = 'v6.1';
     console.log('📦 cloud-sync.js 版本:', CLOUD_SYNC_VERSION);
 
     // 配置
@@ -87,8 +87,8 @@
             
         } catch(e) {
             console.error('❌ 实时同步启动失败:', e);
-            // 降级为5秒轮询
-            startFallbackPolling();
+            // 不使用轮询，只依赖Realtime实时同步
+            // 用户可以手动点击同步按钮
         }
     }
 
@@ -164,51 +164,9 @@
     }
     
     // ============================================
-    // 降级方案：30秒轮询（确保即使Realtime不工作也能同步）
-    // 优化：只在云端数据更新时才下载，避免覆盖本地数据
+    // 注意：不使用定时轮询，只依赖Realtime实时同步
+    // 用户修改数据时（新建款/删除款/修改款）会自动触发同步
     // ============================================
-    let pollingTimer = null;
-    function startFallbackPolling() {
-        if (pollingTimer) clearInterval(pollingTimer);
-        console.log('🔄 启动30秒轮询降级方案...');
-        pollingTimer = setInterval(() => {
-            if (!isSyncing && supabaseClient && !justSyncedFromCloud && !isApplyingCloudChange) {
-                console.log('🔄 轮询：检查云端最新数据...');
-                // 只检查gf_cost_db的更新时间，不直接下载
-                checkCloudUpdateTime();
-            }
-        }, 30000); // 30秒轮询一次，避免频繁同步
-    }
-    
-    // 检查云端数据更新时间，如果云端更新则下载
-    async function checkCloudUpdateTime() {
-        try {
-            const { data, error } = await supabaseClient
-                .from('app_data')
-                .select('key, updated_at')
-                .in('key', DATA_KEYS);
-                
-            if (error) return;
-            
-            // 比较本地和云端的更新时间
-            const lastSync = localStorage.getItem(LAST_SYNC_KEY);
-            let needSync = false;
-            
-            for (const item of data) {
-                if (item.updated_at && (!lastSync || new Date(item.updated_at) > new Date(lastSync))) {
-                    needSync = true;
-                    break;
-                }
-            }
-            
-            if (needSync) {
-                console.log('🔄 轮询：云端数据已更新，开始同步...');
-                syncFromCloud(true);
-            }
-        } catch(e) {
-            // 忽略错误
-        }
-    }
 
     // ============================================
     // 上传数据到云端
@@ -475,7 +433,7 @@
     // 初始化
     // ============================================
     function init() {
-        console.log('🚀 多绮爱服饰云端实时同步模块 v6.0 启动（真正的在线版本）...');
+        console.log('🚀 多绮爱服饰云端实时同步模块 v6.1 启动（用户修改数据时才同步，不使用定时轮询）...');
         
         // 等待supabase-js加载完成
         const waitForSupabase = setInterval(() => {
