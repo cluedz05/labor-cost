@@ -1,18 +1,18 @@
 // ============================================
-// 多绮爱服饰 - GitHub仓库数据同步模块 v1.0
+// 多绮爱服饰 - GitHub仓库数据同步模块 v2.0
 // 用GitHub API读写仓库中的JSON文件，实现多人共享
+// 真正的多用户实时同步
 // ============================================
 
 (function() {
     'use strict';
 
-    console.log('📦 github-sync.js v1.0 已加载 (GitHub仓库数据同步)');
+    console.log('📦 github-sync.js v2.0 已加载 (多用户实时同步)');
 
     // ============================================
     // 配置
     // ============================================
     
-    // GitHub配置
     const GITHUB_REPO = 'cluedz05/labor-cost';
     const GITHUB_BRANCH = 'main';
     const DATA_FILE_PATH = 'data/labor-cost-data.json';
@@ -26,7 +26,7 @@
     const GITHUB_API = 'https://api.github.com';
     
     // 同步配置
-    const DEBOUNCE_DELAY = 3000; // 本地修改后3秒防抖同步
+    const POLL_INTERVAL = 30000; // 每30秒从远程同步一次
     const MAX_RETRIES = 3; // 最大重试次数
     
     // 数据key列表（需要同步的数据）
@@ -42,51 +42,14 @@
     
     // 同步状态
     let isSyncing = false;
-    let lastRemoteUpdate = null;
-    let lastLocalUpdate = null;
-    let debounceTimer = null;
     let isInitialized = false;
-    let lastRemoteHash = null;
-    let lastLocalHash = null;
-    let remoteFileSha = null; // 远程文件的SHA，用于更新文件
+    let remoteFileSha = null;
+    let pollTimer = null;
+    let isSyncingFromRemote = false; // 标志位：是否正在从远程同步，避免同步循环
     
     // ============================================
     // 工具函数
     // ============================================
-    
-    // 简单哈希函数，用于检测数据变化
-    function simpleHash(str) {
-        let hash = 0;
-        if (str.length === 0) return hash;
-        for (let i = 0; i < str.length; i++) {
-            const char = str.charCodeAt(i);
-            hash = ((hash << 5) - hash) + char;
-            hash = hash & hash;
-        }
-        return hash.toString();
-    }
-    
-    // 计算数据的哈希值
-    function getDataHash(data) {
-        const hashes = {};
-        for (const key of DATA_KEYS) {
-            const value = data[key];
-            if (value !== undefined && value !== null) {
-                hashes[key] = simpleHash(typeof value === 'string' ? value : JSON.stringify(value));
-            }
-        }
-        return simpleHash(JSON.stringify(hashes));
-    }
-    
-    // 安全解析JSON
-    function safeParseJSON(str) {
-        if (typeof str !== 'string') return str;
-        try {
-            return JSON.parse(str);
-        } catch (e) {
-            return str;
-        }
-    }
     
     // 分块编码base64，避免大文件栈溢出
     function base64Encode(bytes) {
@@ -99,6 +62,31 @@
         return btoa(binary);
     }
     
+    // 解码base64内容，支持UTF-8中文字符
+    function decodeBase64(base64) {
+        try {
+            const binaryString = atob(base64);
+            const bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            return new TextDecoder('utf-8').decode(bytes);
+        } catch (error) {
+            console.error('❌ base64解码失败:', error);
+            return atob(base64);
+        }
+    }
+    
+    // 安全解析JSON
+    function safeParseJSON(str) {
+        if (typeof str !== 'string') return str;
+        try {
+            return JSON.parse(str);
+        } catch (e) {
+            return str;
+        }
+    }
+    
     // 修复数据格式（styles从对象转换为数组）
     function fixDataFormat(data) {
         if (!data || typeof data !== 'object') return data;
@@ -106,25 +94,9 @@
         // 修复styles格式
         if (data.styles && !Array.isArray(data.styles) && typeof data.styles === 'object') {
             console.log('🔧 检测到styles格式问题，正在修复...');
-            // 检查是否是{value: [...], Count: N}格式
             if (data.styles.value && Array.isArray(data.styles.value)) {
                 data.styles = data.styles.value;
-                console.log('🔧 styles已从{value: [...]}格式修复为数组，数量:', data.styles.length);
-            } else {
-                // 尝试把对象的值合并成数组
-                let mergedArray = [];
-                for (const key of Object.keys(data.styles)) {
-                    const value = data.styles[key];
-                    if (Array.isArray(value)) {
-                        mergedArray = mergedArray.concat(value);
-                    } else if (typeof value === 'object' && value !== null) {
-                        mergedArray.push(value);
-                    }
-                }
-                if (mergedArray.length > 0) {
-                    data.styles = mergedArray;
-                    console.log('🔧 styles已从对象合并为数组，数量:', mergedArray.length);
-                }
+                console.log('🔧 styles已修复为数组，数量:', data.styles.length);
             }
         }
         
@@ -144,23 +116,6 @@
     // GitHub API
     // ============================================
     
-    // 解码base64内容，支持UTF-8中文字符
-    function decodeBase64(base64) {
-        try {
-            // 使用TextDecoder来正确处理UTF-8编码的中文字符
-            const binaryString = atob(base64);
-            const bytes = new Uint8Array(binaryString.length);
-            for (let i = 0; i < binaryString.length; i++) {
-                bytes[i] = binaryString.charCodeAt(i);
-            }
-            return new TextDecoder('utf-8').decode(bytes);
-        } catch (error) {
-            console.error('❌ base64解码失败:', error);
-            // 降级使用atob
-            return atob(base64);
-        }
-    }
-    
     // 获取远程数据文件
     async function getRemoteData() {
         try {
@@ -178,15 +133,13 @@
             }
             
             const fileData = await response.json();
-            
-            // 保存文件的SHA，用于后续更新
             remoteFileSha = fileData.sha;
             
             // 处理大文件（超过1MB时，GitHub API返回encoding: "none"，content为空）
             let content;
             if (fileData.encoding === 'none' || !fileData.content) {
                 console.log('📦 检测到大文件，使用Git Data API下载...');
-                // 使用GitHub API的Git Data API来获取文件内容，避免CORS问题
+                // 使用Git Data API获取文件内容
                 const blobUrl = `${GITHUB_API}/repos/${GITHUB_REPO}/git/blobs/${fileData.sha}`;
                 const blobResponse = await fetch(blobUrl, {
                     headers: {
@@ -194,25 +147,14 @@
                         'Accept': 'application/vnd.github.v3+json'
                     }
                 });
-                
-                if (!blobResponse.ok) {
-                    throw new Error(`下载大文件失败: ${blobResponse.status} ${blobResponse.statusText}`);
-                }
-                
                 const blobData = await blobResponse.json();
-                console.log('📦 大文件下载完成，编码:', blobData.encoding, '大小:', blobData.size);
-                
-                // 使用TextDecoder解码base64内容，支持UTF-8中文字符
                 content = decodeBase64(blobData.content);
-                console.log('📦 大文件解码完成，大小:', content.length, '字符');
+                console.log('📦 大文件下载完成，大小:', content.length, '字符');
             } else {
-                // 使用TextDecoder解码base64内容，支持UTF-8中文字符
                 content = decodeBase64(fileData.content);
             }
             
             let data = safeParseJSON(content);
-            
-            // 自动修复数据格式
             data = fixDataFormat(data);
             
             return {
@@ -236,14 +178,12 @@
                 await getRemoteData();
             }
             
-            // 修复数据格式
             data = fixDataFormat(data);
             
             const content = JSON.stringify(data, null, 2);
             const bytes = new TextEncoder().encode(content);
             console.log('📦 正在编码数据，大小:', bytes.length, '字节');
             
-            // 使用分块编码base64，避免大文件栈溢出
             const base64Content = base64Encode(bytes);
             console.log('📦 数据编码完成，base64大小:', base64Content.length, '字符');
             
@@ -270,8 +210,6 @@
             }
             
             const result = await response.json();
-            
-            // 更新文件的SHA
             remoteFileSha = result.content.sha;
             
             console.log('✅ 远程数据更新成功，提交SHA:', result.commit.sha);
@@ -287,10 +225,6 @@
         }
     }
     
-    // ============================================
-    // 同步逻辑
-    // ============================================
-    
     // 收集本地数据
     function collectLocalData() {
         const data = {};
@@ -300,49 +234,34 @@
                 data[key] = safeParseJSON(value);
             }
         }
-        // 添加更新时间戳
         data._lastUpdated = new Date().toISOString();
-        
-        // 自动修复数据格式
         return fixDataFormat(data);
     }
     
-    // 从远程同步数据到本地
-    async function syncFromRemote(force = false) {
+    // ============================================
+    // 核心同步函数
+    // ============================================
+    
+    // 从远程同步数据到本地（强制覆盖）
+    async function syncFromRemote() {
         if (isSyncing) {
             console.log('⏳ 正在同步中，跳过本次从远程同步');
             return false;
         }
         
         isSyncing = true;
-        console.log('📥 从远程同步数据...');
+        isSyncingFromRemote = true; // 设置标志位，避免同步循环
+        console.log('📥 从远程同步数据（强制覆盖本地）...');
         
         try {
+            // 1. 获取远程数据
             console.log('📥 步骤1: 获取远程数据...');
             const remoteResult = await getRemoteData();
             const remoteData = remoteResult.data;
             console.log('📥 步骤1完成: 远程数据获取成功，styles数量:', remoteData.styles ? remoteData.styles.length : 0);
             
-            // 检查远程数据是否有更新
-            console.log('📥 步骤2: 计算哈希...');
-            const remoteHash = getDataHash(remoteData);
-            const localData = collectLocalData();
-            const localHash = getDataHash(localData);
-            console.log('📥 步骤2完成: 远程哈希:', remoteHash, '本地哈希:', localHash);
-            
-            lastRemoteHash = remoteHash;
-            lastLocalHash = localHash;
-            
-            if (remoteHash === localHash && !force) {
-                console.log('✅ 远程数据与本地数据一致，无需同步');
-                lastRemoteUpdate = remoteResult.updated_at;
-                lastLocalUpdate = new Date().toISOString();
-                isSyncing = false;
-                return true;
-            }
-            
-            // 保存远程数据到本地
-            console.log('📥 步骤3: 保存远程数据到本地...');
+            // 2. 强制保存远程数据到本地（覆盖本地数据）
+            console.log('📥 步骤2: 强制保存远程数据到本地（覆盖本地）...');
             let updatedCount = 0;
             for (const key of DATA_KEYS) {
                 if (remoteData[key] !== undefined && remoteData[key] !== null) {
@@ -354,32 +273,41 @@
                     console.log('📥 已保存:', key, '大小:', value.length);
                 }
             }
-            console.log('📥 步骤3完成: 保存了', updatedCount, '个数据项');
-            
-            lastRemoteUpdate = remoteResult.updated_at;
-            lastLocalUpdate = new Date().toISOString();
+            console.log('📥 步骤2完成: 保存了', updatedCount, '个数据项');
             
             console.log(`✅ 从远程同步成功，更新了${updatedCount}个数据项`);
             
             // 触发数据更新事件
-            window.dispatchEvent(new CustomEvent('github-data-updated', {
-                detail: { source: 'remote', time: new Date(), updatedCount: updatedCount }
-            }));
+            try {
+                window.dispatchEvent(new CustomEvent('github-data-updated', {
+                    detail: { source: 'remote', time: new Date(), updatedCount: updatedCount }
+                }));
+            } catch (eventError) {
+                console.error('📥 触发数据更新事件失败:', eventError);
+            }
             
             isSyncing = false;
+            isSyncingFromRemote = false;
             return true;
         } catch (error) {
             console.error('❌ 从远程同步失败:', error);
             console.error('❌ 错误堆栈:', error.stack);
             isSyncing = false;
+            isSyncingFromRemote = false;
             return false;
         }
     }
     
     // 同步本地数据到远程
-    async function syncToRemote(force = false) {
+    async function syncToRemote() {
         if (isSyncing) {
             console.log('⏳ 正在同步中，跳过本次同步到远程');
+            return false;
+        }
+        
+        // 如果正在从远程同步，不要同步到远程（避免同步循环）
+        if (isSyncingFromRemote) {
+            console.log('⏳ 正在从远程同步，跳过本次同步到远程（避免同步循环）');
             return false;
         }
         
@@ -389,84 +317,26 @@
         let updateSuccess = false;
         
         try {
-            console.log('📤 步骤1: 获取远程数据...');
-            const remoteResult = await getRemoteData();
-            const remoteData = remoteResult.data;
-            console.log('📤 步骤1完成: 远程数据获取成功，styles数量:', remoteData.styles ? remoteData.styles.length : 0);
-            
-            // 检查本地数据是否有更新
-            console.log('📤 步骤2: 收集本地数据...');
+            // 1. 收集本地数据
+            console.log('📤 步骤1: 收集本地数据...');
             const localData = collectLocalData();
-            console.log('📤 步骤2完成: 本地数据收集成功，styles数量:', localData.styles ? localData.styles.length : 0);
+            console.log('📤 步骤1完成: 本地数据收集成功，styles数量:', localData.styles ? localData.styles.length : 0);
             
-            // 计算哈希
-            const localHash = getDataHash(localData);
-            const remoteHash = getDataHash(remoteData);
-            console.log('📤 本地哈希:', localHash, '远程哈希:', remoteHash);
-            
-            lastRemoteHash = remoteHash;
-            lastLocalHash = localHash;
-            
-            // 检查数据是否一致（不仅比较哈希，还比较styles数量）
-            const localStylesCount = localData.styles ? localData.styles.length : 0;
-            const remoteStylesCount = remoteData.styles ? remoteData.styles.length : 0;
-            const stylesCountMatch = localStylesCount === remoteStylesCount;
-            const hashMatch = localHash === remoteHash;
-            const dataMatch = hashMatch && stylesCountMatch;
-            
-            console.log('📤 数据一致性检查: 哈希一致=', hashMatch, 'styles数量一致=', stylesCountMatch, '数据一致=', dataMatch);
-            
-            if (dataMatch && !force) {
-                console.log('✅ 本地数据与远程数据一致，无需同步');
-                lastRemoteUpdate = remoteResult.updated_at;
-                lastLocalUpdate = new Date().toISOString();
-                isSyncing = false;
-                return true;
-            }
-            
-            if (!dataMatch) {
-                console.log('📤 检测到数据变化: 本地styles数量=', localStylesCount, '远程styles数量=', remoteStylesCount);
-            }
-            
-            // 合并数据（以本地数据为主，但是保留远程新增的key）
-            console.log('📤 步骤3: 合并数据...');
-            const mergedData = { ...remoteData, ...localData };
-            console.log('📤 步骤3完成: 数据合并完成，styles数量:', mergedData.styles ? mergedData.styles.length : 0);
-            
-            // 更新远程数据
-            console.log('📤 步骤4: 更新远程数据...');
-            const updateResult = await updateRemoteData(mergedData);
-            console.log('📤 步骤4完成: 远程数据更新成功，新SHA:', updateResult.sha);
+            // 2. 更新远程数据
+            console.log('📤 步骤2: 更新远程数据...');
+            const updateResult = await updateRemoteData(localData);
+            console.log('📤 步骤2完成: 远程数据更新成功，新SHA:', updateResult.sha);
             updateSuccess = true;
-            
-            // 更新远程哈希（使用合并后的数据重新计算）
-            try {
-                console.log('📤 步骤5: 更新哈希...');
-                const newRemoteHash = getDataHash(mergedData);
-                lastRemoteHash = newRemoteHash;
-                lastLocalHash = newRemoteHash;
-                console.log('📤 步骤5完成: 新哈希:', newRemoteHash);
-            } catch (hashError) {
-                console.error('📤 更新哈希失败（不影响同步结果）:', hashError);
-            }
-            
-            try {
-                lastLocalUpdate = new Date().toISOString();
-                lastRemoteUpdate = new Date().toISOString();
-            } catch (updateError) {
-                console.error('📤 更新时间失败（不影响同步结果）:', updateError);
-            }
             
             console.log('✅ 同步本地数据到远程成功');
             
-            // 触发数据更新事件（放在try-catch中，避免抛出错误）
+            // 触发数据更新事件
             try {
                 window.dispatchEvent(new CustomEvent('github-data-updated', {
                     detail: { source: 'local', time: new Date() }
                 }));
-                console.log('📤 步骤6: 数据更新事件已触发');
             } catch (eventError) {
-                console.error('📤 触发数据更新事件失败（不影响同步结果）:', eventError);
+                console.error('📤 触发数据更新事件失败:', eventError);
             }
             
             isSyncing = false;
@@ -474,9 +344,6 @@
         } catch (error) {
             console.error('❌ 同步本地数据到远程失败:', error);
             console.error('❌ 错误堆栈:', error.stack);
-            console.error('❌ 错误名称:', error.name);
-            console.error('❌ 错误消息:', error.message);
-            console.error('❌ updateSuccess:', updateSuccess);
             isSyncing = false;
             // 如果updateRemoteData已经成功，即使后续出现错误，也返回true
             if (updateSuccess) {
@@ -487,12 +354,29 @@
         }
     }
     
-    // 防抖同步
-    function debounceSyncToRemote() {
-        if (debounceTimer) clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => {
-            syncToRemote();
-        }, DEBOUNCE_DELAY);
+    // ============================================
+    // 定时同步
+    // ============================================
+    
+    // 启动定时同步
+    function startPolling() {
+        if (pollTimer) {
+            clearInterval(pollTimer);
+        }
+        console.log(`⏰ 启动定时同步，每${POLL_INTERVAL/1000}秒从远程同步一次`);
+        pollTimer = setInterval(() => {
+            console.log('⏰ 定时同步触发...');
+            syncFromRemote();
+        }, POLL_INTERVAL);
+    }
+    
+    // 停止定时同步
+    function stopPolling() {
+        if (pollTimer) {
+            clearInterval(pollTimer);
+            pollTimer = null;
+            console.log('⏰ 停止定时同步');
+        }
     }
     
     // ============================================
@@ -507,16 +391,31 @@
                 return;
             }
             
-            console.log('🔄 初始化GitHubSync v1.0...');
+            console.log('🔄 初始化GitHubSync v2.0 (多用户实时同步)...');
             
-            // 启动时从远程同步一次
-            syncFromRemote(true);
-            
-            // 监听本地数据变化（只在用户修改数据时才同步）
-            this.setupLocalStorageListener();
-            
-            isInitialized = true;
-            console.log('✅ GitHubSync初始化完成（已禁用定时轮询，只在修改数据时同步）');
+            // 1. 启动时从远程同步一次（强制覆盖本地）
+            console.log('🔄 步骤1: 启动时从远程同步...');
+            syncFromRemote().then(result => {
+                console.log('🔄 启动时同步完成，结果:', result);
+                
+                // 2. 启动定时同步
+                console.log('🔄 步骤2: 启动定时同步...');
+                startPolling();
+                
+                // 3. 监听本地数据变化
+                console.log('🔄 步骤3: 监听本地数据变化...');
+                this.setupLocalStorageListener();
+                
+                isInitialized = true;
+                console.log('✅ GitHubSync初始化完成（多用户实时同步已启用）');
+            }).catch(error => {
+                console.error('❌ 初始化时同步失败:', error);
+                // 即使同步失败，也要启动定时同步和监听
+                startPolling();
+                this.setupLocalStorageListener();
+                isInitialized = true;
+                console.log('✅ GitHubSync初始化完成（同步失败，但定时同步已启用）');
+            });
         },
         
         // 设置localStorage监听器
@@ -525,11 +424,15 @@
             const originalSetItem = localStorage.setItem.bind(localStorage);
             localStorage.setItem = function(key, value) {
                 originalSetItem(key, value);
+                // 如果正在从远程同步，不要触发同步到远程（避免同步循环）
+                if (isSyncingFromRemote) {
+                    console.log(`📝 检测到本地数据变化: ${key}（正在从远程同步，跳过同步到远程）`);
+                    return;
+                }
                 if (DATA_KEYS.includes(key)) {
                     console.log(`📝 检测到本地数据变化: ${key}`);
-                    // 不使用防抖同步，直接调用syncToRemote函数
                     console.log(`📤 直接调用syncToRemote函数...`);
-                    syncToRemote(true).then(result => {
+                    syncToRemote().then(result => {
                         console.log(`📤 syncToRemote函数执行完成，结果: ${result}`);
                     }).catch(error => {
                         console.error(`📤 syncToRemote函数执行失败: ${error}`);
@@ -541,11 +444,15 @@
             const originalRemoveItem = localStorage.removeItem.bind(localStorage);
             localStorage.removeItem = function(key) {
                 originalRemoveItem(key);
+                // 如果正在从远程同步，不要触发同步到远程（避免同步循环）
+                if (isSyncingFromRemote) {
+                    console.log(`📝 检测到本地数据删除: ${key}（正在从远程同步，跳过同步到远程）`);
+                    return;
+                }
                 if (DATA_KEYS.includes(key)) {
                     console.log(`📝 检测到本地数据删除: ${key}`);
-                    // 不使用防抖同步，直接调用syncToRemote函数
                     console.log(`📤 直接调用syncToRemote函数...`);
-                    syncToRemote(true).then(result => {
+                    syncToRemote().then(result => {
                         console.log(`📤 syncToRemote函数执行完成，结果: ${result}`);
                     }).catch(error => {
                         console.error(`📤 syncToRemote函数执行失败: ${error}`);
@@ -553,25 +460,25 @@
                 }
             };
             
-            console.log('👂 localStorage监听器已设置（直接同步，不使用防抖）');
+            console.log('👂 localStorage监听器已设置（本地数据变化时自动同步到远程）');
         },
         
         // 手动从远程同步
         syncFromRemote: async function() {
-            return await syncFromRemote(true);
+            return await syncFromRemote();
         },
         
         // 手动同步到远程
         syncToRemote: async function() {
-            return await syncToRemote(true);
+            return await syncToRemote();
         },
         
         // 手动同步（双向）
         forceSync: async function() {
             console.log('🔄 手动同步（双向）...');
             // 先从远程同步，再同步到远程
-            await syncFromRemote(true);
-            await syncToRemote(true);
+            await syncFromRemote();
+            await syncToRemote();
             console.log('✅ 手动同步完成');
         },
         
@@ -579,18 +486,21 @@
         getStatus: function() {
             return {
                 isSyncing: isSyncing,
-                lastRemoteUpdate: lastRemoteUpdate,
-                lastLocalUpdate: lastLocalUpdate,
                 isInitialized: isInitialized,
-                lastRemoteHash: lastRemoteHash,
-                lastLocalHash: lastLocalHash,
-                remoteFileSha: remoteFileSha
+                isSyncingFromRemote: isSyncingFromRemote,
+                remoteFileSha: remoteFileSha,
+                pollInterval: POLL_INTERVAL
             };
         },
         
-        // 获取数据key列表
-        getDataKeys: function() {
-            return DATA_KEYS;
+        // 启动定时同步
+        startPolling: function() {
+            startPolling();
+        },
+        
+        // 停止定时同步
+        stopPolling: function() {
+            stopPolling();
         }
     };
     
@@ -599,20 +509,11 @@
     // ============================================
     
     function initGitHubSync() {
-        // 延迟5秒再初始化，避免被app.js的初始化代码覆盖
-        console.log('📦 github-sync.js 将在5秒后初始化...');
+        console.log('📦 github-sync.js 将在3秒后初始化...');
         setTimeout(() => {
             console.log('📦 github-sync.js 开始初始化...');
             window.GitHubSync.init();
-            
-            // 初始化后10秒再次同步，确保数据一致
-            setTimeout(() => {
-                console.log('📦 10秒后再次同步，确保数据一致...');
-                if (window.GitHubSync && window.GitHubSync.syncFromRemote) {
-                    window.GitHubSync.syncFromRemote(true);
-                }
-            }, 10000);
-        }, 5000);
+        }, 3000);
     }
     
     if (document.readyState === 'loading') {
