@@ -462,6 +462,11 @@
             console.error('❌ 错误消息:', error.message);
             console.error('❌ updateSuccess:', updateSuccess);
             isSyncing = false;
+            // 如果updateRemoteData已经成功，即使后续出现错误，也返回true
+            if (updateSuccess) {
+                console.log('⚠️ updateRemoteData已成功，后续错误不影响同步结果，返回true');
+                return true;
+            }
             return false;
         }
     }
