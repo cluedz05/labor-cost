@@ -511,12 +511,29 @@
     // 自动初始化
     // ============================================
     
+    function initGitHubSync() {
+        // 延迟5秒再初始化，避免被app.js的初始化代码覆盖
+        console.log('📦 github-sync.js 将在5秒后初始化...');
+        setTimeout(() => {
+            console.log('📦 github-sync.js 开始初始化...');
+            window.GitHubSync.init();
+            
+            // 初始化后10秒再次同步，确保数据一致
+            setTimeout(() => {
+                console.log('📦 10秒后再次同步，确保数据一致...');
+                if (window.GitHubSync && window.GitHubSync.syncFromRemote) {
+                    window.GitHubSync.syncFromRemote(true);
+                }
+            }, 10000);
+        }, 5000);
+    }
+    
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
-            window.GitHubSync.init();
+            initGitHubSync();
         });
     } else {
-        window.GitHubSync.init();
+        initGitHubSync();
     }
 
 })();
