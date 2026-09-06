@@ -1,13 +1,13 @@
 // ============================================
-// 多绮爱服饰 - GitHub仓库数据同步模块 v2.0
+// 多绮爱服饰 - GitHub仓库数据同步模块 v2.1
 // 用GitHub API读写仓库中的JSON文件，实现多人共享
-// 真正的多用户实时同步
+// 真正的多用户实时同步（简化版，移除复杂的标志位逻辑）
 // ============================================
 
 (function() {
     'use strict';
 
-    console.log('📦 github-sync.js v2.0 已加载 (多用户实时同步)');
+    console.log('📦 github-sync.js v2.1 已加载 (多用户实时同步-简化版)');
 
     // ============================================
     // 配置
@@ -27,7 +27,6 @@
     
     // 同步配置
     const POLL_INTERVAL = 30000; // 每30秒从远程同步一次
-    const MAX_RETRIES = 3; // 最大重试次数
     
     // 数据key列表（需要同步的数据）
     const DATA_KEYS = [
@@ -45,7 +44,10 @@
     let isInitialized = false;
     let remoteFileSha = null;
     let pollTimer = null;
-    let isSyncingFromRemote = false; // 标志位：是否正在从远程同步，避免同步循环
+    
+    // 保存原始的localStorage方法（用于从远程同步时不触发自动同步）
+    const originalSetItem = localStorage.setItem.bind(localStorage);
+    const originalRemoveItem = localStorage.removeItem.bind(localStorage);
     
     // ============================================
     // 工具函数
@@ -229,7 +231,7 @@
     function collectLocalData() {
         const data = {};
         for (const key of DATA_KEYS) {
-            const value = localStorage.getItem(key);
+            const value = originalGetItem(key);
             if (value !== null) {
                 data[key] = safeParseJSON(value);
             }
@@ -238,11 +240,16 @@
         return fixDataFormat(data);
     }
     
+    // 原始的getItem
+    function originalGetItem(key) {
+        return localStorage.getItem(key);
+    }
+    
     // ============================================
     // 核心同步函数
     // ============================================
     
-    // 从远程同步数据到本地（强制覆盖）
+    // 从远程同步数据到本地（强制覆盖，使用原始的setItem，不触发自动同步）
     async function syncFromRemote() {
         if (isSyncing) {
             console.log('⏳ 正在同步中，跳过本次从远程同步');
@@ -250,7 +257,6 @@
         }
         
         isSyncing = true;
-        isSyncingFromRemote = true; // 设置标志位，避免同步循环
         console.log('📥 从远程同步数据（强制覆盖本地）...');
         
         try {
@@ -260,15 +266,15 @@
             const remoteData = remoteResult.data;
             console.log('📥 步骤1完成: 远程数据获取成功，styles数量:', remoteData.styles ? remoteData.styles.length : 0);
             
-            // 2. 强制保存远程数据到本地（覆盖本地数据）
-            console.log('📥 步骤2: 强制保存远程数据到本地（覆盖本地）...');
+            // 2. 强制保存远程数据到本地（使用原始的setItem，不触发自动同步）
+            console.log('📥 步骤2: 强制保存远程数据到本地（使用原始setItem）...');
             let updatedCount = 0;
             for (const key of DATA_KEYS) {
                 if (remoteData[key] !== undefined && remoteData[key] !== null) {
                     const value = typeof remoteData[key] === 'string' 
                         ? remoteData[key] 
                         : JSON.stringify(remoteData[key]);
-                    localStorage.setItem(key, value);
+                    originalSetItem(key, value); // 使用原始的setItem，不触发自动同步
                     updatedCount++;
                     console.log('📥 已保存:', key, '大小:', value.length);
                 }
@@ -287,13 +293,11 @@
             }
             
             isSyncing = false;
-            isSyncingFromRemote = false;
             return true;
         } catch (error) {
             console.error('❌ 从远程同步失败:', error);
             console.error('❌ 错误堆栈:', error.stack);
             isSyncing = false;
-            isSyncingFromRemote = false;
             return false;
         }
     }
@@ -302,12 +306,6 @@
     async function syncToRemote() {
         if (isSyncing) {
             console.log('⏳ 正在同步中，跳过本次同步到远程');
-            return false;
-        }
-        
-        // 如果正在从远程同步，不要同步到远程（避免同步循环）
-        if (isSyncingFromRemote) {
-            console.log('⏳ 正在从远程同步，跳过本次同步到远程（避免同步循环）');
             return false;
         }
         
@@ -391,7 +389,7 @@
                 return;
             }
             
-            console.log('🔄 初始化GitHubSync v2.0 (多用户实时同步)...');
+            console.log('🔄 初始化GitHubSync v2.1 (多用户实时同步-简化版)...');
             
             // 1. 启动时从远程同步一次（强制覆盖本地）
             console.log('🔄 步骤1: 启动时从远程同步...');
@@ -421,14 +419,8 @@
         // 设置localStorage监听器
         setupLocalStorageListener: function() {
             // 重写localStorage.setItem，监听数据变化
-            const originalSetItem = localStorage.setItem.bind(localStorage);
             localStorage.setItem = function(key, value) {
                 originalSetItem(key, value);
-                // 如果正在从远程同步，不要触发同步到远程（避免同步循环）
-                if (isSyncingFromRemote) {
-                    console.log(`📝 检测到本地数据变化: ${key}（正在从远程同步，跳过同步到远程）`);
-                    return;
-                }
                 if (DATA_KEYS.includes(key)) {
                     console.log(`📝 检测到本地数据变化: ${key}`);
                     console.log(`📤 直接调用syncToRemote函数...`);
@@ -441,14 +433,8 @@
             };
             
             // 重写localStorage.removeItem，监听数据删除
-            const originalRemoveItem = localStorage.removeItem.bind(localStorage);
             localStorage.removeItem = function(key) {
                 originalRemoveItem(key);
-                // 如果正在从远程同步，不要触发同步到远程（避免同步循环）
-                if (isSyncingFromRemote) {
-                    console.log(`📝 检测到本地数据删除: ${key}（正在从远程同步，跳过同步到远程）`);
-                    return;
-                }
                 if (DATA_KEYS.includes(key)) {
                     console.log(`📝 检测到本地数据删除: ${key}`);
                     console.log(`📤 直接调用syncToRemote函数...`);
@@ -487,7 +473,6 @@
             return {
                 isSyncing: isSyncing,
                 isInitialized: isInitialized,
-                isSyncingFromRemote: isSyncingFromRemote,
                 remoteFileSha: remoteFileSha,
                 pollInterval: POLL_INTERVAL
             };
