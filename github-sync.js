@@ -386,6 +386,8 @@
         isSyncing = true;
         console.log('📤 同步本地数据到远程...');
         
+        let updateSuccess = false;
+        
         try {
             console.log('📤 步骤1: 获取远程数据...');
             const remoteResult = await getRemoteData();
@@ -419,15 +421,25 @@
             console.log('📤 步骤4: 更新远程数据...');
             const updateResult = await updateRemoteData(mergedData);
             console.log('📤 步骤4完成: 远程数据更新成功，新SHA:', updateResult.sha);
+            updateSuccess = true;
             
             // 更新远程哈希（使用合并后的数据重新计算）
-            const newRemoteHash = getDataHash(mergedData);
-            lastRemoteHash = newRemoteHash;
-            lastLocalHash = newRemoteHash;
-            console.log('📤 步骤5: 更新哈希完成，新哈希:', newRemoteHash);
+            try {
+                console.log('📤 步骤5: 更新哈希...');
+                const newRemoteHash = getDataHash(mergedData);
+                lastRemoteHash = newRemoteHash;
+                lastLocalHash = newRemoteHash;
+                console.log('📤 步骤5完成: 新哈希:', newRemoteHash);
+            } catch (hashError) {
+                console.error('📤 更新哈希失败（不影响同步结果）:', hashError);
+            }
             
-            lastLocalUpdate = new Date().toISOString();
-            lastRemoteUpdate = new Date().toISOString();
+            try {
+                lastLocalUpdate = new Date().toISOString();
+                lastRemoteUpdate = new Date().toISOString();
+            } catch (updateError) {
+                console.error('📤 更新时间失败（不影响同步结果）:', updateError);
+            }
             
             console.log('✅ 同步本地数据到远程成功');
             
@@ -448,6 +460,7 @@
             console.error('❌ 错误堆栈:', error.stack);
             console.error('❌ 错误名称:', error.name);
             console.error('❌ 错误消息:', error.message);
+            console.error('❌ updateSuccess:', updateSuccess);
             isSyncing = false;
             return false;
         }
