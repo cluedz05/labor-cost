@@ -17383,6 +17383,14 @@
       "styleNo": "FINAL-1788619956419",
       "createdAt": "2026-09-05T14:52:36.419Z",
       "updatedAt": "2026-09-05T14:52:36.419Z"
+    },
+    {
+      "id": "sync-test-1788666079016",
+      "name": "同步测试款-中文",
+      "styleNo": "SYNC-1788666079016",
+      "createdAt": "2026-09-06T03:41:19.016Z",
+      "updatedAt": "2026-09-06T03:41:19.016Z",
+      "description": "这是一个用于测试同步功能的款式，包含中文"
     }
   ],
   "style_library": [
@@ -22449,5 +22457,5 @@
     "isAdmin": true,
     "uid": "admin_001"
   },
-  "_lastUpdated": "2026-09-05T14:53:36.244Z"
+  "_lastUpdated": "2026-09-06T03:41:24.431Z"
 }
