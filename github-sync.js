@@ -39,8 +39,9 @@
         'app_current_user'
     ];
     
-    // 同步状态
-    let isSyncing = false;
+    // 同步状态（使用两个独立的标志位，避免互相阻止）
+    let isSyncingFromRemote = false;
+    let isSyncingToRemote = false;
     let isInitialized = false;
     let remoteFileSha = null;
     let pollTimer = null;
@@ -251,12 +252,12 @@
     
     // 从远程同步数据到本地（强制覆盖，使用原始的setItem，不触发自动同步）
     async function syncFromRemote() {
-        if (isSyncing) {
-            console.log('⏳ 正在同步中，跳过本次从远程同步');
+        if (isSyncingFromRemote) {
+            console.log('⏳ 正在从远程同步中，跳过本次从远程同步');
             return false;
         }
         
-        isSyncing = true;
+        isSyncingFromRemote = true;
         console.log('📥 从远程同步数据（强制覆盖本地）...');
         
         try {
@@ -292,24 +293,24 @@
                 console.error('📥 触发数据更新事件失败:', eventError);
             }
             
-            isSyncing = false;
+            isSyncingFromRemote = false;
             return true;
         } catch (error) {
             console.error('❌ 从远程同步失败:', error);
             console.error('❌ 错误堆栈:', error.stack);
-            isSyncing = false;
+            isSyncingFromRemote = false;
             return false;
         }
     }
     
     // 同步本地数据到远程
     async function syncToRemote() {
-        if (isSyncing) {
-            console.log('⏳ 正在同步中，跳过本次同步到远程');
+        if (isSyncingToRemote) {
+            console.log('⏳ 正在同步到远程中，跳过本次同步到远程');
             return false;
         }
         
-        isSyncing = true;
+        isSyncingToRemote = true;
         console.log('📤 同步本地数据到远程...');
         
         let updateSuccess = false;
@@ -337,12 +338,12 @@
                 console.error('📤 触发数据更新事件失败:', eventError);
             }
             
-            isSyncing = false;
+            isSyncingToRemote = false;
             return true;
         } catch (error) {
             console.error('❌ 同步本地数据到远程失败:', error);
             console.error('❌ 错误堆栈:', error.stack);
-            isSyncing = false;
+            isSyncingToRemote = false;
             // 如果updateRemoteData已经成功，即使后续出现错误，也返回true
             if (updateSuccess) {
                 console.log('⚠️ updateRemoteData已成功，后续错误不影响同步结果，返回true');
@@ -471,7 +472,8 @@
         // 获取同步状态
         getStatus: function() {
             return {
-                isSyncing: isSyncing,
+                isSyncingFromRemote: isSyncingFromRemote,
+                isSyncingToRemote: isSyncingToRemote,
                 isInitialized: isInitialized,
                 remoteFileSha: remoteFileSha,
                 pollInterval: POLL_INTERVAL
