@@ -144,6 +144,23 @@
     // GitHub API
     // ============================================
     
+    // 解码base64内容，支持UTF-8中文字符
+    function decodeBase64(base64) {
+        try {
+            // 使用TextDecoder来正确处理UTF-8编码的中文字符
+            const binaryString = atob(base64);
+            const bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            return new TextDecoder('utf-8').decode(bytes);
+        } catch (error) {
+            console.error('❌ base64解码失败:', error);
+            // 降级使用atob
+            return atob(base64);
+        }
+    }
+    
     // 获取远程数据文件
     async function getRemoteData() {
         try {
@@ -168,18 +185,29 @@
             // 处理大文件（超过1MB时，GitHub API返回encoding: "none"，content为空）
             let content;
             if (fileData.encoding === 'none' || !fileData.content) {
-                console.log('📦 检测到大文件，使用raw.githubusercontent.com下载...');
-                // 使用raw.githubusercontent.com的URL来下载文件内容，避免CORS问题
-                const rawUrl = `https://raw.githubusercontent.com/${GITHUB_REPO}/${GITHUB_BRANCH}/${DATA_FILE_PATH}?t=${Date.now()}`;
-                const downloadResponse = await fetch(rawUrl);
-                if (!downloadResponse.ok) {
-                    throw new Error(`下载大文件失败: ${downloadResponse.status} ${downloadResponse.statusText}`);
+                console.log('📦 检测到大文件，使用Git Data API下载...');
+                // 使用GitHub API的Git Data API来获取文件内容，避免CORS问题
+                const blobUrl = `${GITHUB_API}/repos/${GITHUB_REPO}/git/blobs/${fileData.sha}`;
+                const blobResponse = await fetch(blobUrl, {
+                    headers: {
+                        'Authorization': `token ${GITHUB_TOKEN}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                
+                if (!blobResponse.ok) {
+                    throw new Error(`下载大文件失败: ${blobResponse.status} ${blobResponse.statusText}`);
                 }
-                content = await downloadResponse.text();
-                console.log('📦 大文件下载完成，大小:', content.length, '字符');
+                
+                const blobData = await blobResponse.json();
+                console.log('📦 大文件下载完成，编码:', blobData.encoding, '大小:', blobData.size);
+                
+                // 使用TextDecoder解码base64内容，支持UTF-8中文字符
+                content = decodeBase64(blobData.content);
+                console.log('📦 大文件解码完成，大小:', content.length, '字符');
             } else {
-                // 解码base64内容
-                content = atob(fileData.content);
+                // 使用TextDecoder解码base64内容，支持UTF-8中文字符
+                content = decodeBase64(fileData.content);
             }
             
             let data = safeParseJSON(content);
