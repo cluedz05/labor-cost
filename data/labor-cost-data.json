@@ -17412,6 +17412,13 @@
       "styleNo": "DEBUG-1788667360702",
       "createdAt": "2026-09-06T04:02:40.702Z",
       "updatedAt": "2026-09-06T04:02:40.702Z"
+    },
+    {
+      "id": "direct-test-1788667609473",
+      "name": "直接同步测试款-1788667609",
+      "styleNo": "DIRECT-1788667609473",
+      "createdAt": "2026-09-06T04:06:49.473Z",
+      "updatedAt": "2026-09-06T04:06:49.473Z"
     }
   ],
   "style_library": [
@@ -22478,5 +22485,5 @@
     "isAdmin": true,
     "uid": "admin_001"
   },
-  "_lastUpdated": "2026-09-06T04:02:43.815Z"
+  "_lastUpdated": "2026-09-06T04:06:52.575Z"
 }
