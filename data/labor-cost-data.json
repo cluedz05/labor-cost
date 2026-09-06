@@ -17461,6 +17461,13 @@
       "styleNo": "DEBUGAUTO-1788682368377",
       "createdAt": "2026-09-06T08:12:48.377Z",
       "updatedAt": "2026-09-06T08:12:48.377Z"
+    },
+    {
+      "id": "multi-browser-1788686010016",
+      "name": "多浏览器同步测试-1788686010",
+      "styleNo": "MULTI-1788686010016",
+      "createdAt": "2026-09-06T09:13:30.016Z",
+      "updatedAt": "2026-09-06T09:13:30.016Z"
     }
   ],
   "style_library": [
@@ -22527,5 +22534,5 @@
     "isAdmin": true,
     "uid": "admin_001"
   },
-  "_lastUpdated": "2026-09-06T08:12:48.407Z"
+  "_lastUpdated": "2026-09-06T09:13:30.021Z"
 }
