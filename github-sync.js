@@ -395,21 +395,37 @@
             console.log('📤 步骤1完成: 远程数据获取成功，styles数量:', remoteData.styles ? remoteData.styles.length : 0);
             
             // 检查本地数据是否有更新
-            console.log('📤 步骤2: 计算哈希...');
+            console.log('📤 步骤2: 收集本地数据...');
             const localData = collectLocalData();
+            console.log('📤 步骤2完成: 本地数据收集成功，styles数量:', localData.styles ? localData.styles.length : 0);
+            
+            // 计算哈希
             const localHash = getDataHash(localData);
             const remoteHash = getDataHash(remoteData);
-            console.log('📤 步骤2完成: 本地哈希:', localHash, '远程哈希:', remoteHash);
+            console.log('📤 本地哈希:', localHash, '远程哈希:', remoteHash);
             
             lastRemoteHash = remoteHash;
             lastLocalHash = localHash;
             
-            if (localHash === remoteHash && !force) {
+            // 检查数据是否一致（不仅比较哈希，还比较styles数量）
+            const localStylesCount = localData.styles ? localData.styles.length : 0;
+            const remoteStylesCount = remoteData.styles ? remoteData.styles.length : 0;
+            const stylesCountMatch = localStylesCount === remoteStylesCount;
+            const hashMatch = localHash === remoteHash;
+            const dataMatch = hashMatch && stylesCountMatch;
+            
+            console.log('📤 数据一致性检查: 哈希一致=', hashMatch, 'styles数量一致=', stylesCountMatch, '数据一致=', dataMatch);
+            
+            if (dataMatch && !force) {
                 console.log('✅ 本地数据与远程数据一致，无需同步');
                 lastRemoteUpdate = remoteResult.updated_at;
                 lastLocalUpdate = new Date().toISOString();
                 isSyncing = false;
                 return true;
+            }
+            
+            if (!dataMatch) {
+                console.log('📤 检测到数据变化: 本地styles数量=', localStylesCount, '远程styles数量=', remoteStylesCount);
             }
             
             // 合并数据（以本地数据为主，但是保留远程新增的key）
