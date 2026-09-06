@@ -14,7 +14,15 @@
     }
   ],
   "gf_cost_export_logs": [],
-  "styles": [],
+  "styles": [
+    {
+      "id": "clean-test-1788686699842",
+      "name": "干净版本测试-1788686699",
+      "styleNo": "CLEAN-1788686699842",
+      "createdAt": "2026-09-06T09:24:59.842Z",
+      "updatedAt": "2026-09-06T09:24:59.842Z"
+    }
+  ],
   "style_library": [],
   "app_current_user": {
     "username": "admin",
@@ -24,5 +32,5 @@
     "createdAt": 1788686682936,
     "uid": "admin_001"
   },
-  "_lastUpdated": "2026-09-06T09:24:55.593Z"
+  "_lastUpdated": "2026-09-06T09:24:59.842Z"
 }
