@@ -527,7 +527,13 @@
                 originalSetItem(key, value);
                 if (DATA_KEYS.includes(key)) {
                     console.log(`📝 检测到本地数据变化: ${key}`);
-                    debounceSyncToRemote();
+                    // 不使用防抖同步，直接调用syncToRemote函数
+                    console.log(`📤 直接调用syncToRemote函数...`);
+                    syncToRemote(true).then(result => {
+                        console.log(`📤 syncToRemote函数执行完成，结果: ${result}`);
+                    }).catch(error => {
+                        console.error(`📤 syncToRemote函数执行失败: ${error}`);
+                    });
                 }
             };
             
@@ -537,11 +543,17 @@
                 originalRemoveItem(key);
                 if (DATA_KEYS.includes(key)) {
                     console.log(`📝 检测到本地数据删除: ${key}`);
-                    debounceSyncToRemote();
+                    // 不使用防抖同步，直接调用syncToRemote函数
+                    console.log(`📤 直接调用syncToRemote函数...`);
+                    syncToRemote(true).then(result => {
+                        console.log(`📤 syncToRemote函数执行完成，结果: ${result}`);
+                    }).catch(error => {
+                        console.error(`📤 syncToRemote函数执行失败: ${error}`);
+                    });
                 }
             };
             
-            console.log('👂 localStorage监听器已设置（只在修改数据时同步）');
+            console.log('👂 localStorage监听器已设置（直接同步，不使用防抖）');
         },
         
         // 手动从远程同步
