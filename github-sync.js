@@ -417,24 +417,37 @@
             
             // 更新远程数据
             console.log('📤 步骤4: 更新远程数据...');
-            await updateRemoteData(mergedData);
-            console.log('📤 步骤4完成: 远程数据更新成功');
+            const updateResult = await updateRemoteData(mergedData);
+            console.log('📤 步骤4完成: 远程数据更新成功，新SHA:', updateResult.sha);
+            
+            // 更新远程哈希（使用合并后的数据重新计算）
+            const newRemoteHash = getDataHash(mergedData);
+            lastRemoteHash = newRemoteHash;
+            lastLocalHash = newRemoteHash;
+            console.log('📤 步骤5: 更新哈希完成，新哈希:', newRemoteHash);
             
             lastLocalUpdate = new Date().toISOString();
             lastRemoteUpdate = new Date().toISOString();
             
             console.log('✅ 同步本地数据到远程成功');
             
-            // 触发数据更新事件
-            window.dispatchEvent(new CustomEvent('github-data-updated', {
-                detail: { source: 'local', time: new Date() }
-            }));
+            // 触发数据更新事件（放在try-catch中，避免抛出错误）
+            try {
+                window.dispatchEvent(new CustomEvent('github-data-updated', {
+                    detail: { source: 'local', time: new Date() }
+                }));
+                console.log('📤 步骤6: 数据更新事件已触发');
+            } catch (eventError) {
+                console.error('📤 触发数据更新事件失败（不影响同步结果）:', eventError);
+            }
             
             isSyncing = false;
             return true;
         } catch (error) {
             console.error('❌ 同步本地数据到远程失败:', error);
             console.error('❌ 错误堆栈:', error.stack);
+            console.error('❌ 错误名称:', error.name);
+            console.error('❌ 错误消息:', error.message);
             isSyncing = false;
             return false;
         }
