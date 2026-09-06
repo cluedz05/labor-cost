@@ -17398,6 +17398,13 @@
       "styleNo": "FINAL-1788666299025",
       "createdAt": "2026-09-06T03:44:59.025Z",
       "updatedAt": "2026-09-06T03:44:59.025Z"
+    },
+    {
+      "id": "mobile-test-1788667133321",
+      "name": "手机版测试款-1788667133",
+      "styleNo": "MOBILE-1788667133321",
+      "createdAt": "2026-09-06T03:58:53.321Z",
+      "updatedAt": "2026-09-06T03:58:53.321Z"
     }
   ],
   "style_library": [
@@ -22464,5 +22471,5 @@
     "isAdmin": true,
     "uid": "admin_001"
   },
-  "_lastUpdated": "2026-09-06T03:45:55.198Z"
+  "_lastUpdated": "2026-09-06T03:58:56.374Z"
 }
